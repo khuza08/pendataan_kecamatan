@@ -1,36 +1,13 @@
 package pendataankecamatan.view;
 
 import com.formdev.flatlaf.FlatLightLaf;
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.RoundRectangle2D;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.SwingConstants;
-import java.awt.FlowLayout;
+import java.awt.*; // Mengimpor semua kelas dari java.awt
+import java.awt.event.*; // Mengimpor semua kelas dari java.awt.event
+import java.awt.geom.RoundRectangle2D; // Tapi RoundRectangle2D tetap spesifik karena bukan di java.awt utama
+import javax.swing.*; // Mengimpor semua kelas dari javax.swing
+import javax.swing.SwingUtilities; // SwingUtilities bisa diakses karena di javax.swing
+import javax.swing.UIManager; // UIManager bisa diakses karena di javax.swing
+import javax.swing.SwingConstants; // SwingConstants bisa diakses karena di javax.swing
 
 /**
  * Tampilan login untuk aplikasi Pendataan Kecamatan.
@@ -354,12 +331,9 @@ public class LoginView extends JFrame {
     // Metode untuk menerapkan shape ke window
     private void applyWindowShape() {
         if (getGraphicsConfiguration().getDevice().isFullScreenSupported()) {
-            // Jika fullscreen support, kita bisa gunakan shape
             java.awt.Shape shape = new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 20, 20);
             setShape(shape);
         } else {
-            // Jika tidak, kita tetap gunakan custom painting
-            // Ini adalah fallback jika setShape gagal
             repaint();
         }
     }
