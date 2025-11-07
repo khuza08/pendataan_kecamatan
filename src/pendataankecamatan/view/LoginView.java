@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.RoundRectangle2D;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -47,29 +48,28 @@ public class LoginView extends JFrame {
 
     public LoginView() {
         try {
-            // Set FlatLaf Look and Feel
             UIManager.setLookAndFeel(new FlatLightLaf());
-            // Konfigurasi komponen rounded
-            UIManager.put("Button.arc", 15); // Contoh: membuat button lebih rounded
+            UIManager.put("Button.arc", 15);
             UIManager.put("Component.arc", 15);
-            UIManager.put("TextComponent.arc", 15); // Membuat JTextField/JPasswordField rounded
+            UIManager.put("TextComponent.arc", 15);
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("Gagal set FlatLaf Look and Feel");
         }
 
-        setUndecorated(true); // Hapus border default window
+        setUndecorated(true);
         setSize(800, 450);
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Set background JFrame menjadi transparan untuk window tanpa dekorasi
-        setBackground(new Color(0, 0, 0, 0));
+        setBackground(new Color(0, 0, 0, 0)); // Transparan
 
         initializeComponents();
         setupLayout();
         setupEventHandlers();
+
+        // Terapkan shape setelah semua komponen diatur
+        applyWindowShape();
     }
 
     private void initializeComponents() {
@@ -78,11 +78,9 @@ public class LoginView extends JFrame {
         buttonLogin = new JButton("Login");
         buttonBatal = new JButton("Batal");
 
-        // Styling tombol login dan batal (warna teks bisa diatur via UIManager atau langsung)
         buttonLogin.setFont(new Font("Arial", Font.BOLD, 14));
         buttonLogin.setForeground(Color.WHITE);
-        // FlatLaf akan menangani background rounded sesuai UIManager.put("Button.arc", ...)
-        buttonLogin.setContentAreaFilled(true); // Biarkan FlatLaf mengelola fill jika tidak di-override
+        buttonLogin.setContentAreaFilled(true);
         buttonLogin.setBorderPainted(false);
         buttonLogin.setFocusPainted(false);
 
@@ -94,29 +92,24 @@ public class LoginView extends JFrame {
     }
 
     private void setupLayout() {
-        // Gunakan panel rounded sebagai komponen utama
         RoundedPanel mainPanel = new RoundedPanel(20);
-        // FlatLaf tidak mengelola background window utama, jadi kita tetap perlu ini transparan
         mainPanel.setBackground(new Color(0, 0, 0, 0));
         mainPanel.setLayout(new BorderLayout());
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // Padding
 
-        // Panel Title Bar macOS
         JPanel titleBar = createMacOSTitleBar();
         mainPanel.add(titleBar, BorderLayout.NORTH);
 
-        // Panel utama 2 kolom (kiri dan kanan)
         JPanel contentMain = new JPanel(new BorderLayout());
         contentMain.setOpaque(false);
         contentMain.setBackground(new Color(0, 0, 0, 0));
 
-        // Panel kiri (Logo / Informasi) - Gunakan FlatLaf untuk warna, bukan custom paint untuk background utama
         JPanel panelKiri = createLeftPanel();
-        panelKiri.setOpaque(false); // Biarkan background transparan untuk custom paint
+        panelKiri.setOpaque(false);
         contentMain.add(panelKiri, BorderLayout.WEST);
 
-        // Panel kanan (Form Login) - Gunakan FlatLaf untuk warna, bukan custom paint untuk background utama
         JPanel panelKanan = createRightPanel();
-        panelKanan.setOpaque(false); // Biarkan background transparan untuk custom paint
+        panelKanan.setOpaque(false);
         contentMain.add(panelKanan, BorderLayout.CENTER);
 
         mainPanel.add(contentMain, BorderLayout.CENTER);
@@ -200,29 +193,23 @@ public class LoginView extends JFrame {
     }
 
     private JPanel createLeftPanel() {
-        // Panel kiri digambar secara custom untuk warna latar belakang abu-abu
         JPanel panel = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(new Color(240, 240, 240)); // Warna latar belakang abu-abu
-                // Gambar area kiri dengan rounded corner
+                g2d.setColor(new Color(240, 240, 240));
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-                // Gambar sedikit overlap ke kanan untuk efek seamless
                 g2d.fillRect(0, 0, 10, getHeight());
                 g2d.dispose();
-                // Panggil super agar komponen anak (logo, tagline) tetap digambar dengan FlatLaf styling
                 super.paintComponent(g);
             }
         };
-        // Karena digambar sendiri, set opaqueness ke false agar tidak menggambar background default
         panel.setOpaque(false);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JLabel labelLogo = new JLabel("KECAMATAN", SwingConstants.CENTER);
-        // FlatLaf akan mengatur font dan warna sesuai tema
-        labelLogo.setFont(new Font("Segoe UI", Font.BOLD, 28)); // Gunakan font yang umum
+        labelLogo.setFont(new Font("Segoe UI", Font.BOLD, 28));
         labelLogo.setForeground(new Color(70, 130, 180));
         panel.add(labelLogo, BorderLayout.NORTH);
 
@@ -235,23 +222,18 @@ public class LoginView extends JFrame {
     }
 
     private JPanel createRightPanel() {
-        // Panel kanan digambar secara custom untuk warna latar belakang putih
         JPanel panel = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(Color.WHITE); // Warna latar belakang putih
-                // Gambar area kanan dengan rounded corner
+                g2d.setColor(Color.WHITE);
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-                // Gambar sedikit overlap ke kiri untuk efek seamless
                 g2d.fillRect(getWidth() - 10, 0, 10, getHeight());
                 g2d.dispose();
-                // Panggil super agar komponen anak (label, field, button) tetap digambar dengan FlatLaf styling
                 super.paintComponent(g);
             }
         };
-        // Karena digambar sendiri, set opaqueness ke false
         panel.setOpaque(false);
         panel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
 
@@ -261,7 +243,6 @@ public class LoginView extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel labelJudul = new JLabel("Masuk ke Akun Anda");
-        // FlatLaf akan mengatur font dan warna sesuai tema
         labelJudul.setFont(new Font("Segoe UI", Font.BOLD, 24));
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -338,11 +319,8 @@ public class LoginView extends JFrame {
             return;
         }
 
-        // TODO: Ganti dengan panggilan ke AuthController
         if ("admin".equals(username) && "password".equals(password)) {
             JOptionPane.showMessageDialog(this, "Login Berhasil!", "Info", JOptionPane.INFORMATION_MESSAGE);
-            // new HomeView().setVisible(true);
-            // this.dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Username atau Password salah!", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -354,7 +332,7 @@ public class LoginView extends JFrame {
 
         public RoundedPanel(int radius) {
             this.radius = radius;
-            setOpaque(false); // Panel digambar sendiri
+            setOpaque(false);
         }
 
         @Override
@@ -362,16 +340,27 @@ public class LoginView extends JFrame {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            // Gambar area utama dengan rounded corner (warna putih untuk window)
             g2.setColor(Color.WHITE);
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
 
-            // Gambar border tipis (opsional)
             g2.setColor(new Color(200, 200, 200));
             g2.setStroke(new BasicStroke(1.0f));
             g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
 
             g2.dispose();
+        }
+    }
+
+    // Metode untuk menerapkan shape ke window
+    private void applyWindowShape() {
+        if (getGraphicsConfiguration().getDevice().isFullScreenSupported()) {
+            // Jika fullscreen support, kita bisa gunakan shape
+            java.awt.Shape shape = new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 20, 20);
+            setShape(shape);
+        } else {
+            // Jika tidak, kita tetap gunakan custom painting
+            // Ini adalah fallback jika setShape gagal
+            repaint();
         }
     }
 
