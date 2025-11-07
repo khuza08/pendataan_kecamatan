@@ -58,7 +58,6 @@ public class LoginView extends JFrame {
         getLayeredPane().setOpaque(false);
         getRootPane().setOpaque(false);
 
-        // Jangan gunakan transparansi window — gunakan panel rounded sebagai gantinya
         setBackground(new Color(0, 0, 0, 0));
         
         initializeComponents();
@@ -113,7 +112,7 @@ public class LoginView extends JFrame {
         JPanel titleBar = new JPanel(new BorderLayout());
         titleBar.setOpaque(false);
         titleBar.setPreferredSize(new Dimension(0, 40));
-        titleBar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        titleBar.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
 
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         controlPanel.setOpaque(false);
