@@ -1,27 +1,44 @@
 package pendataankecamatan.view;
 
 import com.formdev.flatlaf.FlatLightLaf;
-import java.awt.*; // Mengimpor semua kelas dari java.awt
-import java.awt.event.*; // Mengimpor semua kelas dari java.awt.event
-import java.awt.geom.RoundRectangle2D; // Tapi RoundRectangle2D tetap spesifik karena bukan di java.awt utama
-import javax.swing.*; // Mengimpor semua kelas dari javax.swing
-import javax.swing.SwingUtilities; // SwingUtilities bisa diakses karena di javax.swing
-import javax.swing.UIManager; // UIManager bisa diakses karena di javax.swing
-import javax.swing.SwingConstants; // SwingConstants bisa diakses karena di javax.swing
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.SwingConstants;
+import java.awt.FlowLayout;
 
-/**
- * Tampilan login untuk aplikasi Pendataan Kecamatan.
- * Menggunakan layout 2 kolom: kiri (logo/info), kanan (form login).
- * Menambahkan rounded corner dan tombol kontrol macOS.
- * Menggunakan FlatLaf Look and Feel untuk tampilan modern.
- */
 public class LoginView extends JFrame {
 
     private JTextField fieldUsername;
     private JPasswordField fieldPassword;
     private JButton buttonLogin;
     private JButton buttonBatal;
-    private Point initialClick; // Untuk fitur draggable window
+    private Point initialClick;
+    private static final int CORNER_RADIUS = 20;
 
     public LoginView() {
         try {
@@ -38,15 +55,15 @@ public class LoginView extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        getLayeredPane().setOpaque(false);
+        getRootPane().setOpaque(false);
 
-        setBackground(new Color(0, 0, 0, 0)); // Transparan
-
+        // Jangan gunakan transparansi window — gunakan panel rounded sebagai gantinya
+        setBackground(new Color(0, 0, 0, 0));
+        
         initializeComponents();
         setupLayout();
         setupEventHandlers();
-
-        // Terapkan shape setelah semua komponen diatur
-        applyWindowShape();
     }
 
     private void initializeComponents() {
@@ -57,53 +74,49 @@ public class LoginView extends JFrame {
 
         buttonLogin.setFont(new Font("Arial", Font.BOLD, 14));
         buttonLogin.setForeground(Color.WHITE);
+        buttonLogin.setBackground(new Color(70, 130, 180));
         buttonLogin.setContentAreaFilled(true);
         buttonLogin.setBorderPainted(false);
         buttonLogin.setFocusPainted(false);
 
         buttonBatal.setFont(new Font("Arial", Font.BOLD, 14));
         buttonBatal.setForeground(Color.WHITE);
+        buttonBatal.setBackground(new Color(180, 180, 180));
         buttonBatal.setContentAreaFilled(true);
         buttonBatal.setBorderPainted(false);
         buttonBatal.setFocusPainted(false);
     }
 
     private void setupLayout() {
-        RoundedPanel mainPanel = new RoundedPanel(20);
-        mainPanel.setBackground(new Color(0, 0, 0, 0));
+        RoundedPanel mainPanel = new RoundedPanel(CORNER_RADIUS);
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); // Padding
+        mainPanel.setBorder(BorderFactory.createEmptyBorder());
 
         JPanel titleBar = createMacOSTitleBar();
         mainPanel.add(titleBar, BorderLayout.NORTH);
 
         JPanel contentMain = new JPanel(new BorderLayout());
         contentMain.setOpaque(false);
-        contentMain.setBackground(new Color(0, 0, 0, 0));
 
         JPanel panelKiri = createLeftPanel();
-        panelKiri.setOpaque(false);
         contentMain.add(panelKiri, BorderLayout.WEST);
 
         JPanel panelKanan = createRightPanel();
-        panelKanan.setOpaque(false);
         contentMain.add(panelKanan, BorderLayout.CENTER);
 
         mainPanel.add(contentMain, BorderLayout.CENTER);
 
-        add(mainPanel);
+        setContentPane(mainPanel);
     }
 
     private JPanel createMacOSTitleBar() {
         JPanel titleBar = new JPanel(new BorderLayout());
         titleBar.setOpaque(false);
-        titleBar.setBackground(new Color(0, 0, 0, 0));
-        titleBar.setPreferredSize(new Dimension(0, 30));
-        titleBar.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        titleBar.setPreferredSize(new Dimension(0, 40));
+        titleBar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         controlPanel.setOpaque(false);
-        controlPanel.setBackground(new Color(0, 0, 0, 0));
 
         JButton redDot = createMacOSDotButton(new Color(0xFF5F57), "Close");
         JButton yellowDot = createMacOSDotButton(new Color(0xFFBD2E), "Minimize");
@@ -148,6 +161,7 @@ public class LoginView extends JFrame {
                     g2d.fillOval(0, 0, getWidth(), getHeight());
                 }
                 g2d.dispose();
+                // Jangan panggil super.paintComponent — biar transparan
             }
         };
 
@@ -176,23 +190,25 @@ public class LoginView extends JFrame {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setColor(new Color(240, 240, 240));
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-                g2d.fillRect(0, 0, 10, getHeight());
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
+                // Tutup sisi kanan agar tidak transparan di ujung kiri window
+                g2d.fillRect(getWidth() - CORNER_RADIUS, 0, CORNER_RADIUS, getHeight());
                 g2d.dispose();
-                super.paintComponent(g);
             }
         };
         panel.setOpaque(false);
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setPreferredSize(new Dimension(300, 0));
+        panel.setBorder(BorderFactory.createEmptyBorder(60, 30, 30, 30));
 
         JLabel labelLogo = new JLabel("KECAMATAN", SwingConstants.CENTER);
-        labelLogo.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        labelLogo.setFont(new Font("Segoe UI", Font.BOLD, 32));
         labelLogo.setForeground(new Color(70, 130, 180));
         panel.add(labelLogo, BorderLayout.NORTH);
 
         JLabel labelTagline = new JLabel("<html><center>Aplikasi Pendataan<br>dan Layanan Masyarakat</center></html>");
-        labelTagline.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        labelTagline.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         labelTagline.setForeground(Color.GRAY);
+        labelTagline.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(labelTagline, BorderLayout.CENTER);
 
         return panel;
@@ -205,10 +221,10 @@ public class LoginView extends JFrame {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2d.setColor(Color.WHITE);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-                g2d.fillRect(getWidth() - 10, 0, 10, getHeight());
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
+                // Tutup sisi kiri agar tidak transparan di ujung kanan window
+                g2d.fillRect(0, 0, CORNER_RADIUS, getHeight());
                 g2d.dispose();
-                super.paintComponent(g);
             }
         };
         panel.setOpaque(false);
@@ -252,10 +268,10 @@ public class LoginView extends JFrame {
         gbc.weightx = 0.0;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(20, 8, 8, 8);
 
         JPanel panelButton = new JPanel();
         panelButton.setOpaque(false);
-        panelButton.setBackground(new Color(0, 0, 0, 0));
         panelButton.add(buttonLogin);
         panelButton.add(buttonBatal);
         panel.add(panelButton, gbc);
@@ -264,25 +280,16 @@ public class LoginView extends JFrame {
     }
 
     private void setupEventHandlers() {
-        buttonLogin.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handleLogin();
-            }
-        });
-
-        buttonBatal.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int option = JOptionPane.showConfirmDialog(
-                    LoginView.this,
-                    "Apakah Anda yakin ingin keluar?",
-                    "Konfirmasi",
-                    JOptionPane.YES_NO_OPTION
-                );
-                if (option == JOptionPane.YES_OPTION) {
-                    System.exit(0);
-                }
+        buttonLogin.addActionListener(e -> handleLogin());
+        buttonBatal.addActionListener(e -> {
+            int option = JOptionPane.showConfirmDialog(
+                LoginView.this,
+                "Apakah Anda yakin ingin keluar?",
+                "Konfirmasi",
+                JOptionPane.YES_NO_OPTION
+            );
+            if (option == JOptionPane.YES_OPTION) {
+                System.exit(0);
             }
         });
     }
@@ -303,9 +310,9 @@ public class LoginView extends JFrame {
         }
     }
 
-    // Inner class untuk panel dengan rounded corner (untuk window utama)
+    // RoundedPanel sebagai content utama — digambar penuh, tidak pakai setShape()
     private class RoundedPanel extends JPanel {
-        private int radius;
+        private final int radius;
 
         public RoundedPanel(int radius) {
             this.radius = radius;
@@ -314,28 +321,25 @@ public class LoginView extends JFrame {
 
         @Override
         protected void paintComponent(Graphics g) {
+            if (getWidth() <= 0 || getHeight() <= 0) return;
+
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
 
+            // Gambar background putih untuk panel utama
             g2.setColor(Color.WHITE);
             g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
 
+            // Gambar border
             g2.setColor(new Color(200, 200, 200));
             g2.setStroke(new BasicStroke(1.0f));
             g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
 
             g2.dispose();
         }
-    }
-
-    // Metode untuk menerapkan shape ke window
-    private void applyWindowShape() {
-        if (getGraphicsConfiguration().getDevice().isFullScreenSupported()) {
-            java.awt.Shape shape = new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 20, 20);
-            setShape(shape);
-        } else {
-            repaint();
-        }
+        
     }
 
     public static void main(String[] args) {
