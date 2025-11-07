@@ -175,8 +175,11 @@ public class HomeView extends JFrame {
             JButton btnInfo = createStyledButton("Lihat Informasi Umum");
             JButton btnLogin = createStyledButton("Login");
 
-            btnInfo.addActionListener(e -> new PublicInfoView().setVisible(true));
-            btnLogin.addActionListener(e -> {
+                btnInfo.addActionListener(e -> {
+                    new PublicInfoView().setVisible(true);
+                    this.dispose();
+                });            
+                btnLogin.addActionListener(e -> {
                 new LoginView().setVisible(true);
                 this.dispose();
             });

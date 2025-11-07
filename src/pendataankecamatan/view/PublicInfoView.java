@@ -61,7 +61,7 @@ public class PublicInfoView extends JFrame {
         JPanel titleBar = createTitleBar();
         mainPanel.add(titleBar, BorderLayout.NORTH);
 
-        // 🔹 Add content
+        // 🔹 Add content (tabs)
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 13));
         tabbedPane.putClientProperty("JTabbedPane.tabType", "card"); // Modern FlatLAF style
@@ -73,7 +73,26 @@ public class PublicInfoView extends JFrame {
 
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
+        // 🔹 Add back button panel at the bottom
+        JPanel bottomPanel = createBackButtonPanel();
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
         add(mainPanel);
+    }
+
+    private JPanel createBackButtonPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // atas, kiri, bawah, kanan
+
+        JButton backButton = new JButton("Kembali ke Home");
+        backButton.addActionListener(e -> {
+            new HomeView().setVisible(true);
+            dispose(); // Tutup PublicInfoView
+        });
+
+        panel.add(backButton);
+        return panel;
     }
 
     private JPanel createTitleBar() {
