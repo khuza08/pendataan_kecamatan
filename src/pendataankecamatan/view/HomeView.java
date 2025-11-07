@@ -35,7 +35,7 @@ public class HomeView extends JFrame {
         setBackground(new Color(0, 0, 0, 0));
 
         initializeUI();
-        refreshButtons(); // Tampilkan tombol sesuai status login
+        refreshButtons(); 
     }
 
     private void initializeUI() {
@@ -60,7 +60,7 @@ public class HomeView extends JFrame {
         JPanel content = new JPanel(new BorderLayout());
         content.setOpaque(false);
 
-        JLabel titleLabel = new JLabel("Dashboard Utama", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Menu Utama", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
         titleLabel.setForeground(new Color(70, 130, 180));
         content.add(titleLabel, BorderLayout.NORTH);
@@ -87,7 +87,6 @@ public class HomeView extends JFrame {
                 g2d.fillOval(0, 0, getWidth(), getHeight());
             }
             g2d.dispose();
-            // Jangan panggil super.paintComponent — biar transparan
         }
     };
 
@@ -198,7 +197,7 @@ public class HomeView extends JFrame {
             btnKonsultasi.addActionListener(e -> new ChatView().setVisible(true));
             btnLogout.addActionListener(e -> {
                 authController.logout();
-                refreshButtons(); // Kembali ke mode tamu
+                refreshButtons(); 
                 JOptionPane.showMessageDialog(this, "Berhasil logout.");
             });
 

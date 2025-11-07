@@ -1,35 +1,17 @@
 package pendataankecamatan.view;
 
 import com.formdev.flatlaf.FlatLightLaf;
-import java.awt.BasicStroke;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
+import java.awt.*; 
+import java.awt.event.*;
+import javax.swing.*;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.SwingConstants;
-import java.awt.FlowLayout;
+import pendataankecamatan.model.User;
+import pendataankecamatan.service.DatabaseConnection;
+import pendataankecamatan.service.DatabaseService;
+import pendataankecamatan.util.Constants;
+import java.sql.*;
 
 public class LoginView extends JFrame {
 
@@ -160,7 +142,6 @@ public class LoginView extends JFrame {
                     g2d.fillOval(0, 0, getWidth(), getHeight());
                 }
                 g2d.dispose();
-                // Jangan panggil super.paintComponent — biar transparan
             }
         };
 
@@ -302,14 +283,25 @@ public class LoginView extends JFrame {
             return;
         }
 
-        if ("admin".equals(username) && "password".equals(password)) {
-            JOptionPane.showMessageDialog(this, "Login Berhasil!", "Info", JOptionPane.INFORMATION_MESSAGE);
+        DatabaseService dbService = new DatabaseService();
+        User user = dbService.authenticateUser(username, password);
+
+        if (user != null) {
+            // Simpan user ke sesi global
+            Constants.CURRENT_USER = user;
+
+            JOptionPane.showMessageDialog(this, "Login berhasil sebagai: " + user.getNamaLengkap(), "Sukses", JOptionPane.INFORMATION_MESSAGE);
+
+            // Buka HomeView dan tutup LoginView
+            SwingUtilities.invokeLater(() -> {
+                new HomeView().setVisible(true);
+                dispose();
+            });
         } else {
             JOptionPane.showMessageDialog(this, "Username atau Password salah!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    // RoundedPanel sebagai content utama — digambar penuh, tidak pakai setShape()
     private class RoundedPanel extends JPanel {
         private final int radius;
 

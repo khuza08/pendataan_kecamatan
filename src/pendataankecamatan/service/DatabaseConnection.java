@@ -7,10 +7,9 @@ import java.sql.SQLException;
 import javax.swing.JOptionPane;
 
 public class DatabaseConnection {
-    // 🔐 Ganti sesuai konfigurasi database-mu
-    private static final String URL = "jdbc:mysql://localhost:3306/kecamatan_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String USERNAME = "root";        // ganti sesuai user MySQL-mu
-    private static final String PASSWORD = "root";            // ganti sesuai password (kosong jika pakai XAMPP default)
+    private static final String URL = "jdbc:mysql://localhost:3306/pendataankecamatan?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    private static final String USERNAME = "root";       
+    private static final String PASSWORD = "root";           
 
     static {
         try {
