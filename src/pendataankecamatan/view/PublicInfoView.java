@@ -9,17 +9,20 @@ import pendataankecamatan.model.Pejabat;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.RoundRectangle2D;
 import java.util.List;
 
 public class PublicInfoView extends JFrame {
     private final PublicController publicController = new PublicController();
+    private Point initialClick;
 
     public PublicInfoView() {
         // 🔹 Atur FlatLAF hanya jika belum diatur sebelumnya
         try {
             if (UIManager.getLookAndFeel().getClass() != FlatLightLaf.class) {
                 UIManager.setLookAndFeel(new FlatLightLaf());
-                // Set properti FlatLAF (opsional, sesuai preferensimu)
                 UIManager.put("Button.arc", 30);
                 UIManager.put("Component.arc", 15);
                 UIManager.put("Table.showHorizontalLines", true);
@@ -30,21 +33,130 @@ public class PublicInfoView extends JFrame {
             e.printStackTrace();
         }
 
-        setTitle("Informasi Umum - Kecamatan Siwalan Panji");
+        // 🔹 Set custom window
+        setUndecorated(true);
         setSize(850, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setBackground(new Color(0, 0, 0, 0)); // Transparent background
         setLayout(new BorderLayout());
 
+        // 🔹 Create rounded window shape
+        setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 20, 20));
+
+        // 🔹 Create main content panel with rounded border
+        JPanel mainPanel = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(Color.WHITE);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                g2.dispose();
+            }
+        };
+        mainPanel.setOpaque(false);
+
+        // 🔹 Create title bar
+        JPanel titleBar = createTitleBar();
+        mainPanel.add(titleBar, BorderLayout.NORTH);
+
+        // 🔹 Add content
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        tabbedPane.putClientProperty("JTabbedPane.tabType", "card"); // Modern FlatLAF style
 
         tabbedPane.addTab("Profil Kecamatan", createProfilPanel());
         tabbedPane.addTab("Daftar Desa", createDesaPanel());
         tabbedPane.addTab("Pejabat Kecamatan", createPejabatPanel());
         tabbedPane.addTab("Peta Wilayah", createPetaPanel());
 
-        add(tabbedPane, BorderLayout.CENTER);
+        mainPanel.add(tabbedPane, BorderLayout.CENTER);
+
+        add(mainPanel);
+    }
+
+    private JPanel createTitleBar() {
+        JPanel titleBar = new JPanel(new BorderLayout());
+        titleBar.setOpaque(false);
+        titleBar.setPreferredSize(new Dimension(0, 40));
+        titleBar.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
+
+        // Panel untuk tombol macOS (red, yellow, green)
+        JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        controlPanel.setOpaque(false);
+
+        JButton redDot = createMacOSDotButton(new Color(0xFF5F57), "Close");
+        JButton yellowDot = createMacOSDotButton(new Color(0xFFBD2E), "Minimize");
+        JButton greenDot = createMacOSDotButton(new Color(0x28CA42), "Maximize");
+
+        controlPanel.add(redDot);
+        controlPanel.add(yellowDot);
+        controlPanel.add(greenDot);
+
+        titleBar.add(controlPanel, BorderLayout.WEST);
+
+        // Agar bisa drag window
+        titleBar.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                initialClick = e.getPoint();
+            }
+        });
+        titleBar.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (initialClick != null) {
+                    int newX = e.getXOnScreen() - initialClick.x;
+                    int newY = e.getYOnScreen() - initialClick.y;
+                    setLocation(newX, newY);
+                }
+            }
+        });
+
+        return titleBar;
+    }
+
+    private JButton createMacOSDotButton(Color color, String action) {
+        JButton dot = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setColor(color);
+                g2d.fillOval(0, 0, getWidth(), getHeight());
+                if (getModel().isRollover()) {
+                    g2d.setColor(new Color(0, 0, 0, 50));
+                    g2d.fillOval(0, 0, getWidth(), getHeight());
+                }
+                g2d.dispose();
+            }
+        };
+
+        dot.setPreferredSize(new Dimension(12, 12));
+        dot.setMinimumSize(new Dimension(12, 12));
+        dot.setMaximumSize(new Dimension(12, 12));
+
+        dot.setContentAreaFilled(false);
+        dot.setBorderPainted(false);
+        dot.setFocusPainted(false);
+        dot.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        if ("Close".equals(action)) {
+            dot.addActionListener(e -> dispose()); // Tutup window ini, bukan aplikasi
+        } else if ("Minimize".equals(action)) {
+            dot.addActionListener(e -> setState(JFrame.ICONIFIED));
+        } else if ("Maximize".equals(action)) {
+            dot.addActionListener(e -> {
+                if (getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+                    setExtendedState(JFrame.NORMAL);
+                } else {
+                    setExtendedState(JFrame.MAXIMIZED_BOTH);
+                }
+            });
+        }
+
+        return dot;
     }
 
     private JPanel createProfilPanel() {
@@ -55,7 +167,7 @@ public class PublicInfoView extends JFrame {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        textArea.setBackground(UIManager.getColor("Panel.background")); // cocokkan warna latar
+        textArea.setBackground(UIManager.getColor("Panel.background"));
         panel.add(new JScrollPane(textArea), BorderLayout.CENTER);
         return panel;
     }
