@@ -73,37 +73,90 @@ public class HomeView extends JFrame {
         mainPanel.add(content, BorderLayout.CENTER);
         setContentPane(mainPanel);
     }
+    
+    private JButton createMacOSDotButton(Color color, String action) {
+    JButton dot = new JButton() {
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2d = (Graphics2D) g.create();
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.setColor(color);
+            g2d.fillOval(0, 0, getWidth(), getHeight());
+            if (getModel().isRollover()) {
+                g2d.setColor(new Color(0, 0, 0, 50));
+                g2d.fillOval(0, 0, getWidth(), getHeight());
+            }
+            g2d.dispose();
+            // Jangan panggil super.paintComponent — biar transparan
+        }
+    };
 
-    private JPanel createTitleBar() {
-        JPanel titleBar = new JPanel(new BorderLayout());
-        titleBar.setPreferredSize(new Dimension(0, 40));
-        titleBar.setOpaque(false);
-        titleBar.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                initialClick = e.getPoint();
+    dot.setPreferredSize(new Dimension(12, 12));
+    dot.setMinimumSize(new Dimension(12, 12));
+    dot.setMaximumSize(new Dimension(12, 12));
+
+    dot.setContentAreaFilled(false);
+    dot.setBorderPainted(false);
+    dot.setFocusPainted(false);
+    dot.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+    if ("Close".equals(action)) {
+        dot.addActionListener(e -> System.exit(0));
+    } else if ("Minimize".equals(action)) {
+        dot.addActionListener(e -> setState(JFrame.ICONIFIED));
+    } else if ("Maximize".equals(action)) {
+        dot.addActionListener(e -> {
+            if (getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+                setExtendedState(JFrame.NORMAL);
+            } else {
+                setExtendedState(JFrame.MAXIMIZED_BOTH);
             }
         });
-        titleBar.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if (initialClick != null) {
-                    setLocation(e.getXOnScreen() - initialClick.x, e.getYOnScreen() - initialClick.y);
-                }
-            }
-        });
-
-        JButton closeButton = new JButton("✕");
-        closeButton.setFont(new Font("Arial", Font.PLAIN, 16));
-        closeButton.setForeground(Color.RED);
-        closeButton.setContentAreaFilled(false);
-        closeButton.setBorderPainted(false);
-        closeButton.setFocusPainted(false);
-        closeButton.addActionListener(e -> System.exit(0));
-
-        titleBar.add(closeButton, BorderLayout.EAST);
-        return titleBar;
     }
+
+    return dot;
+}
+
+   private JPanel createTitleBar() {
+    JPanel titleBar = new JPanel(new BorderLayout());
+    titleBar.setOpaque(false);
+    titleBar.setPreferredSize(new Dimension(0, 40));
+    titleBar.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
+
+    // Panel untuk tombol macOS (red, yellow, green)
+    JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+    controlPanel.setOpaque(false);
+
+    JButton redDot = createMacOSDotButton(new Color(0xFF5F57), "Close");
+    JButton yellowDot = createMacOSDotButton(new Color(0xFFBD2E), "Minimize");
+    JButton greenDot = createMacOSDotButton(new Color(0x28CA42), "Maximize");
+
+    controlPanel.add(redDot);
+    controlPanel.add(yellowDot);
+    controlPanel.add(greenDot);
+
+    titleBar.add(controlPanel, BorderLayout.WEST);
+
+    // Agar bisa drag window
+    titleBar.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mousePressed(MouseEvent e) {
+            initialClick = e.getPoint();
+        }
+    });
+    titleBar.addMouseMotionListener(new MouseAdapter() {
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            if (initialClick != null) {
+                int newX = e.getXOnScreen() - initialClick.x;
+                int newY = e.getYOnScreen() - initialClick.y;
+                setLocation(newX, newY);
+            }
+        }
+    });
+
+    return titleBar;
+}
 
     private JButton createStyledButton(String text) {
         JButton btn = new JButton(text);
@@ -154,7 +207,6 @@ public class HomeView extends JFrame {
             buttonPanel.add(btnKonsultasi);
             buttonPanel.add(btnLogout);
 
-            // 👑 Tambahkan Admin Dashboard jika admin
             if ("ADMIN".equals(user.getRole())) {
                 JButton btnAdmin = createStyledButton("Admin Dashboard");
                 btnAdmin.setBackground(new Color(120, 80, 200)); // warna berbeda
