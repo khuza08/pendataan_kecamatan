@@ -22,7 +22,7 @@ public class HomeView extends JFrame {
     public HomeView() {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
-            UIManager.put("Button.arc", 30); // pill-shaped
+            UIManager.put("Button.arc", 30);
             UIManager.put("Component.arc", 15);
         } catch (Exception ex) {
             ex.printStackTrace();
