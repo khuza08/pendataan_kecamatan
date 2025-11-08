@@ -118,7 +118,7 @@ public class LoginView extends JFrame {
 
         JLabel logo;
         try {
-            ImageIcon logoIcon = new ImageIcon(getClass().getResource("/assets/sidoarjo.png")); // 🔹 FIX PATH
+            ImageIcon logoIcon = new ImageIcon(getClass().getResource("../assets/sidoarjo.png")); // 🔹 FIX PATH
             if (logoIcon.getImage() == null) {
                 throw new NullPointerException("Logo image not found");
             }
@@ -305,24 +305,16 @@ public class LoginView extends JFrame {
         buttonPanel.setOpaque(false);
 
         buttonLogin = new JButton("Login");
-        buttonBatal = new JButton("Batal");
+        buttonBatal = new JButton("Kembali ke Home"); // 🔹 GANTI: Tulisan tombol
 
         // Styling tombol seperti HomeView
         buttonLogin = createStyledButton("Login");
-        buttonBatal = createStyledButton("Batal");
+        buttonBatal = createStyledButton("Kembali"); // 🔹 GANTI: Nama tombol
 
-        // Ganti warna tombol batal
-        buttonBatal.setBackground(new Color(180, 180, 180));
+        // 🔹 GANTI: Aksi tombol batal menjadi buka HomeView dan dispose
         buttonBatal.addActionListener(e -> {
-            int option = JOptionPane.showConfirmDialog(
-                LoginView.this,
-                "Apakah Anda yakin ingin keluar?",
-                "Konfirmasi",
-                JOptionPane.YES_NO_OPTION
-            );
-            if (option == JOptionPane.YES_OPTION) {
-                System.exit(0);
-            }
+            new HomeView().setVisible(true);
+            dispose();
         });
 
         buttonPanel.add(buttonLogin);
@@ -430,10 +422,8 @@ public class LoginView extends JFrame {
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.setPreferredSize(new Dimension(120, 40)); 
         
-        if ("Batal".equals(text)) {
-            btn.setBackground(new Color(180, 180, 180));
-        } else {
-            btn.addActionListener(e -> handleLogin());
+        if ("Kembali".equals(text)) {
+            btn.setBackground(new Color(180, 180, 180)); // warna berbeda untuk tombol kembali
         }
         
         return btn;
