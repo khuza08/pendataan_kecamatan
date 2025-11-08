@@ -88,14 +88,14 @@ public class HomeView extends JFrame {
         // Top panel dengan macOS buttons
         JPanel leftTopPanel = new JPanel(new BorderLayout());
         leftTopPanel.setOpaque(false);
-        
+
         JPanel macOSButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
         macOSButtons.setOpaque(false);
-        
+
         JButton closeBtn = createMacOSButton(new Color(0xFF5F57), "Close");
         JButton minimizeBtn = createMacOSButton(new Color(0xFFBD2E), "Minimize");
         JButton maximizeBtn = createMacOSButton(new Color(0x28CA42), "Maximize");
-        
+
         macOSButtons.add(closeBtn);
         macOSButtons.add(minimizeBtn);
         macOSButtons.add(maximizeBtn);
@@ -103,10 +103,22 @@ public class HomeView extends JFrame {
 
         leftPanel.add(leftTopPanel, BorderLayout.NORTH);
 
-        // Tambahkan logo atau konten di tengah panel kiri jika ada
+        // 🔹 TAMBAHKAN LOGO DI TENGAH PANEL KIRI
         JPanel logoContainer = new JPanel(new GridBagLayout());
         logoContainer.setOpaque(false);
-        // Bisa tambahkan logo disini jika diperlukan
+
+        // Load logo dari folder assets
+        ImageIcon icon = new ImageIcon(getClass().getResource("../assets/sidoarjo.png"));
+        if (icon.getIconWidth() <= 0) {
+            // Jika tidak ditemukan, gunakan placeholder
+            icon = new ImageIcon("../assets/sidoarjo.png"); // fallback path
+        }
+
+        JLabel logoLabel = new JLabel(icon);
+        logoLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0)); // padding atas bawah
+
+        logoContainer.add(logoLabel);
+
         leftPanel.add(logoContainer, BorderLayout.CENTER);
 
         splitPane.setLeftComponent(leftPanel);
