@@ -89,9 +89,9 @@ public class LoginView extends JFrame {
         leftPanel.setOpaque(false);
 
         // 🔹 macOS buttons di atas logo, menyatu dengan background hijau
-        JPanel macOSButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        JPanel macOSButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         macOSButtons.setOpaque(false); // Transparan agar menyatu dengan hijau
-        macOSButtons.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 0)); // Padding atas dan kiri
+        macOSButtons.setBorder(BorderFactory.createEmptyBorder(8, 0, 0, 0)); // Padding atas dan kiri
 
         JButton closeBtn = createMacOSButton(new Color(0xFF5F57), "Close");
         JButton minimizeBtn = createMacOSButton(new Color(0xFFBD2E), "Minimize");

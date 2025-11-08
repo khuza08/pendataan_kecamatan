@@ -83,7 +83,7 @@ public class PublicInfoView extends JFrame {
     private JPanel createBackButtonPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panel.setOpaque(false);
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // atas, kiri, bawah, kanan
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); 
 
         JButton backButton = new JButton("Kembali ke Home");
         backButton.addActionListener(e -> {
