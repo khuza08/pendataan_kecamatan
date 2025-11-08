@@ -1,266 +1,328 @@
+// src/pendataankecamatan/view/LoginView.java
 package pendataankecamatan.view;
 
 import com.formdev.flatlaf.FlatLightLaf;
-import java.awt.*; 
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.SwingConstants;
 import pendataankecamatan.model.User;
-import pendataankecamatan.service.DatabaseConnection;
 import pendataankecamatan.service.DatabaseService;
 import pendataankecamatan.util.Constants;
-import java.sql.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.RoundRectangle2D;
 
 public class LoginView extends JFrame {
-
     private JTextField fieldUsername;
     private JPasswordField fieldPassword;
     private JButton buttonLogin;
     private JButton buttonBatal;
+    private JButton togglePasswordButton;
     private Point initialClick;
     private static final int CORNER_RADIUS = 20;
+    private JSplitPane splitPane;
 
     public LoginView() {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
-            UIManager.put("Button.arc", 15);
+            UIManager.put("Button.arc", 30);
+            UIManager.put("TextComponent.arc", 25); // 🔹 Arc untuk input field
             UIManager.put("Component.arc", 15);
-            UIManager.put("TextComponent.arc", 15);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
         setUndecorated(true);
-        setSize(800, 450);
+        setSize(720, 384);
         setLocationRelativeTo(null);
-        setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        getLayeredPane().setOpaque(false);
-        getRootPane().setOpaque(false);
-
         setBackground(new Color(0, 0, 0, 0));
+        setLayout(new BorderLayout());
+
+        initializeUI();
         
-        initializeComponents();
-        setupLayout();
-        setupEventHandlers();
+        // Apply window shape for smooth rounded corners
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                applyWindowShape();
+            }
+        });
     }
 
-    private void initializeComponents() {
-        fieldUsername = new JTextField(15);
-        fieldPassword = new JPasswordField(15);
+    private void applyWindowShape() {
+        if (getWidth() > 0 && getHeight() > 0) {
+            Shape shape = new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
+            setShape(shape);
+        }
+    }
+
+    private void initializeUI() {
+        // Main container with rounded corners
+        JPanel mainContainer = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                // Background with rounded corners (hijau)
+                g2d.setColor(new Color(0x006315));
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
+                
+                g2d.dispose();
+            }
+        };
+        mainContainer.setOpaque(false);
+
+        // Split pane untuk 2 kolom
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setDividerLocation(360); // 50% dari 720px
+        splitPane.setDividerSize(0);
+        splitPane.setOpaque(false);
+        splitPane.setBackground(new Color(0, 0, 0, 0));
+
+        // ================= PANEL KIRI (Hijau dengan Logo dan Title Bar) =================
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.setOpaque(false);
+
+        // 🔹 macOS buttons di atas logo, menyatu dengan background hijau
+        JPanel macOSButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        macOSButtons.setOpaque(false); // Transparan agar menyatu dengan hijau
+        macOSButtons.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 0)); // Padding atas dan kiri
+
+        JButton closeBtn = createMacOSButton(new Color(0xFF5F57), "Close");
+        JButton minimizeBtn = createMacOSButton(new Color(0xFFBD2E), "Minimize");
+        JButton maximizeBtn = createMacOSButton(new Color(0x28CA42), "Maximize");
+
+        macOSButtons.add(closeBtn);
+        macOSButtons.add(minimizeBtn);
+        macOSButtons.add(maximizeBtn);
+
+        leftPanel.add(macOSButtons, BorderLayout.NORTH); // Letakkan di atas
+
+        // 🔹 Tambahkan logo di tengah panel kiri
+        JPanel logoContainer = new JPanel(new GridBagLayout());
+        logoContainer.setOpaque(false);
+
+        // Setup GridBagConstraints for centering
+        GridBagConstraints gbcLogo = new GridBagConstraints();
+        gbcLogo.gridx = 0;
+        gbcLogo.gridy = 0;
+        gbcLogo.weightx = 1.0;
+        gbcLogo.weighty = 1.0;
+        gbcLogo.fill = GridBagConstraints.NONE;
+        gbcLogo.anchor = GridBagConstraints.CENTER;
+
+        JLabel logo;
+        try {
+            ImageIcon logoIcon = new ImageIcon(getClass().getResource("../assets/sidoarjo.png")); // 🔹 FIX PATH
+            if (logoIcon.getImage() == null) {
+                throw new NullPointerException("Logo image not found");
+            }
+            Image img = logoIcon.getImage().getScaledInstance(180, 180, Image.SCALE_SMOOTH);
+            logo = new JLabel(new ImageIcon(img));
+            logo.setHorizontalAlignment(SwingConstants.CENTER);
+            
+            // 🔹 Tambahkan padding atas & bawah
+            logo.setBorder(BorderFactory.createEmptyBorder(40, 0, 40, 0));
+            
+        } catch (Exception e) {
+            System.err.println("Error loading logo: " + e.getMessage());
+            logo = new JLabel("SIDOARJO", SwingConstants.CENTER);
+            logo.setFont(new Font("Segoe UI", Font.BOLD, 24));
+            logo.setForeground(Color.WHITE);
+            logo.setBorder(BorderFactory.createEmptyBorder(40, 0, 40, 0)); // tetap kasih border untuk konsistensi
+        }
+
+        logoContainer.add(logo, gbcLogo);
+        leftPanel.add(logoContainer, BorderLayout.CENTER);
+
+        splitPane.setLeftComponent(leftPanel);
+
+        // ================= PANEL KANAN (Putih dengan Form) =================
+        JPanel rightPanel = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                // Background putih dengan rounded corner di kanan
+                g2d.setColor(Color.WHITE);
+                g2d.fillRoundRect(-CORNER_RADIUS, 0, getWidth() + CORNER_RADIUS, getHeight(), CORNER_RADIUS, CORNER_RADIUS);
+                
+                // Tutup bagian kiri yang masih terlihat
+                g2d.fillRect(0, 0, CORNER_RADIUS, getHeight());
+                
+                g2d.dispose();
+            }
+        };
+        rightPanel.setOpaque(false);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 20, 8, 20); // padding konsisten
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+
+        // Title
+        gbc.gridy = 0;
+        JLabel titleLabel = new JLabel("Masuk ke Akun Anda", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setForeground(Color.BLACK);
+        rightPanel.add(titleLabel, gbc);
+
+        gbc.gridy++;
+        rightPanel.add(Box.createVerticalStrut(20), gbc);
+
+        // 🔹 Username field dengan background dan icon
+        gbc.gridy++;
+        JPanel usernameContainer = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                g2d.setColor(new Color(0x004d10)); // hijau gelap
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+                
+                g2d.setColor(new Color(0x006315)); // hijau terang
+                g2d.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+                FontMetrics fm = g2d.getFontMetrics();
+                int iconY = (getHeight() + fm.getAscent()) / 2 - 2;
+                g2d.drawString("👤", 15, iconY);
+                
+                g2d.dispose();
+            }
+        };
+        usernameContainer.setOpaque(false);
+        usernameContainer.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+
+        fieldUsername = new JTextField(15) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                super.paintComponent(g);
+                g2.dispose();
+            }
+        };
+        fieldUsername.setBorder(BorderFactory.createEmptyBorder(12, 45, 12, 15)); // kiri untuk icon
+        fieldUsername.setOpaque(false);
+        fieldUsername.setForeground(new Color(204, 204, 204)); // 80% white (0xCC) saat kosong
+        fieldUsername.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        fieldUsername.setCaretColor(Color.WHITE);
+        fieldUsername.setText("Username");
+
+        setupPlaceholder(fieldUsername, "Username");
+        // 🔹 Pindahkan listener ke bawah setelah passwordField dibuat
+        // fieldUsername.addActionListener(e -> passwordField.requestFocus());
+
+        usernameContainer.add(fieldUsername, BorderLayout.CENTER);
+        rightPanel.add(usernameContainer, gbc);
+
+        gbc.gridy++;
+        rightPanel.add(Box.createVerticalStrut(10), gbc); // jarak antar field
+
+        // 🔹 Password field dengan background, icon, dan toggle button
+        gbc.gridy++;
+        JPanel passwordContainer = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                g2d.setColor(new Color(0x004d10)); // hijau gelap
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
+                
+                g2d.setColor(new Color(0x006315)); // hijau terang
+                g2d.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+                FontMetrics fm = g2d.getFontMetrics();
+                int iconY = (getHeight() + fm.getAscent()) / 2 - 2;
+                g2d.drawString("🔒", 15, iconY);
+                
+                g2d.dispose();
+            }
+        };
+        passwordContainer.setOpaque(false);
+        passwordContainer.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
+
+        fieldPassword = new JPasswordField(15) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                super.paintComponent(g);
+                g2.dispose();
+            }
+        };
+        fieldPassword.setBorder(BorderFactory.createEmptyBorder(12, 45, 12, 5)); // kiri untuk icon, kanan untuk toggle
+        fieldPassword.setOpaque(false);
+        fieldPassword.setForeground(new Color(204, 204, 204)); // 80% white (0xCC) saat kosong
+        fieldPassword.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        fieldPassword.setCaretColor(Color.WHITE);
+        fieldPassword.setEchoChar((char) 0);
+        fieldPassword.setText("Password");
+
+        setupPasswordPlaceholder(fieldPassword);
+        fieldPassword.addActionListener(e -> handleLogin());
+
+        togglePasswordButton = new JButton("👁️") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                if (getModel().isPressed()) {
+                    g2.setColor(new Color(0, 0, 0, 30));
+                    g2.fillOval(5, 5, getWidth()-10, getHeight()-10);
+                } else if (getModel().isRollover()) {
+                    g2.setColor(new Color(0x006315));
+                    g2.fillOval(5, 5, getWidth()-10, getHeight()-10);
+                }
+                
+                super.paintComponent(g);
+                g2.dispose();
+            }
+        };
+        togglePasswordButton.setContentAreaFilled(false);
+        togglePasswordButton.setBorderPainted(false);
+        togglePasswordButton.setFocusPainted(false);
+        togglePasswordButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        togglePasswordButton.setPreferredSize(new Dimension(40, 30));
+        togglePasswordButton.setForeground(new Color(0x006315));
+        togglePasswordButton.setToolTipText("Tampilkan Password");
+        togglePasswordButton.addActionListener(e -> togglePasswordVisibility());
+
+        passwordContainer.add(fieldPassword, BorderLayout.CENTER);
+        passwordContainer.add(togglePasswordButton, BorderLayout.EAST);
+
+        rightPanel.add(passwordContainer, gbc);
+
+        // 🔹 Sekarang fieldUsername bisa mengakses fieldPassword
+        fieldUsername.addActionListener(e -> fieldPassword.requestFocus());
+
+        gbc.gridy++;
+        rightPanel.add(Box.createVerticalStrut(20), gbc); // jarak ke tombol
+
+        // Buttons
+        gbc.gridy++;
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        buttonPanel.setOpaque(false);
+
         buttonLogin = new JButton("Login");
         buttonBatal = new JButton("Batal");
 
-        buttonLogin.setFont(new Font("Arial", Font.BOLD, 14));
-        buttonLogin.setForeground(Color.WHITE);
-        buttonLogin.setBackground(new Color(70, 130, 180));
-        buttonLogin.setContentAreaFilled(true);
-        buttonLogin.setBorderPainted(false);
-        buttonLogin.setFocusPainted(false);
+        // Styling tombol seperti HomeView
+        buttonLogin = createStyledButton("Login");
+        buttonBatal = createStyledButton("Batal");
 
-        buttonBatal.setFont(new Font("Arial", Font.BOLD, 14));
-        buttonBatal.setForeground(Color.WHITE);
+        // Ganti warna tombol batal
         buttonBatal.setBackground(new Color(180, 180, 180));
-        buttonBatal.setContentAreaFilled(true);
-        buttonBatal.setBorderPainted(false);
-        buttonBatal.setFocusPainted(false);
-    }
-
-    private void setupLayout() {
-        RoundedPanel mainPanel = new RoundedPanel(CORNER_RADIUS);
-        mainPanel.setLayout(new BorderLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder());
-
-        JPanel titleBar = createMacOSTitleBar();
-        mainPanel.add(titleBar, BorderLayout.NORTH);
-
-        JPanel contentMain = new JPanel(new BorderLayout());
-        contentMain.setOpaque(false);
-
-        JPanel panelKiri = createLeftPanel();
-        contentMain.add(panelKiri, BorderLayout.WEST);
-
-        JPanel panelKanan = createRightPanel();
-        contentMain.add(panelKanan, BorderLayout.CENTER);
-
-        mainPanel.add(contentMain, BorderLayout.CENTER);
-
-        setContentPane(mainPanel);
-    }
-
-    private JPanel createMacOSTitleBar() {
-        JPanel titleBar = new JPanel(new BorderLayout());
-        titleBar.setOpaque(false);
-        titleBar.setPreferredSize(new Dimension(0, 40));
-        titleBar.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
-
-        JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        controlPanel.setOpaque(false);
-
-        JButton redDot = createMacOSDotButton(new Color(0xFF5F57), "Close");
-        JButton yellowDot = createMacOSDotButton(new Color(0xFFBD2E), "Minimize");
-        JButton greenDot = createMacOSDotButton(new Color(0x28CA42), "Maximize");
-
-        controlPanel.add(redDot);
-        controlPanel.add(yellowDot);
-        controlPanel.add(greenDot);
-
-        titleBar.add(controlPanel, BorderLayout.WEST);
-
-        titleBar.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                initialClick = e.getPoint();
-            }
-        });
-        titleBar.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if (initialClick != null) {
-                    int newX = e.getXOnScreen() - initialClick.x;
-                    int newY = e.getYOnScreen() - initialClick.y;
-                    setLocation(newX, newY);
-                }
-            }
-        });
-
-        return titleBar;
-    }
-
-    private JButton createMacOSDotButton(Color color, String action) {
-        JButton dot = new JButton() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(color);
-                g2d.fillOval(0, 0, getWidth(), getHeight());
-                if (getModel().isRollover()) {
-                    g2d.setColor(new Color(0, 0, 0, 50));
-                    g2d.fillOval(0, 0, getWidth(), getHeight());
-                }
-                g2d.dispose();
-            }
-        };
-
-        dot.setPreferredSize(new Dimension(12, 12));
-        dot.setMinimumSize(new Dimension(12, 12));
-        dot.setMaximumSize(new Dimension(12, 12));
-
-        dot.setContentAreaFilled(false);
-        dot.setBorderPainted(false);
-        dot.setFocusPainted(false);
-        dot.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        if ("Close".equals(action)) {
-            dot.addActionListener(e -> System.exit(0));
-        } else if ("Minimize".equals(action)) {
-            dot.addActionListener(e -> setState(JFrame.ICONIFIED));
-        }
-
-        return dot;
-    }
-
-    private JPanel createLeftPanel() {
-        JPanel panel = new JPanel(new BorderLayout()) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(new Color(240, 240, 240));
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
-                // Tutup sisi kanan agar tidak transparan di ujung kiri window
-                g2d.fillRect(getWidth() - CORNER_RADIUS, 0, CORNER_RADIUS, getHeight());
-                g2d.dispose();
-            }
-        };
-        panel.setOpaque(false);
-        panel.setPreferredSize(new Dimension(300, 0));
-        panel.setBorder(BorderFactory.createEmptyBorder(60, 30, 30, 30));
-
-        JLabel labelLogo = new JLabel("KECAMATAN", SwingConstants.CENTER);
-        labelLogo.setFont(new Font("Segoe UI", Font.BOLD, 32));
-        labelLogo.setForeground(new Color(70, 130, 180));
-        panel.add(labelLogo, BorderLayout.NORTH);
-
-        JLabel labelTagline = new JLabel("<html><center>Aplikasi Pendataan<br>dan Layanan Masyarakat</center></html>");
-        labelTagline.setFont(new Font("Segoe UI", Font.PLAIN, 15));
-        labelTagline.setForeground(Color.GRAY);
-        labelTagline.setHorizontalAlignment(SwingConstants.CENTER);
-        panel.add(labelTagline, BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    private JPanel createRightPanel() {
-        JPanel panel = new JPanel(new GridBagLayout()) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(Color.WHITE);
-                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
-                // Tutup sisi kiri agar tidak transparan di ujung kanan window
-                g2d.fillRect(0, 0, CORNER_RADIUS, getHeight());
-                g2d.dispose();
-            }
-        };
-        panel.setOpaque(false);
-        panel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        JLabel labelJudul = new JLabel("Masuk ke Akun Anda");
-        labelJudul.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2;
-        panel.add(labelJudul, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        panel.add(new JLabel("Username:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        gbc.weightx = 1.0;
-        panel.add(fieldUsername, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 0.0;
-        panel.add(new JLabel("Password:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        panel.add(fieldPassword, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        gbc.weightx = 0.0;
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.insets = new Insets(20, 8, 8, 8);
-
-        JPanel panelButton = new JPanel();
-        panelButton.setOpaque(false);
-        panelButton.add(buttonLogin);
-        panelButton.add(buttonBatal);
-        panel.add(panelButton, gbc);
-
-        return panel;
-    }
-
-    private void setupEventHandlers() {
-        buttonLogin.addActionListener(e -> handleLogin());
         buttonBatal.addActionListener(e -> {
             int option = JOptionPane.showConfirmDialog(
                 LoginView.this,
@@ -272,14 +334,187 @@ public class LoginView extends JFrame {
                 System.exit(0);
             }
         });
+
+        buttonPanel.add(buttonLogin);
+        buttonPanel.add(buttonBatal);
+
+        rightPanel.add(buttonPanel, gbc);
+
+        splitPane.setRightComponent(rightPanel);
+        mainContainer.add(splitPane, BorderLayout.CENTER);
+        add(mainContainer);
+
+        addDragFunctionality();
+    }
+
+    private void addDragFunctionality() {
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                initialClick = e.getPoint();
+            }
+        });
+        addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (initialClick != null) {
+                    int newX = e.getXOnScreen() - initialClick.x;
+                    int newY = e.getYOnScreen() - initialClick.y;
+                    setLocation(newX, newY);
+                }
+            }
+        });
+    }
+
+    private JButton createMacOSButton(Color color, String action) {
+        JButton button = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                g2d.setColor(color);
+                g2d.fillOval(0, 0, getWidth(), getHeight());
+                
+                if (getModel().isRollover()) {
+                    g2d.setColor(new Color(0, 0, 0, 50));
+                    g2d.fillOval(0, 0, getWidth(), getHeight());
+                }
+                g2d.dispose();
+            }
+        };
+
+        button.setPreferredSize(new Dimension(12, 12));
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        if ("Close".equals(action)) {
+            button.addActionListener(e -> System.exit(0));
+        } else if ("Minimize".equals(action)) {
+            button.addActionListener(e -> setState(JFrame.ICONIFIED));
+        } else if ("Maximize".equals(action)) {
+            button.addActionListener(e -> {
+                if (getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+                    setExtendedState(JFrame.NORMAL);
+                } else {
+                    setExtendedState(JFrame.MAXIMIZED_BOTH);
+                }
+            });
+        }
+
+        return button;
+    }
+
+    private JButton createStyledButton(String text) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                Color bgColor;
+                if (getModel().isPressed()) {
+                    bgColor = new Color(0x004d10);
+                } else if (getModel().isRollover()) {
+                    bgColor = new Color(0x005512);
+                } else {
+                    bgColor = new Color(0x006315); 
+                }
+                
+                g2.setColor(bgColor);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
+                
+                super.paintComponent(g);
+                g2.dispose();
+            }
+        };
+        
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setPreferredSize(new Dimension(120, 40)); 
+        
+        if ("Batal".equals(text)) {
+            btn.setBackground(new Color(180, 180, 180));
+        } else {
+            btn.addActionListener(e -> handleLogin());
+        }
+        
+        return btn;
+    }
+
+    private void togglePasswordVisibility() {
+        if (fieldPassword.getEchoChar() == '•') {
+            fieldPassword.setEchoChar((char) 0);
+            togglePasswordButton.setText("🙈");
+            togglePasswordButton.setToolTipText("Sembunyikan Password");
+        } else {
+            fieldPassword.setEchoChar('•');
+            togglePasswordButton.setText("👁️");
+            togglePasswordButton.setToolTipText("Tampilkan Password");
+        }
+        fieldPassword.requestFocus();
+    }
+
+    private void setupPlaceholder(JTextField field, String placeholder) {
+        field.addFocusListener(new java.awt.event.FocusListener() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (field.getText().equals(placeholder)) {
+                    field.setText("");
+                    field.setForeground(Color.WHITE); 
+                }
+            }
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (field.getText().isEmpty()) {
+                    field.setText(placeholder);
+                    field.setForeground(new Color(204, 204, 204)); 
+                }
+            }
+        });
+    }
+
+    private void setupPasswordPlaceholder(JPasswordField field) {
+        field.addFocusListener(new java.awt.event.FocusListener() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (String.valueOf(field.getPassword()).equals("Password")) {
+                    field.setText("");
+                    field.setForeground(Color.WHITE); 
+                    field.setEchoChar('•');
+                }
+            }
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (String.valueOf(field.getPassword()).isEmpty()) {
+                    field.setEchoChar((char) 0);
+                    field.setText("Password");
+                    field.setForeground(new Color(204, 204, 204));
+                }
+            }
+        });
     }
 
     private void handleLogin() {
         String username = fieldUsername.getText().trim();
         String password = new String(fieldPassword.getPassword());
 
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Username dan Password harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+        if (username.equals("Username") || username.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            fieldUsername.requestFocus();
+            return;
+        }
+
+        if (new String(fieldPassword.getPassword()).equals("Password") || password.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Password harus diisi!", "Error", JOptionPane.ERROR_MESSAGE);
+            fieldPassword.requestFocus();
             return;
         }
 
@@ -300,37 +535,6 @@ public class LoginView extends JFrame {
         } else {
             JOptionPane.showMessageDialog(this, "Username atau Password salah!", "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }
-
-    private class RoundedPanel extends JPanel {
-        private final int radius;
-
-        public RoundedPanel(int radius) {
-            this.radius = radius;
-            setOpaque(false);
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            if (getWidth() <= 0 || getHeight() <= 0) return;
-
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-
-            // Gambar background putih untuk panel utama
-            g2.setColor(Color.WHITE);
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
-
-            // Gambar border
-            g2.setColor(new Color(200, 200, 200));
-            g2.setStroke(new BasicStroke(1.0f));
-            g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
-
-            g2.dispose();
-        }
-        
     }
 
     public static void main(String[] args) {
