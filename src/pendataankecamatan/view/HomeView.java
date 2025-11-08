@@ -222,46 +222,46 @@ public class HomeView extends JFrame {
     }
 
     private JButton createStyledButton(String text) {
-        JButton btn = new JButton(text) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                
-                Color bgColor;
-                if (getModel().isPressed()) {
-                    bgColor = new Color(0x004d10);
-                } else if (getModel().isRollover()) {
-                    bgColor = new Color(0x005512);
-                } else {
-                    bgColor = new Color(0x006315);
-                }
-                
-                g2.setColor(bgColor);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
-                
-                super.paintComponent(g);
-                g2.dispose();
+    JButton btn = new JButton(text) {
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            
+            Color bgColor;
+            if (getModel().isPressed()) {
+                bgColor = new Color(0x004d10);
+            } else if (getModel().isRollover()) {
+                bgColor = new Color(0x005512);
+            } else {
+                bgColor = new Color(0x006315);
             }
-        };
-        
-        btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        btn.setForeground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.setPreferredSize(new Dimension(250, 50));
-        
-        return btn;
-    }
+            
+            g2.setColor(bgColor);
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20); // ✅ Lebih rapi
+            
+            super.paintComponent(g);
+            g2.dispose();
+        }
+    };
+    
+    btn.setContentAreaFilled(false);
+    btn.setBorderPainted(false);
+    btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
+    btn.setForeground(Color.WHITE);
+    btn.setFocusPainted(false);
+    btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+    btn.setPreferredSize(new Dimension(250, 45)); // ✅ Lebih ramping
+    
+    return btn;
+}
 
     public void refreshButtons() {
         rightPanel.removeAll();
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 20, 10, 20);
+        gbc.insets = new Insets(8, 20, 8, 20);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
 
