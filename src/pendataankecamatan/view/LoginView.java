@@ -118,7 +118,7 @@ public class LoginView extends JFrame {
 
         JLabel logo;
         try {
-            ImageIcon logoIcon = new ImageIcon(getClass().getResource("../assets/sidoarjo.png")); // 🔹 FIX PATH
+            ImageIcon logoIcon = new ImageIcon(getClass().getResource("/assets/sidoarjo.png")); // 🔹 FIX PATH
             if (logoIcon.getImage() == null) {
                 throw new NullPointerException("Logo image not found");
             }
@@ -177,7 +177,7 @@ public class LoginView extends JFrame {
         gbc.gridy++;
         rightPanel.add(Box.createVerticalStrut(20), gbc);
 
-        // 🔹 Username field dengan background dan icon
+        // 🔹 Username field dengan background
         gbc.gridy++;
         JPanel usernameContainer = new JPanel(new BorderLayout()) {
             @Override
@@ -188,12 +188,6 @@ public class LoginView extends JFrame {
                 
                 g2d.setColor(new Color(0x004d10)); // hijau gelap
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
-                
-                g2d.setColor(new Color(0x006315)); // hijau terang
-                g2d.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-                FontMetrics fm = g2d.getFontMetrics();
-                int iconY = (getHeight() + fm.getAscent()) / 2 - 2;
-                g2d.drawString("👤", 15, iconY);
                 
                 g2d.dispose();
             }
@@ -210,7 +204,7 @@ public class LoginView extends JFrame {
                 g2.dispose();
             }
         };
-        fieldUsername.setBorder(BorderFactory.createEmptyBorder(12, 45, 12, 15)); // kiri untuk icon
+        fieldUsername.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12)); // padding kiri dan kanan
         fieldUsername.setOpaque(false);
         fieldUsername.setForeground(new Color(204, 204, 204)); // 80% white (0xCC) saat kosong
         fieldUsername.setFont(new Font("Segoe UI", Font.PLAIN, 14));
@@ -227,7 +221,7 @@ public class LoginView extends JFrame {
         gbc.gridy++;
         rightPanel.add(Box.createVerticalStrut(10), gbc); // jarak antar field
 
-        // 🔹 Password field dengan background, icon, dan toggle button
+        // 🔹 Password field dengan background dan toggle button
         gbc.gridy++;
         JPanel passwordContainer = new JPanel(new BorderLayout()) {
             @Override
@@ -238,12 +232,6 @@ public class LoginView extends JFrame {
                 
                 g2d.setColor(new Color(0x004d10)); // hijau gelap
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 25, 25);
-                
-                g2d.setColor(new Color(0x006315)); // hijau terang
-                g2d.setFont(new Font("Segoe UI", Font.PLAIN, 16));
-                FontMetrics fm = g2d.getFontMetrics();
-                int iconY = (getHeight() + fm.getAscent()) / 2 - 2;
-                g2d.drawString("🔒", 15, iconY);
                 
                 g2d.dispose();
             }
@@ -260,7 +248,7 @@ public class LoginView extends JFrame {
                 g2.dispose();
             }
         };
-        fieldPassword.setBorder(BorderFactory.createEmptyBorder(12, 45, 12, 5)); // kiri untuk icon, kanan untuk toggle
+        fieldPassword.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 5)); // padding kiri untuk teks, kanan untuk toggle
         fieldPassword.setOpaque(false);
         fieldPassword.setForeground(new Color(204, 204, 204)); // 80% white (0xCC) saat kosong
         fieldPassword.setFont(new Font("Segoe UI", Font.PLAIN, 14));
