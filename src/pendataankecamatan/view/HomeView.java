@@ -81,16 +81,14 @@ public class HomeView extends JFrame {
         splitPane.setOpaque(false);
         splitPane.setBackground(new Color(0, 0, 0, 0));
 
-        // ================= PANEL KIRI (Hijau dengan Logo) =================
+        // ================= PANEL KIRI (Hijau dengan Logo dan Title Bar) =================
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.setOpaque(false);
 
-        // Top panel dengan macOS buttons
-        JPanel leftTopPanel = new JPanel(new BorderLayout());
-        leftTopPanel.setOpaque(false);
-
-        JPanel macOSButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
-        macOSButtons.setOpaque(false);
+        // 🔹 macOS buttons di atas logo, menyatu dengan background hijau
+        JPanel macOSButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        macOSButtons.setOpaque(false); // Transparan agar menyatu dengan hijau
+        macOSButtons.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 0)); // Padding atas dan kiri
 
         JButton closeBtn = createMacOSButton(new Color(0xFF5F57), "Close");
         JButton minimizeBtn = createMacOSButton(new Color(0xFFBD2E), "Minimize");
@@ -99,26 +97,39 @@ public class HomeView extends JFrame {
         macOSButtons.add(closeBtn);
         macOSButtons.add(minimizeBtn);
         macOSButtons.add(maximizeBtn);
-        leftTopPanel.add(macOSButtons, BorderLayout.WEST);
 
-        leftPanel.add(leftTopPanel, BorderLayout.NORTH);
+        leftPanel.add(macOSButtons, BorderLayout.NORTH); // Letakkan di atas
 
-        // 🔹 TAMBAHKAN LOGO DI TENGAH PANEL KIRI
+        // 🔹 Tambahkan logo di tengah panel kiri
         JPanel logoContainer = new JPanel(new GridBagLayout());
         logoContainer.setOpaque(false);
 
-        // Load logo dari folder assets
-        ImageIcon icon = new ImageIcon(getClass().getResource("../assets/sidoarjo.png"));
-        if (icon.getIconWidth() <= 0) {
-            // Jika tidak ditemukan, gunakan placeholder
-            icon = new ImageIcon("../assets/sidoarjo.png"); // fallback path
+        // Setup GridBagConstraints for centering
+        GridBagConstraints gbcLogo = new GridBagConstraints();
+        gbcLogo.gridx = 0;
+        gbcLogo.gridy = 0;
+        gbcLogo.weightx = 1.0;
+        gbcLogo.weighty = 1.0;
+        gbcLogo.fill = GridBagConstraints.NONE;
+        gbcLogo.anchor = GridBagConstraints.CENTER;
+
+        JLabel logo;
+        try {
+            ImageIcon logoIcon = new ImageIcon(getClass().getResource("../assets/sidoarjo.png")); // 🔹 FIX PATH
+            if (logoIcon.getImage() == null) {
+                throw new NullPointerException("Logo image not found");
+            }
+            Image img = logoIcon.getImage().getScaledInstance(256, 256, Image.SCALE_SMOOTH);
+            logo = new JLabel(new ImageIcon(img));
+            logo.setHorizontalAlignment(SwingConstants.CENTER);
+        } catch (Exception e) {
+            System.err.println("Error loading logo: " + e.getMessage());
+            logo = new JLabel("SIDOARJO", SwingConstants.CENTER);
+            logo.setFont(new Font("Segoe UI", Font.BOLD, 24));
+            logo.setForeground(Color.WHITE);
         }
 
-        JLabel logoLabel = new JLabel(icon);
-        logoLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0)); // padding atas bawah
-
-        logoContainer.add(logoLabel);
-
+        logoContainer.add(logo, gbcLogo);
         leftPanel.add(logoContainer, BorderLayout.CENTER);
 
         splitPane.setLeftComponent(leftPanel);
