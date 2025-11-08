@@ -284,7 +284,8 @@ public class LoginView extends JFrame {
         togglePasswordButton.setFocusPainted(false);
         togglePasswordButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         togglePasswordButton.setPreferredSize(new Dimension(40, 30));
-        togglePasswordButton.setForeground(new Color(0x006315));
+        togglePasswordButton.setForeground(Color.WHITE);
+        togglePasswordButton.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 16));
         togglePasswordButton.setToolTipText("Tampilkan Password");
         togglePasswordButton.addActionListener(e -> togglePasswordVisibility());
 
@@ -305,13 +306,11 @@ public class LoginView extends JFrame {
         buttonPanel.setOpaque(false);
 
         buttonLogin = new JButton("Login");
-        buttonBatal = new JButton("Kembali ke Home"); // 🔹 GANTI: Tulisan tombol
+        buttonBatal = new JButton("Kembali"); 
 
-        // Styling tombol seperti HomeView
         buttonLogin = createStyledButton("Login");
-        buttonBatal = createStyledButton("Kembali"); // 🔹 GANTI: Nama tombol
+        buttonBatal = createStyledButton("Kembali"); 
 
-        // 🔹 GANTI: Aksi tombol batal menjadi buka HomeView dan dispose
         buttonBatal.addActionListener(e -> {
             new HomeView().setVisible(true);
             dispose();
@@ -423,7 +422,7 @@ public class LoginView extends JFrame {
         btn.setPreferredSize(new Dimension(120, 40)); 
         
         if ("Kembali".equals(text)) {
-            btn.setBackground(new Color(180, 180, 180)); // warna berbeda untuk tombol kembali
+            btn.setBackground(new Color(180, 180, 180));
         }
         
         return btn;
@@ -432,11 +431,11 @@ public class LoginView extends JFrame {
     private void togglePasswordVisibility() {
         if (fieldPassword.getEchoChar() == '•') {
             fieldPassword.setEchoChar((char) 0);
-            togglePasswordButton.setText("🙈");
+            togglePasswordButton.setText("👁"); // bisa juga tetap "👁️"
             togglePasswordButton.setToolTipText("Sembunyikan Password");
         } else {
             fieldPassword.setEchoChar('•');
-            togglePasswordButton.setText("👁️");
+            togglePasswordButton.setText("👁️"); // bisa juga "👁"
             togglePasswordButton.setToolTipText("Tampilkan Password");
         }
         fieldPassword.requestFocus();
