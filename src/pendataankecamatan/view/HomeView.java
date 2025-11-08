@@ -8,16 +8,18 @@ import pendataankecamatan.model.User;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.RoundRectangle2D;
 
 public class HomeView extends JFrame {
-    private JPanel mainPanel;
-    private JPanel buttonPanel;
+    private JPanel rightPanel;
     private Point initialClick;
     private final AuthController authController = new AuthController();
+    private static final int CORNER_RADIUS = 20;
+    private JSplitPane splitPane;
 
     public HomeView() {
         try {
@@ -29,195 +31,290 @@ public class HomeView extends JFrame {
         }
 
         setUndecorated(true);
-        setSize(900, 600);
+        setSize(720, 384);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBackground(new Color(0, 0, 0, 0));
+        setLayout(new BorderLayout());
 
         initializeUI();
-        refreshButtons(); 
-    }
-
-    private void initializeUI() {
-        mainPanel = new JPanel(new BorderLayout()) {
+        refreshButtons();
+        
+        // Apply window shape for smooth rounded corners
+        addComponentListener(new ComponentAdapter() {
             @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(Color.WHITE);
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
-                g2.dispose();
-            }
-        };
-        mainPanel.setOpaque(false);
-
-        // Title bar custom
-        JPanel titleBar = createTitleBar();
-        mainPanel.add(titleBar, BorderLayout.NORTH);
-
-        // Content
-        JPanel content = new JPanel(new BorderLayout());
-        content.setOpaque(false);
-
-        JLabel titleLabel = new JLabel("Menu Utama", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        titleLabel.setForeground(new Color(70, 130, 180));
-        content.add(titleLabel, BorderLayout.NORTH);
-
-        buttonPanel = new JPanel(new GridLayout(0, 1, 10, 10));
-        buttonPanel.setOpaque(false);
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(40, 80, 40, 80));
-        content.add(buttonPanel, BorderLayout.CENTER);
-
-        mainPanel.add(content, BorderLayout.CENTER);
-        setContentPane(mainPanel);
-    }
-    
-    private JButton createMacOSDotButton(Color color, String action) {
-    JButton dot = new JButton() {
-        @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2d = (Graphics2D) g.create();
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.setColor(color);
-            g2d.fillOval(0, 0, getWidth(), getHeight());
-            if (getModel().isRollover()) {
-                g2d.setColor(new Color(0, 0, 0, 50));
-                g2d.fillOval(0, 0, getWidth(), getHeight());
-            }
-            g2d.dispose();
-        }
-    };
-
-    dot.setPreferredSize(new Dimension(12, 12));
-    dot.setMinimumSize(new Dimension(12, 12));
-    dot.setMaximumSize(new Dimension(12, 12));
-
-    dot.setContentAreaFilled(false);
-    dot.setBorderPainted(false);
-    dot.setFocusPainted(false);
-    dot.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-    if ("Close".equals(action)) {
-        dot.addActionListener(e -> System.exit(0));
-    } else if ("Minimize".equals(action)) {
-        dot.addActionListener(e -> setState(JFrame.ICONIFIED));
-    } else if ("Maximize".equals(action)) {
-        dot.addActionListener(e -> {
-            if (getExtendedState() == JFrame.MAXIMIZED_BOTH) {
-                setExtendedState(JFrame.NORMAL);
-            } else {
-                setExtendedState(JFrame.MAXIMIZED_BOTH);
+            public void componentResized(ComponentEvent e) {
+                applyWindowShape();
             }
         });
     }
 
-    return dot;
-}
-
-   private JPanel createTitleBar() {
-    JPanel titleBar = new JPanel(new BorderLayout());
-    titleBar.setOpaque(false);
-    titleBar.setPreferredSize(new Dimension(0, 40));
-    titleBar.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
-
-    // Panel untuk tombol macOS (red, yellow, green)
-    JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-    controlPanel.setOpaque(false);
-
-    JButton redDot = createMacOSDotButton(new Color(0xFF5F57), "Close");
-    JButton yellowDot = createMacOSDotButton(new Color(0xFFBD2E), "Minimize");
-    JButton greenDot = createMacOSDotButton(new Color(0x28CA42), "Maximize");
-
-    controlPanel.add(redDot);
-    controlPanel.add(yellowDot);
-    controlPanel.add(greenDot);
-
-    titleBar.add(controlPanel, BorderLayout.WEST);
-
-    // Agar bisa drag window
-    titleBar.addMouseListener(new MouseAdapter() {
-        @Override
-        public void mousePressed(MouseEvent e) {
-            initialClick = e.getPoint();
+    private void applyWindowShape() {
+        if (getWidth() > 0 && getHeight() > 0) {
+            Shape shape = new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
+            setShape(shape);
         }
-    });
-    titleBar.addMouseMotionListener(new MouseAdapter() {
-        @Override
-        public void mouseDragged(MouseEvent e) {
-            if (initialClick != null) {
-                int newX = e.getXOnScreen() - initialClick.x;
-                int newY = e.getYOnScreen() - initialClick.y;
-                setLocation(newX, newY);
+    }
+
+    private void initializeUI() {
+        // Main container with rounded corners
+        JPanel mainContainer = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                // Background with rounded corners (hijau)
+                g2d.setColor(new Color(0x006315));
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
+                
+                g2d.dispose();
             }
-        }
-    });
+        };
+        mainContainer.setOpaque(false);
 
-    return titleBar;
-}
+        // Split pane untuk 2 kolom
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setDividerLocation(360); // 50% dari 720px
+        splitPane.setDividerSize(0);
+        splitPane.setOpaque(false);
+        splitPane.setBackground(new Color(0, 0, 0, 0));
+
+        // ================= PANEL KIRI (Hijau dengan Logo) =================
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.setOpaque(false);
+
+        // Top panel dengan macOS buttons
+        JPanel leftTopPanel = new JPanel(new BorderLayout());
+        leftTopPanel.setOpaque(false);
+        
+        JPanel macOSButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
+        macOSButtons.setOpaque(false);
+        
+        JButton closeBtn = createMacOSButton(new Color(0xFF5F57), "Close");
+        JButton minimizeBtn = createMacOSButton(new Color(0xFFBD2E), "Minimize");
+        JButton maximizeBtn = createMacOSButton(new Color(0x28CA42), "Maximize");
+        
+        macOSButtons.add(closeBtn);
+        macOSButtons.add(minimizeBtn);
+        macOSButtons.add(maximizeBtn);
+        leftTopPanel.add(macOSButtons, BorderLayout.WEST);
+
+        leftPanel.add(leftTopPanel, BorderLayout.NORTH);
+
+        // Tambahkan logo atau konten di tengah panel kiri jika ada
+        JPanel logoContainer = new JPanel(new GridBagLayout());
+        logoContainer.setOpaque(false);
+        // Bisa tambahkan logo disini jika diperlukan
+        leftPanel.add(logoContainer, BorderLayout.CENTER);
+
+        splitPane.setLeftComponent(leftPanel);
+
+        // ================= PANEL KANAN (Putih dengan Menu) =================
+        rightPanel = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                // Background putih dengan rounded corner di kanan
+                g2d.setColor(Color.WHITE);
+                g2d.fillRoundRect(-CORNER_RADIUS, 0, getWidth() + CORNER_RADIUS, getHeight(), CORNER_RADIUS, CORNER_RADIUS);
+                
+                // Tutup bagian kiri yang masih terlihat
+                g2d.fillRect(0, 0, CORNER_RADIUS, getHeight());
+                
+                g2d.dispose();
+            }
+        };
+        rightPanel.setOpaque(false);
+
+        splitPane.setRightComponent(rightPanel);
+        mainContainer.add(splitPane, BorderLayout.CENTER);
+        add(mainContainer);
+
+        addDragFunctionality();
+    }
+
+    private void addDragFunctionality() {
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                initialClick = e.getPoint();
+            }
+        });
+        addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (initialClick != null) {
+                    int newX = e.getXOnScreen() - initialClick.x;
+                    int newY = e.getYOnScreen() - initialClick.y;
+                    setLocation(newX, newY);
+                }
+            }
+        });
+    }
+
+    private JButton createMacOSButton(Color color, String action) {
+        JButton button = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                g2d.setColor(color);
+                g2d.fillOval(0, 0, getWidth(), getHeight());
+                
+                if (getModel().isRollover()) {
+                    g2d.setColor(new Color(0, 0, 0, 50));
+                    g2d.fillOval(0, 0, getWidth(), getHeight());
+                }
+                g2d.dispose();
+            }
+        };
+
+        button.setPreferredSize(new Dimension(12, 12));
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        if ("Close".equals(action)) {
+            button.addActionListener(e -> System.exit(0));
+        } else if ("Minimize".equals(action)) {
+            button.addActionListener(e -> setState(JFrame.ICONIFIED));
+        } else if ("Maximize".equals(action)) {
+            button.addActionListener(e -> {
+                if (getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+                    setExtendedState(JFrame.NORMAL);
+                } else {
+                    setExtendedState(JFrame.MAXIMIZED_BOTH);
+                }
+            });
+        }
+
+        return button;
+    }
 
     private JButton createStyledButton(String text) {
-        JButton btn = new JButton(text);
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                Color bgColor;
+                if (getModel().isPressed()) {
+                    bgColor = new Color(0x004d10);
+                } else if (getModel().isRollover()) {
+                    bgColor = new Color(0x005512);
+                } else {
+                    bgColor = new Color(0x006315);
+                }
+                
+                g2.setColor(bgColor);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30);
+                
+                super.paintComponent(g);
+                g2.dispose();
+            }
+        };
+        
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btn.setForeground(Color.WHITE);
-        btn.setBackground(new Color(70, 130, 180));
         btn.setFocusPainted(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setPreferredSize(new Dimension(250, 50));
+        
         return btn;
     }
 
     public void refreshButtons() {
-        buttonPanel.removeAll();
+        rightPanel.removeAll();
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 20, 10, 20);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+
+        // Title
+        gbc.gridy = 0;
+        JLabel titleLabel = new JLabel("Menu Utama", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        titleLabel.setForeground(Color.BLACK);
+        rightPanel.add(titleLabel, gbc);
+
+        gbc.gridy++;
+        rightPanel.add(Box.createVerticalStrut(20), gbc);
 
         if (Constants.CURRENT_USER == null) {
             // 🔹 TAMU
-            JButton btnInfo = createStyledButton("Lihat Informasi Umum");
-            JButton btnLogin = createStyledButton("Login");
+            gbc.gridy++;
+            JButton btnInfo = createStyledButton("Lihat Informasi Publik");
+            btnInfo.addActionListener(e -> {
+                new PublicInfoView().setVisible(true);
+                this.dispose();
+            });
+            rightPanel.add(btnInfo, gbc);
 
-                btnInfo.addActionListener(e -> {
-                    new PublicInfoView().setVisible(true);
-                    this.dispose();
-                });            
-                btnLogin.addActionListener(e -> {
+            gbc.gridy++;
+            JButton btnLogin = createStyledButton("Login");
+            btnLogin.addActionListener(e -> {
                 new LoginView().setVisible(true);
                 this.dispose();
             });
-
-            buttonPanel.add(btnInfo);
-            buttonPanel.add(btnLogin);
+            rightPanel.add(btnLogin, gbc);
         } else {
             User user = Constants.CURRENT_USER;
 
             // 🔐 WARGA / 👑 ADMIN
+            gbc.gridy++;
             JButton btnLaporan = createStyledButton("Laporan Masalah");
-            JButton btnPendataan = createStyledButton("Pendataan Warga");
-            JButton btnKonsultasi = createStyledButton("Konsultasi Kesehatan");
-            JButton btnLogout = createStyledButton("Logout");
-
             btnLaporan.addActionListener(e -> new ReportFormView().setVisible(true));
+            rightPanel.add(btnLaporan, gbc);
+
+            gbc.gridy++;
+            JButton btnPendataan = createStyledButton("Pendataan Warga");
             btnPendataan.addActionListener(e -> new RegistrationFormView().setVisible(true));
+            rightPanel.add(btnPendataan, gbc);
+
+            gbc.gridy++;
+            JButton btnKonsultasi = createStyledButton("Konsultasi Kesehatan");
             btnKonsultasi.addActionListener(e -> new ChatView().setVisible(true));
+            rightPanel.add(btnKonsultasi, gbc);
+
+            gbc.gridy++;
+            JButton btnLogout = createStyledButton("Logout");
             btnLogout.addActionListener(e -> {
                 authController.logout();
-                refreshButtons(); 
+                refreshButtons();
                 JOptionPane.showMessageDialog(this, "Berhasil logout.");
             });
-
-            buttonPanel.add(btnLaporan);
-            buttonPanel.add(btnPendataan);
-            buttonPanel.add(btnKonsultasi);
-            buttonPanel.add(btnLogout);
+            rightPanel.add(btnLogout, gbc);
 
             if ("ADMIN".equals(user.getRole())) {
+                gbc.gridy++;
                 JButton btnAdmin = createStyledButton("Admin Dashboard");
-                btnAdmin.setBackground(new Color(120, 80, 200)); // warna berbeda
+                btnAdmin.setBackground(new Color(120, 80, 200));
                 btnAdmin.addActionListener(e -> new AdminDashboardView().setVisible(true));
-                buttonPanel.add(btnAdmin);
+                rightPanel.add(btnAdmin, gbc);
             }
         }
 
-        buttonPanel.revalidate();
-        buttonPanel.repaint();
+        rightPanel.revalidate();
+        rightPanel.repaint();
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            HomeView frame = new HomeView();
+            frame.setVisible(true);
+            frame.applyWindowShape();
+        });
     }
 }
