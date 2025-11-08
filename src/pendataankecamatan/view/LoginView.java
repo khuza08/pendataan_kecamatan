@@ -162,8 +162,9 @@ public class LoginView extends JFrame {
         };
         rightPanel.setOpaque(false);
 
+        // 🔹 GANTI: Kurangi vertical padding untuk jarak antar komponen
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 20, 8, 20); // padding konsisten
+        gbc.insets = new Insets(5, 20, 5, 20); // ❌ DARI (8, 20, 8, 20) → (5, 20, 5, 20)
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
 
@@ -175,7 +176,7 @@ public class LoginView extends JFrame {
         rightPanel.add(titleLabel, gbc);
 
         gbc.gridy++;
-        rightPanel.add(Box.createVerticalStrut(20), gbc);
+        rightPanel.add(Box.createVerticalStrut(8), gbc); // 🔹 Kurangi jarak setelah title
 
         // 🔹 Username field dengan background
         gbc.gridy++;
@@ -218,11 +219,12 @@ public class LoginView extends JFrame {
         usernameContainer.add(fieldUsername, BorderLayout.CENTER);
         rightPanel.add(usernameContainer, gbc);
 
-        gbc.gridy++;
-        rightPanel.add(Box.createVerticalStrut(10), gbc); // jarak antar field
+        // 🔹 HAPUS: Box.createVerticalStrut(10) antara username dan password
+        // gbc.gridy++;
+        // rightPanel.add(Box.createVerticalStrut(10), gbc); // ❌ HAPUS
 
         // 🔹 Password field dengan background dan toggle button
-        gbc.gridy++;
+        gbc.gridy++; // Langsung ke baris berikutnya (tidak ada struts)
         JPanel passwordContainer = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -295,7 +297,7 @@ public class LoginView extends JFrame {
         fieldUsername.addActionListener(e -> fieldPassword.requestFocus());
 
         gbc.gridy++;
-        rightPanel.add(Box.createVerticalStrut(20), gbc); // jarak ke tombol
+        rightPanel.add(Box.createVerticalStrut(10), gbc); // jarak ke tombol
 
         // Buttons
         gbc.gridy++;
