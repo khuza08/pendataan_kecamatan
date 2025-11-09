@@ -4,6 +4,7 @@ package pendataankecamatan.service;
 import pendataankecamatan.model.User;
 import pendataankecamatan.model.Desa;
 import pendataankecamatan.model.Pejabat;
+import pendataankecamatan.model.Warga;
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
@@ -82,6 +83,66 @@ public class DatabaseService {
         return null;
     }
 
+    public boolean updateWarga(Warga warga) {
+        String sql = "INSERT INTO warga (user_id, nik, nama_lengkap, alamat, rt, rw, desa_id, jenis_kelamin, tanggal_lahir) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE nik=?, alamat=?, rt=?, rw=?, desa_id=?, jenis_kelamin=?, tanggal_lahir=?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, warga.getUserId());
+            stmt.setString(2, warga.getNik());
+            stmt.setString(3, warga.getNamaLengkap());
+            stmt.setString(4, warga.getAlamat());
+            stmt.setString(5, warga.getRt());
+            stmt.setString(6, warga.getRw());
+            stmt.setInt(7, warga.getDesaId());
+            stmt.setString(8, warga.getJenisKelamin());
+            stmt.setString(9, warga.getTanggalLahir());
+
+            // Update values
+            stmt.setString(10, warga.getNik());
+            stmt.setString(11, warga.getAlamat());
+            stmt.setString(12, warga.getRt());
+            stmt.setString(13, warga.getRw());
+            stmt.setInt(14, warga.getDesaId());
+            stmt.setString(15, warga.getJenisKelamin());
+            stmt.setString(16, warga.getTanggalLahir());
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Warga getWargaByUserId(int userId) {
+        String sql = "SELECT * FROM warga WHERE user_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new Warga(
+                    rs.getInt("id"),
+                    rs.getInt("user_id"),
+                    rs.getString("nik"),
+                    rs.getString("nama_lengkap"),
+                    rs.getString("alamat"),
+                    rs.getString("rt"),
+                    rs.getString("rw"),
+                    rs.getInt("desa_id"),
+                    rs.getString("jenis_kelamin"),
+                    rs.getString("tanggal_lahir")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
     public boolean saveLaporan(int userId, String judul, String deskripsi) {
         String sql = "INSERT INTO laporan (user_id, judul, deskripsi) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
