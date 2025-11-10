@@ -22,13 +22,15 @@ import java.awt.geom.RoundRectangle2D;
 import java.util.List;
 
 public class AdminDashboardView extends JFrame {
-    private JTabbedPane tabbedPane;
     private JPanel panelDesa, panelWarga, panelPejabat;
     private JTable tableDesa, tableWarga, tablePejabat;
     private DefaultTableModel modelDesa, modelWarga, modelPejabat;
     private AdminController controller;
     private Point initialClick;
     private static final int CORNER_RADIUS = 20;
+
+    private CardLayout cardLayout;
+    private JPanel mainContent;
 
     public AdminDashboardView() {
         try {
@@ -38,18 +40,16 @@ public class AdminDashboardView extends JFrame {
         }
 
         setUndecorated(true);
-        setSize(900, 700);
+        setSize(1000, 700);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
-        setBackground(new Color(0, 0, 0, 0)); // Transparent background
+        setBackground(new Color(0, 0, 0, 0));
         setLayout(new BorderLayout());
 
         controller = new AdminController();
 
         initializeUI();
         loadAllData();
-        
-        // Apply window shape for smooth rounded corners
         applyWindowShape();
     }
 
@@ -61,44 +61,130 @@ public class AdminDashboardView extends JFrame {
     }
 
     private void initializeUI() {
-        // Main container with rounded corners
         JPanel mainContainer = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-                
-                // Background with rounded corners (hijau)
                 g2d.setColor(new Color(0x006315));
                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
-                
                 g2d.dispose();
             }
         };
         mainContainer.setOpaque(false);
 
-        // Title bar
         JPanel titleBar = createTitleBar();
         mainContainer.add(titleBar, BorderLayout.NORTH);
 
-        // TabbedPane
-        tabbedPane = new JTabbedPane();
+        // Buat panel konten dengan CardLayout
+        cardLayout = new CardLayout();
+        mainContent = new JPanel(cardLayout);
 
-        // Tab Desa
+        // Buat panel CRUD
         panelDesa = createCrudPanel("Desa", "desa");
-        tabbedPane.addTab("Kelola Desa", panelDesa);
-
-        // Tab Warga
         panelWarga = createCrudPanel("Warga", "warga");
-        tabbedPane.addTab("Kelola Warga", panelWarga);
-
-        // Tab Pejabat
         panelPejabat = createCrudPanel("Pejabat", "pejabat");
-        tabbedPane.addTab("Kelola Pejabat", panelPejabat);
 
-        mainContainer.add(tabbedPane, BorderLayout.CENTER);
+        mainContent.add(createWelcomePanel(), "beranda");
+        mainContent.add(panelDesa, "desa");
+        mainContent.add(panelWarga, "warga");
+        mainContent.add(panelPejabat, "pejabat");
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createSidebar(), mainContent);
+        splitPane.setDividerLocation(180);
+        splitPane.setDividerSize(0);
+        splitPane.setBorder(null);
+
+        mainContainer.add(splitPane, BorderLayout.CENTER);
         add(mainContainer);
+    }
+
+    private JPanel createSidebar() {
+        JPanel sidebar = new JPanel(new BorderLayout());
+        sidebar.setBackground(new Color(0x004d00)); // Hijau tua
+        sidebar.setPreferredSize(new Dimension(180, 0));
+
+        // Panel untuk tombol
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setBackground(new Color(0x004d00));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Header Beranda
+        buttonPanel.add(createSidebarButton("Beranda", e -> showPanel("beranda")));
+        buttonPanel.add(Box.createVerticalStrut(10));
+
+        // Header Manajemen
+        JLabel manajemenLabel = new JLabel("Manajemen");
+        manajemenLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        manajemenLabel.setForeground(Color.WHITE);
+        manajemenLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+        buttonPanel.add(manajemenLabel);
+
+        // Tombol Data Warga
+        buttonPanel.add(createSidebarButton("Data Warga", e -> showPanel("warga")));
+        buttonPanel.add(Box.createVerticalStrut(10));
+
+        // Tombol Data Desa
+        buttonPanel.add(createSidebarButton("Data Desa", e -> showPanel("desa")));
+        buttonPanel.add(Box.createVerticalStrut(10));
+
+        // Tombol Data Pejabat
+        buttonPanel.add(createSidebarButton("Data Pejabat", e -> showPanel("pejabat")));
+
+        sidebar.add(buttonPanel, BorderLayout.CENTER);
+
+        return sidebar;
+    }
+
+    private JButton createSidebarButton(String text, ActionListener listener) {
+        JButton button = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+                // Background putih dengan rounded corner
+                g2d.setColor(Color.WHITE);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+
+                // Teks hijau
+                g2d.setColor(new Color(0x006315));
+                g2d.setFont(getFont().deriveFont(Font.BOLD));
+                FontMetrics fm = g2d.getFontMetrics();
+                int x = (getWidth() - fm.stringWidth(getText())) / 2;
+                int y = (getHeight() + fm.getAscent()) / 2 - 2;
+                g2d.drawString(getText(), x, y);
+
+                super.paintComponent(g);
+                g2d.dispose();
+            }
+        };
+
+        button.setAlignmentX(Component.LEFT_ALIGNMENT);
+        button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        button.addActionListener(listener);
+
+        return button;
+    }
+
+    private void showPanel(String panelName) {
+        cardLayout.show(mainContent, panelName);
+    }
+
+    private JPanel createWelcomePanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+        JLabel label = new JLabel("Selamat Datang di Dashboard Admin");
+        label.setFont(new Font("SansSerif", Font.BOLD, 24));
+        label.setForeground(Color.WHITE);
+        panel.add(label);
+        panel.setBackground(new Color(0x006315));
+        return panel;
     }
 
     private JPanel createTitleBar() {
@@ -107,7 +193,6 @@ public class AdminDashboardView extends JFrame {
         titleBar.setPreferredSize(new Dimension(0, 40));
         titleBar.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
 
-        // Panel untuk tombol macOS (red, yellow, green)
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         controlPanel.setOpaque(false);
 
@@ -121,13 +206,13 @@ public class AdminDashboardView extends JFrame {
 
         titleBar.add(controlPanel, BorderLayout.WEST);
 
-        // Agar bisa drag window
         titleBar.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 initialClick = e.getPoint();
             }
         });
+
         titleBar.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
@@ -148,10 +233,9 @@ public class AdminDashboardView extends JFrame {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
                 g2d.setColor(color);
                 g2d.fillOval(0, 0, getWidth(), getHeight());
-                
+
                 if (getModel().isRollover()) {
                     g2d.setColor(new Color(0, 0, 0, 50));
                     g2d.fillOval(0, 0, getWidth(), getHeight());
@@ -167,7 +251,7 @@ public class AdminDashboardView extends JFrame {
         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         if ("Close".equals(action)) {
-            button.addActionListener(e -> dispose()); // Tutup window ini, bukan aplikasi
+            button.addActionListener(e -> dispose());
         } else if ("Minimize".equals(action)) {
             button.addActionListener(e -> setState(JFrame.ICONIFIED));
         } else if ("Maximize".equals(action)) {
@@ -199,19 +283,17 @@ public class AdminDashboardView extends JFrame {
         buttonPanel.add(btnEdit);
         buttonPanel.add(btnDelete);
 
-        // Table
         String[] columns = getColumnsForEntity(type);
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make table non-editable
+                return false;
             }
         };
 
         JTable table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        // Assign model to corresponding variable
         if ("desa".equals(type)) {
             modelDesa = model;
             tableDesa = table;
@@ -250,14 +332,10 @@ public class AdminDashboardView extends JFrame {
     }
 
     private void loadDesaData() {
-        modelDesa.setRowCount(0); // Clear existing rows
+        modelDesa.setRowCount(0);
         List<Desa> list = controller.getAllDesa();
         for (Desa item : list) {
-            modelDesa.addRow(new Object[]{
-                item.getId(),
-                item.getNama(),
-                item.getKodePos()
-            });
+            modelDesa.addRow(new Object[]{item.getId(), item.getNama(), item.getKodePos()});
         }
     }
 
@@ -266,16 +344,9 @@ public class AdminDashboardView extends JFrame {
         List<Warga> list = controller.getAllWarga();
         for (Warga item : list) {
             modelWarga.addRow(new Object[]{
-                item.getId(),
-                item.getUserId(),
-                item.getNik(),
-                item.getNamaLengkap(),
-                item.getAlamat(),
-                item.getRt(),
-                item.getRw(),
-                item.getDesaId(),
-                item.getJenisKelamin(),
-                item.getTanggalLahir()
+                item.getId(), item.getUserId(), item.getNik(), item.getNamaLengkap(),
+                item.getAlamat(), item.getRt(), item.getRw(), item.getDesaId(),
+                item.getJenisKelamin(), item.getTanggalLahir()
             });
         }
     }
@@ -284,12 +355,7 @@ public class AdminDashboardView extends JFrame {
         modelPejabat.setRowCount(0);
         List<Pejabat> list = controller.getAllPejabat();
         for (Pejabat item : list) {
-            modelPejabat.addRow(new Object[]{
-                item.getId(),
-                item.getNama(),
-                item.getJabatan(),
-                item.getNomorTelepon()
-            });
+            modelPejabat.addRow(new Object[]{item.getId(), item.getNama(), item.getJabatan(), item.getNomorTelepon()});
         }
     }
 
