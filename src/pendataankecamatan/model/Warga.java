@@ -57,4 +57,20 @@ public class Warga {
 
     public String getTanggalLahir() { return tanggalLahir; }
     public void setTanggalLahir(String tanggalLahir) { this.tanggalLahir = tanggalLahir; }
+
+    @Override
+    public String toString() {
+        return "Warga{" +
+               "id=" + id +
+               ", userId=" + userId +
+               ", nik='" + nik + '\'' +
+               ", namaLengkap='" + namaLengkap + '\'' +
+               ", alamat='" + alamat + '\'' +
+               ", rt='" + rt + '\'' +
+               ", rw='" + rw + '\'' +
+               ", desaId=" + desaId +
+               ", jenisKelamin='" + jenisKelamin + '\'' +
+               ", tanggalLahir='" + tanggalLahir + '\'' +
+               '}';
+    }
 }

@@ -11,101 +11,32 @@ import java.util.ArrayList;
 
 public class DatabaseService {
     
-    // Ambil semua desa
-    public List<Desa> getAllDesa() {
-        List<Desa> desaList = new ArrayList<>();
-        String sql = "SELECT id, nama, kode_pos, luas_wilayah, jumlah_penduduk FROM desa ORDER BY nama";
+    // ==================== DESA CRUD ====================
+    
+    public boolean deleteDesa(int id) {
+        String sql = "DELETE FROM desa WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            if (conn == null) return desaList;
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                Desa desa = new Desa(
-                    rs.getInt("id"),
-                    rs.getString("nama"),
-                    rs.getString("kode_pos")
-                );
-                // Set properti tambahan jika diperlukan
-                desaList.add(desa);
-            }
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
-        return desaList;
     }
-
-    // Ambil semua pejabat
-    public List<Pejabat> getAllPejabat() {
-        List<Pejabat> pejabatList = new ArrayList<>();
-        String sql = "SELECT id, nama, jabatan, nomor_telepon, email FROM pejabat ORDER BY id";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            if (conn == null) return pejabatList;
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                Pejabat pejabat = new Pejabat(
-                    rs.getInt("id"),
-                    rs.getString("nama"),
-                    rs.getString("jabatan"),
-                    rs.getString("nomor_telepon")
-                );
-                // Set email jika perlu
-                pejabatList.add(pejabat);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return pejabatList;
-    }
-
-    public User authenticateUser(String username, String password) {
-        String sql = "SELECT id, username, nama_lengkap, role FROM users WHERE username = ? AND password = ?";
+    
+    public boolean updateDesa(Desa desa) {
+        String sql = "INSERT INTO desa (id, nama, kode_pos) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nama=?, kode_pos=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            if (conn == null) return null;
+            stmt.setInt(1, desa.getId());
+            stmt.setString(2, desa.getNama());
+            stmt.setString(3, desa.getKodePos());
 
-            stmt.setString(1, username);
-            stmt.setString(2, password); 
-
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new User(
-                    rs.getInt("id"),
-                    rs.getString("username"),
-                    rs.getString("nama_lengkap"),
-                    rs.getString("role")
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public boolean updateWarga(Warga warga) {
-        String sql = "INSERT INTO warga (user_id, nik, nama_lengkap, alamat, rt, rw, desa_id, jenis_kelamin, tanggal_lahir) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE nik=?, alamat=?, rt=?, rw=?, desa_id=?, jenis_kelamin=?, tanggal_lahir=?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, warga.getUserId());
-            stmt.setString(2, warga.getNik());
-            stmt.setString(3, warga.getNamaLengkap());
-            stmt.setString(4, warga.getAlamat());
-            stmt.setString(5, warga.getRt());
-            stmt.setString(6, warga.getRw());
-            stmt.setInt(7, warga.getDesaId());
-            stmt.setString(8, warga.getJenisKelamin());
-            stmt.setString(9, warga.getTanggalLahir());
-
-            // Update values
-            stmt.setString(10, warga.getNik());
-            stmt.setString(11, warga.getAlamat());
-            stmt.setString(12, warga.getRt());
-            stmt.setString(13, warga.getRw());
-            stmt.setInt(14, warga.getDesaId());
-            stmt.setString(15, warga.getJenisKelamin());
-            stmt.setString(16, warga.getTanggalLahir());
+            stmt.setString(4, desa.getNama());
+            stmt.setString(5, desa.getKodePos());
 
             int rowsAffected = stmt.executeUpdate();
             return rowsAffected > 0;
@@ -115,6 +46,147 @@ public class DatabaseService {
         }
     }
 
+    public List<Desa> getAllDesa() {
+        List<Desa> list = new ArrayList<>();
+        String sql = "SELECT * FROM desa ORDER BY nama";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                list.add(new Desa(
+                    rs.getInt("id"),
+                    rs.getString("nama"),
+                    rs.getString("kode_pos")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public Desa getDesaById(int id) {
+        String sql = "SELECT * FROM desa WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Desa(
+                    rs.getInt("id"),
+                    rs.getString("nama"),
+                    rs.getString("kode_pos")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // ==================== WARGA CRUD ====================
+
+    public boolean deleteWarga(int id) {
+        String sql = "DELETE FROM warga WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Warga> getAllWarga() {
+        List<Warga> list = new ArrayList<>();
+        String sql = "SELECT * FROM warga ORDER BY nama_lengkap";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                list.add(new Warga(
+                    rs.getInt("id"),
+                    rs.getInt("user_id"),
+                    rs.getString("nik"),
+                    rs.getString("nama_lengkap"),
+                    rs.getString("alamat"),
+                    rs.getString("rt"),
+                    rs.getString("rw"),
+                    rs.getInt("desa_id"),
+                    rs.getString("jenis_kelamin"),
+                    rs.getString("tanggal_lahir")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public Warga getWargaById(int id) {
+        String sql = "SELECT * FROM warga WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Warga(
+                    rs.getInt("id"),
+                    rs.getInt("user_id"),
+                    rs.getString("nik"),
+                    rs.getString("nama_lengkap"),
+                    rs.getString("alamat"),
+                    rs.getString("rt"),
+                    rs.getString("rw"),
+                    rs.getInt("desa_id"),
+                    rs.getString("jenis_kelamin"),
+                    rs.getString("tanggal_lahir")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean updateWarga(Warga warga) {
+        String sql = "INSERT INTO warga (id, user_id, nik, nama_lengkap, alamat, rt, rw, desa_id, jenis_kelamin, tanggal_lahir) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE user_id=?, nik=?, nama_lengkap=?, alamat=?, rt=?, rw=?, desa_id=?, jenis_kelamin=?, tanggal_lahir=?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, warga.getId());
+            stmt.setInt(2, warga.getUserId());
+            stmt.setString(3, warga.getNik());
+            stmt.setString(4, warga.getNamaLengkap());
+            stmt.setString(5, warga.getAlamat());
+            stmt.setString(6, warga.getRt());
+            stmt.setString(7, warga.getRw());
+            stmt.setInt(8, warga.getDesaId());
+            stmt.setString(9, warga.getJenisKelamin());
+            stmt.setString(10, warga.getTanggalLahir());
+
+            // Update values
+            stmt.setInt(11, warga.getUserId());
+            stmt.setString(12, warga.getNik());
+            stmt.setString(13, warga.getNamaLengkap());
+            stmt.setString(14, warga.getAlamat());
+            stmt.setString(15, warga.getRt());
+            stmt.setString(16, warga.getRw());
+            stmt.setInt(17, warga.getDesaId());
+            stmt.setString(18, warga.getJenisKelamin());
+            stmt.setString(19, warga.getTanggalLahir());
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // Ambil warga berdasarkan user_id (untuk form registrasi)
     public Warga getWargaByUserId(int userId) {
         String sql = "SELECT * FROM warga WHERE user_id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -142,7 +214,114 @@ public class DatabaseService {
         }
         return null;
     }
-    
+
+    // ==================== PEJABAT CRUD ====================
+
+    public boolean deletePejabat(int id) {
+        String sql = "DELETE FROM pejabat WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<Pejabat> getAllPejabat() {
+        List<Pejabat> list = new ArrayList<>();
+        String sql = "SELECT * FROM pejabat ORDER BY nama";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                list.add(new Pejabat(
+                    rs.getInt("id"),
+                    rs.getString("nama"),
+                    rs.getString("jabatan"),
+                    rs.getString("nomor_telepon")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public Pejabat getPejabatById(int id) {
+        String sql = "SELECT * FROM pejabat WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new Pejabat(
+                    rs.getInt("id"),
+                    rs.getString("nama"),
+                    rs.getString("jabatan"),
+                    rs.getString("nomor_telepon")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean updatePejabat(Pejabat pejabat) {
+        String sql = "INSERT INTO pejabat (id, nama, jabatan, nomor_telepon) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE nama=?, jabatan=?, nomor_telepon=?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, pejabat.getId());
+            stmt.setString(2, pejabat.getNama());
+            stmt.setString(3, pejabat.getJabatan());
+            stmt.setString(4, pejabat.getNomorTelepon());
+
+            // Update values
+            stmt.setString(5, pejabat.getNama());
+            stmt.setString(6, pejabat.getJabatan());
+            stmt.setString(7, pejabat.getNomorTelepon());
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    // ==================== USER AUTHENTICATION ====================
+
+    public User authenticateUser(String username, String password) {
+        String sql = "SELECT id, username, nama_lengkap, role FROM users WHERE username = ? AND password = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            if (conn == null) return null;
+
+            stmt.setString(1, username);
+            stmt.setString(2, password); 
+
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return new User(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("nama_lengkap"),
+                    rs.getString("role")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // ==================== LAPORAN ====================
+
     public boolean saveLaporan(int userId, String judul, String deskripsi) {
         String sql = "INSERT INTO laporan (user_id, judul, deskripsi) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -157,5 +336,4 @@ public class DatabaseService {
             return false;
         }
     }
-
 }

@@ -1,3 +1,4 @@
+// src/pendataankecamatan/model/Pejabat.java
 package pendataankecamatan.model;
 
 public class Pejabat {
@@ -26,4 +27,14 @@ public class Pejabat {
 
     public String getNomorTelepon() { return nomorTelepon; }
     public void setNomorTelepon(String nomorTelepon) { this.nomorTelepon = nomorTelepon; }
+
+    @Override
+    public String toString() {
+        return "Pejabat{" +
+               "id=" + id +
+               ", nama='" + nama + '\'' +
+               ", jabatan='" + jabatan + '\'' +
+               ", nomorTelepon='" + nomorTelepon + '\'' +
+               '}';
+    }
 }
