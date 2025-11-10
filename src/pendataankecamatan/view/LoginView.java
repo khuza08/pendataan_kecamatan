@@ -423,6 +423,8 @@ public class LoginView extends JFrame {
         
         if ("Kembali".equals(text)) {
             btn.setBackground(new Color(180, 180, 180));
+        } else if ("Login".equals(text)) {
+            btn.addActionListener(e -> handleLogin());
         }
         
         return btn;
