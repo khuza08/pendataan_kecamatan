@@ -16,6 +16,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.geom.RoundRectangle2D;
 import java.util.List;
 
 public class AdminDashboardView extends JFrame {
@@ -24,6 +27,8 @@ public class AdminDashboardView extends JFrame {
     private JTable tableDesa, tableWarga, tablePejabat;
     private DefaultTableModel modelDesa, modelWarga, modelPejabat;
     private AdminController controller;
+    private Point initialClick;
+    private static final int CORNER_RADIUS = 20;
 
     public AdminDashboardView() {
         try {
@@ -32,19 +37,52 @@ public class AdminDashboardView extends JFrame {
             e.printStackTrace();
         }
 
-        setTitle("Admin Dashboard - Kecamatan Siwalan Panji");
+        setUndecorated(true);
         setSize(900, 700);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
+        setBackground(new Color(0, 0, 0, 0)); // Transparent background
         setLayout(new BorderLayout());
 
         controller = new AdminController();
 
         initializeUI();
         loadAllData();
+        
+        // Apply window shape for smooth rounded corners
+        applyWindowShape();
+    }
+
+    private void applyWindowShape() {
+        if (getWidth() > 0 && getHeight() > 0) {
+            Shape shape = new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
+            setShape(shape);
+        }
     }
 
     private void initializeUI() {
+        // Main container with rounded corners
+        JPanel mainContainer = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                // Background with rounded corners (hijau)
+                g2d.setColor(new Color(0x006315));
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), CORNER_RADIUS, CORNER_RADIUS);
+                
+                g2d.dispose();
+            }
+        };
+        mainContainer.setOpaque(false);
+
+        // Title bar
+        JPanel titleBar = createTitleBar();
+        mainContainer.add(titleBar, BorderLayout.NORTH);
+
+        // TabbedPane
         tabbedPane = new JTabbedPane();
 
         // Tab Desa
@@ -59,7 +97,90 @@ public class AdminDashboardView extends JFrame {
         panelPejabat = createCrudPanel("Pejabat", "pejabat");
         tabbedPane.addTab("Kelola Pejabat", panelPejabat);
 
-        add(tabbedPane, BorderLayout.CENTER);
+        mainContainer.add(tabbedPane, BorderLayout.CENTER);
+        add(mainContainer);
+    }
+
+    private JPanel createTitleBar() {
+        JPanel titleBar = new JPanel(new BorderLayout());
+        titleBar.setOpaque(false);
+        titleBar.setPreferredSize(new Dimension(0, 40));
+        titleBar.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
+
+        // Panel untuk tombol macOS (red, yellow, green)
+        JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        controlPanel.setOpaque(false);
+
+        JButton closeBtn = createMacOSButton(new Color(0xFF5F57), "Close");
+        JButton minimizeBtn = createMacOSButton(new Color(0xFFBD2E), "Minimize");
+        JButton maximizeBtn = createMacOSButton(new Color(0x28CA42), "Maximize");
+
+        controlPanel.add(closeBtn);
+        controlPanel.add(minimizeBtn);
+        controlPanel.add(maximizeBtn);
+
+        titleBar.add(controlPanel, BorderLayout.WEST);
+
+        // Agar bisa drag window
+        titleBar.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                initialClick = e.getPoint();
+            }
+        });
+        titleBar.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (initialClick != null) {
+                    int newX = e.getXOnScreen() - initialClick.x;
+                    int newY = e.getYOnScreen() - initialClick.y;
+                    setLocation(newX, newY);
+                }
+            }
+        });
+
+        return titleBar;
+    }
+
+    private JButton createMacOSButton(Color color, String action) {
+        JButton button = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                g2d.setColor(color);
+                g2d.fillOval(0, 0, getWidth(), getHeight());
+                
+                if (getModel().isRollover()) {
+                    g2d.setColor(new Color(0, 0, 0, 50));
+                    g2d.fillOval(0, 0, getWidth(), getHeight());
+                }
+                g2d.dispose();
+            }
+        };
+
+        button.setPreferredSize(new Dimension(12, 12));
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        if ("Close".equals(action)) {
+            button.addActionListener(e -> dispose()); // Tutup window ini, bukan aplikasi
+        } else if ("Minimize".equals(action)) {
+            button.addActionListener(e -> setState(JFrame.ICONIFIED));
+        } else if ("Maximize".equals(action)) {
+            button.addActionListener(e -> {
+                if (getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+                    setExtendedState(JFrame.NORMAL);
+                } else {
+                    setExtendedState(JFrame.MAXIMIZED_BOTH);
+                }
+            });
+        }
+
+        return button;
     }
 
     private JPanel createCrudPanel(String entity, String type) {
