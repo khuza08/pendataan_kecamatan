@@ -157,7 +157,6 @@ public class AdminDashboardView extends JFrame {
                 int y = (getHeight() + fm.getAscent()) / 2 - 2;
                 g2d.drawString(getText(), x, y);
 
-                super.paintComponent(g);
                 g2d.dispose();
             }
         };
