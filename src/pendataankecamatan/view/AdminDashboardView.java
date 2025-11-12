@@ -14,7 +14,6 @@ import pendataankecamatan.dialogs.PejabatDialog;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -61,6 +60,7 @@ public class AdminDashboardView extends JFrame {
     }
 
     private void initializeUI() {
+        // Main container with rounded corners
         JPanel mainContainer = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -73,14 +73,30 @@ public class AdminDashboardView extends JFrame {
         };
         mainContainer.setOpaque(false);
 
-        JPanel titleBar = createTitleBar();
-        mainContainer.add(titleBar, BorderLayout.NORTH);
+        // 🔹 Create sidebar panel with full height (no gap at top)
+        JPanel sidebar = createSidebar();
+        sidebar.setPreferredSize(new Dimension(180, 0));
 
-        // Buat panel konten dengan CardLayout
+        // 🔹 macOS buttons directly on sidebar (menyatu dengan background sidebar)
+        JPanel macOSButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        macOSButtons.setOpaque(false); // Transparan agar menyatu
+        macOSButtons.setBorder(BorderFactory.createEmptyBorder(8, 8, 0, 0)); // Padding atas dan kiri
+
+        JButton closeBtn = createMacOSButton(new Color(0xFF5F57), "Close");
+        JButton minimizeBtn = createMacOSButton(new Color(0xFFBD2E), "Minimize");
+        JButton maximizeBtn = createMacOSButton(new Color(0x28CA42), "Maximize");
+
+        macOSButtons.add(closeBtn);
+        macOSButtons.add(minimizeBtn);
+        macOSButtons.add(maximizeBtn);
+
+        // Add macOS buttons to sidebar at the top
+        sidebar.add(macOSButtons, BorderLayout.NORTH);
+
+        // Create content panels
         cardLayout = new CardLayout();
         mainContent = new JPanel(cardLayout);
 
-        // Buat panel CRUD
         panelDesa = createCrudPanel("Desa", "desa");
         panelWarga = createCrudPanel("Warga", "warga");
         panelPejabat = createCrudPanel("Pejabat", "pejabat");
@@ -90,13 +106,81 @@ public class AdminDashboardView extends JFrame {
         mainContent.add(panelWarga, "warga");
         mainContent.add(panelPejabat, "pejabat");
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createSidebar(), mainContent);
+        // Split pane untuk sidebar dan main content
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sidebar, mainContent);
         splitPane.setDividerLocation(180);
         splitPane.setDividerSize(0);
+        splitPane.setOpaque(false);
+        splitPane.setBackground(new Color(0, 0, 0, 0));
         splitPane.setBorder(null);
 
         mainContainer.add(splitPane, BorderLayout.CENTER);
         add(mainContainer);
+
+        addDragFunctionality(mainContainer);
+    }
+
+    private void addDragFunctionality(JPanel container) {
+        container.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                initialClick = e.getPoint();
+            }
+        });
+
+        container.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (initialClick != null) {
+                    int newX = e.getXOnScreen() - initialClick.x;
+                    int newY = e.getYOnScreen() - initialClick.y;
+                    setLocation(newX, newY);
+                }
+            }
+        });
+    }
+
+    private JButton createMacOSButton(Color color, String action) {
+        JButton button = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+                
+                g2d.setColor(color);
+                g2d.fillOval(0, 0, getWidth(), getHeight());
+                
+                if (getModel().isRollover()) {
+                    g2d.setColor(new Color(0, 0, 0, 50));
+                    g2d.fillOval(0, 0, getWidth(), getHeight());
+                }
+                
+                g2d.dispose();
+            }
+        };
+
+        button.setPreferredSize(new Dimension(12, 12));
+        button.setContentAreaFilled(false);
+        button.setBorderPainted(false);
+        button.setFocusPainted(false);
+        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        if ("Close".equals(action)) {
+            button.addActionListener(e -> dispose());
+        } else if ("Minimize".equals(action)) {
+            button.addActionListener(e -> setState(JFrame.ICONIFIED));
+        } else if ("Maximize".equals(action)) {
+            button.addActionListener(e -> {
+                if (getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+                    setExtendedState(JFrame.NORMAL);
+                } else {
+                    setExtendedState(JFrame.MAXIMIZED_BOTH);
+                }
+            });
+        }
+
+        return button;
     }
 
     private JPanel createSidebar() {
@@ -104,11 +188,11 @@ public class AdminDashboardView extends JFrame {
         sidebar.setBackground(new Color(0x004d00)); // Hijau tua
         sidebar.setPreferredSize(new Dimension(180, 0));
 
-        // Panel untuk tombol
+        // Panel untuk tombol dengan padding top lebih besar (untuk space setelah macOS buttons)
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
         buttonPanel.setBackground(new Color(0x004d00));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 20, 20)); // Top padding 30px
 
         // Header Beranda
         buttonPanel.add(createSidebarButton("Beranda", e -> showPanel("beranda")));
@@ -151,7 +235,7 @@ public class AdminDashboardView extends JFrame {
 
                 // Teks hijau
                 g2d.setColor(new Color(0x006315));
-                g2d.setFont(getFont().deriveFont(Font.BOLD));
+                g2d.setFont(getFont().deriveFont(Font.BOLD, 14f));
                 FontMetrics fm = g2d.getFontMetrics();
                 int x = (getWidth() - fm.stringWidth(getText())) / 2;
                 int y = (getHeight() + fm.getAscent()) / 2 - 2;
@@ -184,86 +268,6 @@ public class AdminDashboardView extends JFrame {
         panel.add(label);
         panel.setBackground(new Color(0x006315));
         return panel;
-    }
-
-    private JPanel createTitleBar() {
-        JPanel titleBar = new JPanel(new BorderLayout());
-        titleBar.setOpaque(false);
-        titleBar.setPreferredSize(new Dimension(0, 40));
-        titleBar.setBorder(BorderFactory.createEmptyBorder(6, 0, 0, 0));
-
-        JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        controlPanel.setOpaque(false);
-
-        JButton closeBtn = createMacOSButton(new Color(0xFF5F57), "Close");
-        JButton minimizeBtn = createMacOSButton(new Color(0xFFBD2E), "Minimize");
-        JButton maximizeBtn = createMacOSButton(new Color(0x28CA42), "Maximize");
-
-        controlPanel.add(closeBtn);
-        controlPanel.add(minimizeBtn);
-        controlPanel.add(maximizeBtn);
-
-        titleBar.add(controlPanel, BorderLayout.WEST);
-
-        titleBar.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                initialClick = e.getPoint();
-            }
-        });
-
-        titleBar.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if (initialClick != null) {
-                    int newX = e.getXOnScreen() - initialClick.x;
-                    int newY = e.getYOnScreen() - initialClick.y;
-                    setLocation(newX, newY);
-                }
-            }
-        });
-
-        return titleBar;
-    }
-
-    private JButton createMacOSButton(Color color, String action) {
-        JButton button = new JButton() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(color);
-                g2d.fillOval(0, 0, getWidth(), getHeight());
-
-                if (getModel().isRollover()) {
-                    g2d.setColor(new Color(0, 0, 0, 50));
-                    g2d.fillOval(0, 0, getWidth(), getHeight());
-                }
-                g2d.dispose();
-            }
-        };
-
-        button.setPreferredSize(new Dimension(12, 12));
-        button.setContentAreaFilled(false);
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        if ("Close".equals(action)) {
-            button.addActionListener(e -> dispose());
-        } else if ("Minimize".equals(action)) {
-            button.addActionListener(e -> setState(JFrame.ICONIFIED));
-        } else if ("Maximize".equals(action)) {
-            button.addActionListener(e -> {
-                if (getExtendedState() == JFrame.MAXIMIZED_BOTH) {
-                    setExtendedState(JFrame.NORMAL);
-                } else {
-                    setExtendedState(JFrame.MAXIMIZED_BOTH);
-                }
-            });
-        }
-
-        return button;
     }
 
     private JPanel createCrudPanel(String entity, String type) {
