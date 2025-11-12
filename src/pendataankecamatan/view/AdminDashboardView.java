@@ -189,43 +189,86 @@ public class AdminDashboardView extends JFrame {
         return button;
     }
 
-    private JPanel createSidebar() {
-        JPanel sidebar = new JPanel(new BorderLayout());
-        sidebar.setBackground(new Color(0x004d00)); // Hijau tua
-        sidebar.setPreferredSize(new Dimension(180, 0));
+        private JPanel createSidebar() {
+         JPanel sidebar = new JPanel(new BorderLayout());
+         sidebar.setBackground(new Color(0x004d00)); // Hijau tua
+         sidebar.setPreferredSize(new Dimension(180, 0));
 
-        // Panel untuk tombol dengan padding top lebih besar (untuk space setelah macOS buttons)
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
-        buttonPanel.setBackground(new Color(0x004d00));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 20, 20)); // Top padding 30px
+         // Panel untuk tombol dengan padding top lebih besar (untuk space setelah macOS buttons)
+         JPanel buttonPanel = new JPanel();
+         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+         buttonPanel.setBackground(new Color(0x004d00));
+         buttonPanel.setBorder(BorderFactory.createEmptyBorder(30, 20, 20, 20)); // Top padding 30px
 
-        // Header Beranda
-        buttonPanel.add(createSidebarButton("Beranda", e -> showPanel("beranda")));
-        buttonPanel.add(Box.createVerticalStrut(10));
+         // Header Beranda
+         buttonPanel.add(createSidebarButton("Beranda", e -> showPanel("beranda")));
+         buttonPanel.add(Box.createVerticalStrut(10));
 
-        // Header Manajemen
-        JLabel manajemenLabel = new JLabel("Manajemen");
-        manajemenLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        manajemenLabel.setForeground(Color.WHITE);
-        manajemenLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
-        buttonPanel.add(manajemenLabel);
+         // Header Manajemen
+         JLabel manajemenLabel = new JLabel("Manajemen");
+         manajemenLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+         manajemenLabel.setForeground(Color.WHITE);
+         manajemenLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 0));
+         buttonPanel.add(manajemenLabel);
 
-        // Tombol Data Warga
-        buttonPanel.add(createSidebarButton("Data Warga", e -> showPanel("warga")));
-        buttonPanel.add(Box.createVerticalStrut(10));
+         // Tombol Data Warga
+         buttonPanel.add(createSidebarButton("Data Warga", e -> showPanel("warga")));
+         buttonPanel.add(Box.createVerticalStrut(10));
 
-        // Tombol Data Desa
-        buttonPanel.add(createSidebarButton("Data Desa", e -> showPanel("desa")));
-        buttonPanel.add(Box.createVerticalStrut(10));
+         // Tombol Data Desa
+         buttonPanel.add(createSidebarButton("Data Desa", e -> showPanel("desa")));
+         buttonPanel.add(Box.createVerticalStrut(10));
 
-        // Tombol Data Pejabat
-        buttonPanel.add(createSidebarButton("Data Pejabat", e -> showPanel("pejabat")));
+         // Tombol Data Pejabat
+         buttonPanel.add(createSidebarButton("Data Pejabat", e -> showPanel("pejabat")));
 
-        sidebar.add(buttonPanel, BorderLayout.CENTER);
+         // 🔹 TAMBAHKAN TOMBOL "KEMBALI KE HOME" DI BAWAH SEMUA TOMBOL
+         buttonPanel.add(Box.createVerticalStrut(20)); // Spasi sebelum tombol kembali
+         JButton backButton = createBackButton("Kembali ke Home", e -> {
+             new HomeView().setVisible(true);
+             dispose(); // Tutup AdminDashboardView
+         });
+         buttonPanel.add(backButton);
 
-        return sidebar;
-    }
+         sidebar.add(buttonPanel, BorderLayout.CENTER);
+
+         return sidebar;
+     }
+
+        private JButton createBackButton(String text, ActionListener listener) {
+         JButton button = new JButton(text) {
+             @Override
+             protected void paintComponent(Graphics g) {
+                 Graphics2D g2d = (Graphics2D) g.create();
+                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                 g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+                 // Background putih dengan rounded corner
+                 g2d.setColor(Color.WHITE);
+                 g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+
+                 // Teks hijau
+                 g2d.setColor(new Color(0x006315));
+                 g2d.setFont(getFont().deriveFont(Font.BOLD, 14f));
+                 FontMetrics fm = g2d.getFontMetrics();
+                 int x = (getWidth() - fm.stringWidth(getText())) / 2;
+                 int y = (getHeight() + fm.getAscent()) / 2 - 2;
+                 g2d.drawString(getText(), x, y);
+
+                 g2d.dispose();
+             }
+         };
+
+         button.setAlignmentX(Component.LEFT_ALIGNMENT);
+         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+         button.setContentAreaFilled(false);
+         button.setBorderPainted(false);
+         button.setFocusPainted(false);
+         button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+         button.addActionListener(listener);
+
+         return button;
+     }
 
     private JButton createSidebarButton(String text, ActionListener listener) {
         JButton button = new JButton(text) {
