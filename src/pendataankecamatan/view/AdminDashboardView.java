@@ -265,228 +265,229 @@ public class AdminDashboardView extends JFrame {
     private void showPanel(String panelName) {
         cardLayout.show(mainContent, panelName);
     }
-    
-    private int getTotalWargaCount() {
-    return controller.getAllWarga().size();
-}
 
-private int getTotalDesaCount() {
-    return controller.getAllDesa().size();
-}
+        private int getTotalWargaCount() {
+        return controller.getAllWarga().size();
+    }
 
-private int getTotalPejabatCount() {
-    return controller.getAllPejabat().size(); // 🔹 INI YANG KAMU KURANG
-}
+    private int getTotalDesaCount() {
+        return controller.getAllDesa().size();
+    }
 
-private JPanel createWelcomePanel() {
-    JPanel panel = new JPanel(new BorderLayout());
-    panel.setBackground(new Color(0x006315));
+    private int getTotalPejabatCount() {
+        return controller.getAllPejabat().size();
+    }
 
-    // Title
-    JLabel titleLabel = new JLabel("Dashboard Admin Kecamatan Siwalan Panji", SwingConstants.CENTER);
-    titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
-    titleLabel.setForeground(Color.WHITE);
-    panel.add(titleLabel, BorderLayout.NORTH);
+    private JPanel createWelcomePanel() {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(new Color(0x006315));
 
-    // Main content panel with grid layout
-    JPanel contentPanel = new JPanel(new GridLayout(2, 2, 20, 20));
-    contentPanel.setOpaque(false);
-    contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        // Title
+        JLabel titleLabel = new JLabel("Dashboard Admin Kecamatan Siwalan Panji", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        titleLabel.setForeground(Color.WHITE);
+        panel.add(titleLabel, BorderLayout.NORTH);
 
-    // Summary Cards
-    JPanel summaryPanel = new JPanel(new GridLayout(1, 3, 10, 0));
-    summaryPanel.setOpaque(false);
+        // Main content panel with grid layout
+        JPanel contentPanel = new JPanel(new GridLayout(2, 2, 20, 20));
+        contentPanel.setOpaque(false);
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-    // Total Warga Card
-    JPanel wargaCard = createSummaryCard("Total Warga", getTotalWargaCount(), new Color(0x00802b));
-    summaryPanel.add(wargaCard);
+        // Summary Cards
+        JPanel summaryPanel = new JPanel(new GridLayout(1, 3, 10, 0));
+        summaryPanel.setOpaque(false);
 
-    // Total Desa Card
-    JPanel desaCard = createSummaryCard("Total Desa", getTotalDesaCount(), new Color(0x009933));
-    summaryPanel.add(desaCard);
+        // Total Warga Card
+        JPanel wargaCard = createSummaryCard("Total Warga", getTotalWargaCount(), new Color(0x00802b));
+        summaryPanel.add(wargaCard);
 
-    // Total Pejabat Card
-    JPanel pejabatCard = createSummaryCard("Total Pejabat", getTotalPejabatCount(), new Color(0x00cc44));
-    summaryPanel.add(pejabatCard);
+        // Total Desa Card
+        JPanel desaCard = createSummaryCard("Total Desa", getTotalDesaCount(), new Color(0x009933));
+        summaryPanel.add(desaCard);
 
-    contentPanel.add(summaryPanel);
+        // Total Pejabat Card
+        JPanel pejabatCard = createSummaryCard("Total Pejabat", getTotalPejabatCount(), new Color(0x00cc44));
+        summaryPanel.add(pejabatCard);
 
-    // Pie Chart: Jenis Kelamin Warga
-    JPanel pieChartPanel = createPieChartPanel();
-    contentPanel.add(pieChartPanel);
+        contentPanel.add(summaryPanel);
 
-    // Bar Chart: Warga per Desa
-    JPanel barChartPanel = createBarChartPanel();
-    contentPanel.add(barChartPanel);
+        // Pie Chart: Jenis Kelamin Warga
+        JPanel pieChartPanel = createPieChartPanel();
+        contentPanel.add(pieChartPanel);
 
-    // Spacer
-    contentPanel.add(new JLabel());
+        // Bar Chart: Warga per Desa
+        JPanel barChartPanel = createBarChartPanel();
+        contentPanel.add(barChartPanel);
 
-    panel.add(contentPanel, BorderLayout.CENTER);
+        // Spacer
+        contentPanel.add(new JLabel());
 
-    return panel;
-}
+        panel.add(contentPanel, BorderLayout.CENTER);
 
-private JPanel createSummaryCard(String title, int value, Color bgColor) {
-    JPanel card = new JPanel(new BorderLayout()) {
-        @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2d = (Graphics2D) g.create();
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.setColor(bgColor);
-            g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
-            g2d.dispose();
-        }
-    };
-    card.setPreferredSize(new Dimension(150, 120)); // Lebih tinggi agar angka muat
+        return panel;
+    }
 
-    JLabel titleLabel = new JLabel(title);
-    titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-    titleLabel.setForeground(Color.WHITE);
-    titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-    JLabel valueLabel = new JLabel(String.valueOf(value));
-    valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 28)); // Lebih besar
-    valueLabel.setForeground(Color.WHITE);
-    valueLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
-    card.add(titleLabel, BorderLayout.NORTH);
-    card.add(valueLabel, BorderLayout.CENTER);
-
-    return card;
-}
-
-private JPanel createPieChartPanel() {
-    JPanel panel = new JPanel(new BorderLayout()) {
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D) g.create();
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-            // Simulasi data: Laki-laki vs Perempuan
-            int lakiLaki = 120;
-            int perempuan = 95;
-            int total = lakiLaki + perempuan;
-
-            if (total == 0) return;
-
-            int startAngle = 0;
-            int size = Math.min(getWidth(), getHeight()) - 60; // Lebih kecil agar ada ruang
-            int x = (getWidth() - size) / 2;
-            int y = (getHeight() - size) / 2;
-
-            // Slice Laki-laki (biru)
-            g2d.setColor(new Color(0x007acc));
-            int angleL = (int) ((double) lakiLaki / total * 360);
-            g2d.fillArc(x, y, size, size, startAngle, angleL);
-            startAngle += angleL;
-
-            // Slice Perempuan (pink)
-            g2d.setColor(new Color(0xff66aa));
-            int angleP = (int) ((double) perempuan / total * 360);
-            g2d.fillArc(x, y, size, size, startAngle, angleP);
-
-            // Border lingkaran
-            g2d.setColor(Color.WHITE);
-            g2d.setStroke(new BasicStroke(2));
-            g2d.drawOval(x, y, size, size);
-
-            // Label di tengah
-            g2d.setColor(Color.WHITE);
-            g2d.setFont(new Font("Segoe UI", Font.BOLD, 12));
-            String centerText = "Laki: " + lakiLaki + "\nPerempuan: " + perempuan;
-            FontMetrics fm = g2d.getFontMetrics();
-            int textWidth = fm.stringWidth(centerText);
-            int textHeight = fm.getHeight() * 2; // 2 baris
-            int centerX = x + size / 2 - textWidth / 2;
-            int centerY = y + size / 2 - textHeight / 2;
-            g2d.drawString("Laki: " + lakiLaki, centerX, centerY);
-            g2d.drawString("Perempuan: " + perempuan, centerX, centerY + fm.getHeight());
-
-            // Title
-            JLabel label = new JLabel("Jenis Kelamin Warga", SwingConstants.CENTER);
-            label.setForeground(Color.WHITE);
-            label.setFont(new Font("Segoe UI", Font.BOLD, 14));
-            add(label, BorderLayout.NORTH);
-
-            g2d.dispose();
-        }
-    };
-    panel.setOpaque(false);
-    return panel;
-}
-
-private JPanel createBarChartPanel() {
-    JPanel panel = new JPanel(new BorderLayout()) {
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D) g.create();
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-            // Simulasi data: Warga per Desa
-            String[] desaNames = {"Siwalan Panji", "Balonggarut", "Balong Dowo", "Balong Rejo", "Balong Tengah"};
-            int[] jumlahWarga = {25, 30, 20, 35, 22};
-
-            int maxWarga = 0;
-            for (int j : jumlahWarga) {
-                if (j > maxWarga) maxWarga = j;
+    private JPanel createSummaryCard(String title, int value, Color bgColor) {
+        JPanel card = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setColor(bgColor);
+                g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 15, 15);
+                g2d.dispose();
             }
+        };
+        card.setPreferredSize(new Dimension(150, 120)); // Lebih tinggi agar angka muat
 
-            if (maxWarga == 0) return;
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-            int barWidth = 40;
-            int barSpacing = 25;
-            int graphHeight = getHeight() - 80; // Lebih banyak ruang
-            int graphWidth = getWidth() - 60;
-            int startX = 30;
-            int startY = 30;
+        JLabel valueLabel = new JLabel(String.valueOf(value));
+        valueLabel.setFont(new Font("Segoe UI", Font.BOLD, 28)); // Lebih besar
+        valueLabel.setForeground(Color.WHITE);
+        valueLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-            // Draw bars
-            for (int i = 0; i < desaNames.length; i++) {
-                int barHeight = (int) ((double) jumlahWarga[i] / maxWarga * graphHeight);
-                int x = startX + i * (barWidth + barSpacing);
-                int y = startY + (graphHeight - barHeight);
+        card.add(titleLabel, BorderLayout.NORTH);
+        card.add(valueLabel, BorderLayout.CENTER);
 
-                g2d.setColor(new Color(0x00cc66));
-                g2d.fillRect(x, y, barWidth, barHeight);
+        return card;
+    }
 
-                // Label jumlah di atas bar
+    private JPanel createPieChartPanel() {
+        JPanel panel = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+                // Simulasi data: Laki-laki vs Perempuan
+                int lakiLaki = 120;
+                int perempuan = 95;
+                int total = lakiLaki + perempuan;
+
+                if (total == 0) return;
+
+                int startAngle = 0;
+                int size = Math.min(getWidth(), getHeight()) - 60; // Lebih kecil agar ada ruang
+                int x = (getWidth() - size) / 2;
+                int y = (getHeight() - size) / 2;
+
+                // Slice Laki-laki (biru)
+                g2d.setColor(new Color(0x007acc));
+                int angleL = (int) ((double) lakiLaki / total * 360);
+                g2d.fillArc(x, y, size, size, startAngle, angleL);
+                startAngle += angleL;
+
+                // Slice Perempuan (pink)
+                g2d.setColor(new Color(0xff66aa));
+                int angleP = (int) ((double) perempuan / total * 360);
+                g2d.fillArc(x, y, size, size, startAngle, angleP);
+
+                // Border lingkaran
+                g2d.setColor(Color.WHITE);
+                g2d.setStroke(new BasicStroke(2));
+                g2d.drawOval(x, y, size, size);
+
+                // Label di tengah
                 g2d.setColor(Color.WHITE);
                 g2d.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                String centerText = "Laki: " + lakiLaki + "\nPerempuan: " + perempuan;
                 FontMetrics fm = g2d.getFontMetrics();
-                String countStr = String.valueOf(jumlahWarga[i]);
-                int labelX = x + (barWidth - fm.stringWidth(countStr)) / 2;
-                int labelY = y - 5;
-                g2d.drawString(countStr, labelX, labelY);
+                int textWidth = fm.stringWidth(centerText);
+                int textHeight = fm.getHeight() * 2; // 2 baris
+                int centerX = x + size / 2 - textWidth / 2;
+                int centerY = y + size / 2 - textHeight / 2;
+                g2d.drawString("Laki: " + lakiLaki, centerX, centerY);
+                g2d.drawString("Perempuan: " + perempuan, centerX, centerY + fm.getHeight());
+
+                // Title
+                JLabel label = new JLabel("Jenis Kelamin Warga", SwingConstants.CENTER);
+                label.setForeground(Color.WHITE);
+                label.setFont(new Font("Segoe UI", Font.BOLD, 14));
+                add(label, BorderLayout.NORTH);
+
+                g2d.dispose();
             }
+        };
+        panel.setOpaque(false);
+        return panel;
+    }
 
-            // Label nama desa di bawah
-            g2d.setColor(Color.WHITE);
-            g2d.setFont(new Font("Segoe UI", Font.PLAIN, 10));
-            for (int i = 0; i < desaNames.length; i++) {
-                int x = startX + i * (barWidth + barSpacing) + barWidth / 2;
-                int y = startY + graphHeight + 15;
-                FontMetrics fm = g2d.getFontMetrics();
-                int strWidth = fm.stringWidth(desaNames[i]);
-                g2d.drawString(desaNames[i], x - strWidth / 2, y);
+    private JPanel createBarChartPanel() {
+        JPanel panel = new JPanel(new BorderLayout()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g.create();
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+                // Simulasi data: Warga per Desa
+                String[] desaNames = {"Siwalan Panji", "Balonggarut", "Balong Dowo", "Balong Rejo", "Balong Tengah"};
+                int[] jumlahWarga = {25, 30, 20, 35, 22};
+
+                int maxWarga = 0;
+                for (int j : jumlahWarga) {
+                    if (j > maxWarga) maxWarga = j;
+                }
+
+                if (maxWarga == 0) return;
+
+                int barWidth = 40;
+                int barSpacing = 25;
+                int graphHeight = getHeight() - 80; // Lebih banyak ruang
+                int graphWidth = getWidth() - 60;
+                int startX = 30;
+                int startY = 30;
+
+                // Draw bars
+                for (int i = 0; i < desaNames.length; i++) {
+                    int barHeight = (int) ((double) jumlahWarga[i] / maxWarga * graphHeight);
+                    int x = startX + i * (barWidth + barSpacing);
+                    int y = startY + (graphHeight - barHeight);
+
+                    g2d.setColor(new Color(0x00cc66));
+                    g2d.fillRect(x, y, barWidth, barHeight);
+
+                    // Label jumlah di atas bar
+                    g2d.setColor(Color.WHITE);
+                    g2d.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                    FontMetrics fm = g2d.getFontMetrics();
+                    String countStr = String.valueOf(jumlahWarga[i]);
+                    int labelX = x + (barWidth - fm.stringWidth(countStr)) / 2;
+                    int labelY = y - 5;
+                    g2d.drawString(countStr, labelX, labelY);
+                }
+
+                // Label nama desa di bawah
+                g2d.setColor(Color.WHITE);
+                g2d.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+                for (int i = 0; i < desaNames.length; i++) {
+                    int x = startX + i * (barWidth + barSpacing) + barWidth / 2;
+                    int y = startY + graphHeight + 15;
+                    FontMetrics fm = g2d.getFontMetrics();
+                    int strWidth = fm.stringWidth(desaNames[i]);
+                    g2d.drawString(desaNames[i], x - strWidth / 2, y);
+                }
+
+                // Title
+                JLabel label = new JLabel("Jumlah Warga per Desa", SwingConstants.CENTER);
+                label.setForeground(Color.WHITE);
+                label.setFont(new Font("Segoe UI", Font.BOLD, 14));
+                add(label, BorderLayout.NORTH);
+
+                g2d.dispose();
             }
-
-            // Title
-            JLabel label = new JLabel("Jumlah Warga per Desa", SwingConstants.CENTER);
-            label.setForeground(Color.WHITE);
-            label.setFont(new Font("Segoe UI", Font.BOLD, 14));
-            add(label, BorderLayout.NORTH);
-
-            g2d.dispose();
-        }
-    };
-    panel.setOpaque(false);
-    return panel;
-}
+        };
+        panel.setOpaque(false);
+        return panel;
+    }
+    
     private JPanel createCrudPanel(String entity, String type) {
         JPanel panel = new JPanel(new BorderLayout());
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));

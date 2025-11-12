@@ -264,80 +264,82 @@ public class HomeView extends JFrame {
     }
 
     public void refreshButtons() {
-        rightPanel.removeAll();
+    rightPanel.removeAll();
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 20, 8, 20);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.gridx = 0;
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(8, 20, 8, 20);
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.gridx = 0;
 
-        // Title
-        gbc.gridy = 0;
-        JLabel titleLabel = new JLabel("Menu Utama", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        titleLabel.setForeground(Color.BLACK);
-        rightPanel.add(titleLabel, gbc);
+    // Title
+    gbc.gridy = 0;
+    JLabel titleLabel = new JLabel("Menu Utama", SwingConstants.CENTER);
+    titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
+    titleLabel.setForeground(Color.BLACK);
+    rightPanel.add(titleLabel, gbc);
+
+    gbc.gridy++;
+    rightPanel.add(Box.createVerticalStrut(20), gbc);
+
+    if (Constants.CURRENT_USER == null) {
+        // 🔹 TAMU
+        gbc.gridy++;
+        JButton btnInfo = createStyledButton("Lihat Informasi Publik");
+        btnInfo.addActionListener(e -> {
+            new PublicInfoView().setVisible(true);
+            this.dispose();
+        });
+        rightPanel.add(btnInfo, gbc);
 
         gbc.gridy++;
-        rightPanel.add(Box.createVerticalStrut(20), gbc);
+        JButton btnLogin = createStyledButton("Login");
+        btnLogin.addActionListener(e -> {
+            new LoginView().setVisible(true);
+            this.dispose();
+        });
+        rightPanel.add(btnLogin, gbc);
+    } else {
+        User user = Constants.CURRENT_USER;
 
-        if (Constants.CURRENT_USER == null) {
-            // 🔹 TAMU
+        // 🔐 WARGA / 👑 ADMIN
+        gbc.gridy++;
+        JButton btnLaporan = createStyledButton("Laporan Masalah");
+        btnLaporan.addActionListener(e -> new ReportFormView().setVisible(true));
+        rightPanel.add(btnLaporan, gbc);
+
+        gbc.gridy++;
+        JButton btnPendataan = createStyledButton("Pendataan Warga");
+        btnPendataan.addActionListener(e -> new RegistrationFormView().setVisible(true));
+        rightPanel.add(btnPendataan, gbc);
+
+        gbc.gridy++;
+        JButton btnKonsultasi = createStyledButton("Konsultasi Kesehatan");
+        btnKonsultasi.addActionListener(e -> new ChatView().setVisible(true));
+        rightPanel.add(btnKonsultasi, gbc);
+
+        // 🔹 TOMBOL ADMIN DASHBOARD (jika admin)
+        if ("ADMIN".equals(user.getRole())) {
             gbc.gridy++;
-            JButton btnInfo = createStyledButton("Lihat Informasi Publik");
-            btnInfo.addActionListener(e -> {
-                new PublicInfoView().setVisible(true);
-                this.dispose();
-            });
-            rightPanel.add(btnInfo, gbc);
-
-            gbc.gridy++;
-            JButton btnLogin = createStyledButton("Login");
-            btnLogin.addActionListener(e -> {
-                new LoginView().setVisible(true);
-                this.dispose();
-            });
-            rightPanel.add(btnLogin, gbc);
-        } else {
-            User user = Constants.CURRENT_USER;
-
-            // 🔐 WARGA / 👑 ADMIN
-            gbc.gridy++;
-            JButton btnLaporan = createStyledButton("Laporan Masalah");
-            btnLaporan.addActionListener(e -> new ReportFormView().setVisible(true));
-            rightPanel.add(btnLaporan, gbc);
-
-            gbc.gridy++;
-            JButton btnPendataan = createStyledButton("Pendataan Warga");
-            btnPendataan.addActionListener(e -> new RegistrationFormView().setVisible(true));
-            rightPanel.add(btnPendataan, gbc);
-
-            gbc.gridy++;
-            JButton btnKonsultasi = createStyledButton("Konsultasi Kesehatan");
-            btnKonsultasi.addActionListener(e -> new ChatView().setVisible(true));
-            rightPanel.add(btnKonsultasi, gbc);
-
-            gbc.gridy++;
-            JButton btnLogout = createStyledButton("Logout");
-            btnLogout.addActionListener(e -> {
-                authController.logout();
-                refreshButtons();
-                JOptionPane.showMessageDialog(this, "Berhasil logout.");
-            });
-            rightPanel.add(btnLogout, gbc);
-
-            if ("ADMIN".equals(user.getRole())) {
-                gbc.gridy++;
-                JButton btnAdmin = createStyledButton("Admin Dashboard");
-                btnAdmin.setBackground(new Color(120, 80, 200));
-                btnAdmin.addActionListener(e -> new AdminDashboardView().setVisible(true));
-                rightPanel.add(btnAdmin, gbc);
-            }
+            JButton btnAdmin = createStyledButton("Admin Dashboard");
+            btnAdmin.setBackground(new Color(120, 80, 200));
+            btnAdmin.addActionListener(e -> new AdminDashboardView().setVisible(true));
+            rightPanel.add(btnAdmin, gbc);
         }
 
-        rightPanel.revalidate();
-        rightPanel.repaint();
+        // 🔹 TOMBOL LOGOUT/SENDIRI — DI BAWAH ADMIN DASHBOARD
+        gbc.gridy++;
+        JButton btnLogout = createStyledButton("Log out"); 
+        btnLogout.addActionListener(e -> {
+            authController.logout();
+            refreshButtons();
+            JOptionPane.showMessageDialog(this, "Berhasil logout.");
+        });
+        rightPanel.add(btnLogout, gbc);
     }
+
+    rightPanel.revalidate();
+    rightPanel.repaint();
+}
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
