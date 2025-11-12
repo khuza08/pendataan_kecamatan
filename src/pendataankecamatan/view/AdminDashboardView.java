@@ -117,18 +117,24 @@ public class AdminDashboardView extends JFrame {
         mainContainer.add(splitPane, BorderLayout.CENTER);
         add(mainContainer);
 
+        // 🔹 Tambahkan drag functionality ke main container DAN sidebar
         addDragFunctionality(mainContainer);
+        addDragFunctionality(sidebar);
     }
 
-    private void addDragFunctionality(JPanel container) {
-        container.addMouseListener(new MouseAdapter() {
+    private void addDragFunctionality(Component component) {
+        component.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                initialClick = e.getPoint();
+                // Cegah drag jika klik tombol
+                Component clickedComponent = component.getComponentAt(e.getPoint());
+                if (!(clickedComponent instanceof JButton)) {
+                    initialClick = e.getPoint();
+                }
             }
         });
 
-        container.addMouseMotionListener(new MouseAdapter() {
+        component.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (initialClick != null) {

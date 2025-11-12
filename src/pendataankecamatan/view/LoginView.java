@@ -325,17 +325,22 @@ public class LoginView extends JFrame {
         mainContainer.add(splitPane, BorderLayout.CENTER);
         add(mainContainer);
 
-        addDragFunctionality();
+        // 🔹 Aktifkan drag di panel kiri (area hijau) agar bisa digeser dari situ juga
+        addDragFunctionality(leftPanel);
     }
 
-    private void addDragFunctionality() {
-        addMouseListener(new MouseAdapter() {
+    private void addDragFunctionality(Component component) {
+        component.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                initialClick = e.getPoint();
+                // Cegah drag jika klik tombol
+                Component clickedComponent = component.getComponentAt(e.getPoint());
+                if (!(clickedComponent instanceof JButton)) {
+                    initialClick = e.getPoint();
+                }
             }
         });
-        addMouseMotionListener(new MouseAdapter() {
+        component.addMouseMotionListener(new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (initialClick != null) {
