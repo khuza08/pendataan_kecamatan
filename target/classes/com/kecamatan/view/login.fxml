@@ -13,7 +13,7 @@
         <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
     </padding>
 
-    <Text text="KECAMATAN DATA" styleClass="title-text"/>
+    <Text text="Pendataan Kecamatan" styleClass="title-text"/>
     <Text text="Sign in to continue" styleClass="subtitle-text"/>
 
     <VBox spacing="10.0" alignment="CENTER_LEFT">
