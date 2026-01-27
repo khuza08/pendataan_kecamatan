@@ -1,0 +1,54 @@
+.login-container {
+    -fx-background-color: #FEFEFE;
+}
+
+.title-text {
+    -fx-fill: #2E261A;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.subtitle-text {
+    -fx-fill: #7A7778;
+    -fx-font-size: 14px;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.input-label {
+    -fx-text-fill: #2E261A;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.input-field {
+    -fx-background-color: #f5f5f5;
+    -fx-text-fill: #2E261A;
+    -fx-prompt-text-fill: #7A7778;
+    -fx-background-radius: 4;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 4;
+    -fx-padding: 10;
+}
+
+.input-field:focused {
+    -fx-border-color: #009C4B;
+}
+
+/* Snappy button - light theme colors (Green) */
+.login-button {
+    -fx-background-color: #009C4B;
+    -fx-text-fill: #FEFEFE;
+    -fx-font-weight: bold;
+    -fx-padding: 12;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+}
+
+.login-button:pressed {
+    -fx-background-color: #007d3c;
+}
+
+.message-label {
+    -fx-font-size: 12px;
+}
