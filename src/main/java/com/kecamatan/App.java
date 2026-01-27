@@ -42,22 +42,24 @@ public class App extends Application {
         stage.show();
     }
 
-
-
     public static void setRoot(String fxml, double width, double height, boolean maximized) throws IOException {
         currentFxml = fxml;
         currentWidth = width;
         currentHeight = height;
 
+        // 1. Swap the content first
         refresh();
 
+        // 2. Adjust the window state
         Stage stage = (Stage) scene.getWindow();
         if (stage != null) {
-            stage.setResizable(true);
-            // Use runLater to ensure the window manager processes this after the scene change
+            stage.setResizable(true); // Always allow resize for dashboard
+            
             Platform.runLater(() -> {
-                stage.setMaximized(maximized);
-                if (!maximized) {
+                if (maximized) {
+                    stage.setMaximized(true);
+                } else {
+                    stage.setMaximized(false);
                     stage.setWidth(width);
                     stage.setHeight(height);
                     stage.centerOnScreen();
@@ -70,20 +72,12 @@ public class App extends Application {
         setRoot(fxml, width, height, false);
         Stage stage = (Stage) scene.getWindow();
         if (stage != null) {
-            stage.setResizable(false);
+            stage.setResizable(false); // Locking login window
         }
     }
 
     public static void refresh() throws IOException {
         scene.setRoot(loadFXML(currentFxml));
-        Stage stage = (Stage) scene.getWindow();
-        
-        // If maximized, don't touch width/height
-        if (stage != null && !stage.isMaximized()) {
-            stage.setWidth(currentWidth);
-            stage.setHeight(currentHeight);
-            stage.centerOnScreen();
-        }
     }
 
     private static Parent loadFXML(String fxml) throws IOException {
