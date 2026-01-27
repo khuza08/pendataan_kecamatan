@@ -1,4 +1,5 @@
-.login-container {
+.login-container,
+.dashboard-container {
     -fx-background-color: #FEFEFE;
 }
 
@@ -51,4 +52,69 @@
 
 .message-label {
     -fx-font-size: 12px;
+}
+
+/* Dashboard Styles */
+.sidebar {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: transparent #e0e0e0 transparent transparent;
+    -fx-pref-width: 200;
+}
+
+.sidebar-title {
+    -fx-fill: #7A7778;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.sidebar-button,
+.sidebar-button-active {
+    -fx-background-color: transparent;
+    -fx-text-fill: #2E261A;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10;
+    -fx-background-radius: 4;
+}
+
+.sidebar-button-active {
+    -fx-background-color: #e9ecef;
+    -fx-font-weight: bold;
+}
+
+.logout-button {
+    -fx-background-color: #2E261A;
+    -fx-text-fill: #FEFEFE;
+    -fx-font-weight: bold;
+    -fx-padding: 10;
+    -fx-background-radius: 4;
+}
+
+.card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 20;
+}
+
+.card-label {
+    -fx-fill: #7A7778;
+    -fx-font-size: 12px;
+}
+
+.card-value {
+    -fx-fill: #2E261A;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.card-title {
+    -fx-fill: #2E261A;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.activity-item {
+    -fx-text-fill: #7A7778;
+    -fx-font-size: 13px;
 }

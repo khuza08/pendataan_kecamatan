@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.kecamatan.controller.DashboardController"
+            stylesheets="@../style/style.css" styleClass="dashboard-container">
+    
+    <left>
+        <VBox spacing="10" styleClass="sidebar">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <Text text="MENU" styleClass="sidebar-title"/>
+            <Button text="Dashboard" maxWidth="Infinity" styleClass="sidebar-button-active"/>
+            <Button text="Data Kecamatan" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button text="Laporan" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button text="Logout" onAction="#handleLogout" maxWidth="Infinity" styleClass="logout-button"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="20">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Text text="Dashboard Overview" styleClass="title-text"/>
+            </HBox>
+            
+            <GridPane hgap="20" vgap="20">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
+                </columnConstraints>
+                
+                <VBox styleClass="card" GridPane.columnIndex="0">
+                    <Text text="Total Kecamatan" styleClass="card-label"/>
+                    <Text text="12" styleClass="card-value"/>
+                </VBox>
+                
+                <VBox styleClass="card" GridPane.columnIndex="1">
+                    <Text text="Total Desa/Kel" styleClass="card-label"/>
+                    <Text text="145" styleClass="card-value"/>
+                </VBox>
+                
+                <VBox styleClass="card" GridPane.columnIndex="2">
+                    <Text text="Penduduk (Jiwa)" styleClass="card-label"/>
+                    <Text text="852,431" styleClass="card-value"/>
+                </VBox>
+            </GridPane>
+
+            <VBox VBox.vgrow="ALWAYS" styleClass="card" spacing="10">
+                <Text text="Recent Activities" styleClass="card-title"/>
+                <Label text="• Admin logged in" styleClass="activity-item"/>
+                <Label text="• Database synchronized" styleClass="activity-item"/>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>
