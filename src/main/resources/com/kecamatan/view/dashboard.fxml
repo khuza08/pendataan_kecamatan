@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.chart.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.kecamatan.controller.DashboardController"
@@ -37,29 +38,47 @@
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
                 </columnConstraints>
                 
                 <VBox styleClass="card" GridPane.columnIndex="0">
-                    <Text text="Total Kecamatan" styleClass="card-label"/>
-                    <Text text="12" styleClass="card-value"/>
+                    <Text text="Total Warga" styleClass="card-label"/>
+                    <Text text="1,245,678" styleClass="card-value"/>
                 </VBox>
                 
                 <VBox styleClass="card" GridPane.columnIndex="1">
-                    <Text text="Total Desa/Kel" styleClass="card-label"/>
-                    <Text text="145" styleClass="card-value"/>
+                    <Text text="L / P" styleClass="card-label"/>
+                    <Text text="612K / 633K" styleClass="card-value-small"/>
                 </VBox>
                 
                 <VBox styleClass="card" GridPane.columnIndex="2">
-                    <Text text="Penduduk (Jiwa)" styleClass="card-label"/>
-                    <Text text="852,431" styleClass="card-value"/>
+                    <Text text="Total RT / RW" styleClass="card-label"/>
+                    <Text text="420 / 84" styleClass="card-value-small"/>
+                </VBox>
+
+                <VBox styleClass="card" GridPane.columnIndex="3">
+                    <Text text="Kecamatan" styleClass="card-label"/>
+                    <Text text="12" styleClass="card-value"/>
                 </VBox>
             </GridPane>
 
-            <VBox VBox.vgrow="ALWAYS" styleClass="card" spacing="10">
-                <Text text="Recent Activities" styleClass="card-title"/>
-                <Label text="• Admin logged in" styleClass="activity-item"/>
-                <Label text="• Database synchronized" styleClass="activity-item"/>
-            </VBox>
+            <HBox spacing="20" VBox.vgrow="ALWAYS">
+                <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="10">
+                    <Text text="Pertumbuhan Warga (6 Bulan Terakhir)" styleClass="card-title"/>
+                    <LineChart fx:id="wargaChart" legendSide="BOTTOM" createSymbols="true">
+                        <xAxis><CategoryAxis side="BOTTOM" label="Bulan"/></xAxis>
+                        <yAxis><NumberAxis side="LEFT" label="Jumlah"/></yAxis>
+                    </LineChart>
+                </VBox>
+                
+                <VBox prefWidth="250" styleClass="card" spacing="10">
+                    <Text text="Recent Activities" styleClass="card-title"/>
+                    <Label text="• Admin logged in" styleClass="activity-item"/>
+                    <Label text="• Database synchronized" styleClass="activity-item"/>
+                    <Label text="• New citizen data added" styleClass="activity-item"/>
+                    <Label text="• Report exported to PDF" styleClass="activity-item"/>
+                </VBox>
+            </HBox>
         </VBox>
     </center>
 </BorderPane>

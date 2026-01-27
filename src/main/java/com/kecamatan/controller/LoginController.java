@@ -48,7 +48,7 @@ public class LoginController {
                 messageLabel.setStyle("-fx-text-fill: #009C4B;");
                 
                 // Navigate to dashboard
-                App.setRoot("dashboard", 800, 600);
+                App.setRoot("dashboard", 1200, 800, true);
             } else {
                 messageLabel.setText("Invalid credentials.");
                 messageLabel.setStyle("-fx-text-fill: #2E261A;");

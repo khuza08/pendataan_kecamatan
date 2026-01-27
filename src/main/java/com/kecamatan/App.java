@@ -11,6 +11,7 @@ import java.io.IOException;
 import javafx.scene.input.KeyCode;
 import java.io.File;
 import java.net.URL;
+import javafx.application.Platform;
 
 public class App extends Application {
 
@@ -41,17 +42,44 @@ public class App extends Application {
         stage.show();
     }
 
-    public static void setRoot(String fxml, double width, double height) throws IOException {
+
+
+    public static void setRoot(String fxml, double width, double height, boolean maximized) throws IOException {
         currentFxml = fxml;
         currentWidth = width;
         currentHeight = height;
+
         refresh();
+
+        Stage stage = (Stage) scene.getWindow();
+        if (stage != null) {
+            stage.setResizable(true);
+            // Use runLater to ensure the window manager processes this after the scene change
+            Platform.runLater(() -> {
+                stage.setMaximized(maximized);
+                if (!maximized) {
+                    stage.setWidth(width);
+                    stage.setHeight(height);
+                    stage.centerOnScreen();
+                }
+            });
+        }
+    }
+
+    public static void setRoot(String fxml, double width, double height) throws IOException {
+        setRoot(fxml, width, height, false);
+        Stage stage = (Stage) scene.getWindow();
+        if (stage != null) {
+            stage.setResizable(false);
+        }
     }
 
     public static void refresh() throws IOException {
         scene.setRoot(loadFXML(currentFxml));
         Stage stage = (Stage) scene.getWindow();
-        if (stage != null) {
+        
+        // If maximized, don't touch width/height
+        if (stage != null && !stage.isMaximized()) {
             stage.setWidth(currentWidth);
             stage.setHeight(currentHeight);
             stage.centerOnScreen();

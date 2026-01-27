@@ -118,3 +118,39 @@
     -fx-text-fill: #7A7778;
     -fx-font-size: 13px;
 }
+
+.card-value-small {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-fill: #2E261A;
+}
+
+/* Charts */
+.chart {
+    -fx-padding: 10px;
+}
+
+.chart-series-line {
+    -fx-stroke: #009C4B;
+}
+
+/* Specifically target the FIRST series color (default color 0) */
+.default-color0.chart-series-line {
+    -fx-stroke: #009C4B;
+}
+
+.default-color0.chart-line-symbol {
+    -fx-background-color: #009C4B, white;
+    -fx-background-insets: 0, 2;
+}
+
+.axis {
+    -fx-tick-label-fill: #555;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 11px;
+}
+
+.axis-label {
+    -fx-text-fill: #2E261A;
+    -fx-font-weight: bold;
+}

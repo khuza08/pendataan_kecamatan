@@ -14,16 +14,16 @@
     </padding>
 
     <Text text="Pendataan Kecamatan" styleClass="title-text"/>
-    <Text text="Sign in to continue" styleClass="subtitle-text"/>
+    <Text text="Masukkan Username dan Password" styleClass="subtitle-text"/>
 
     <VBox spacing="10.0" alignment="CENTER_LEFT">
         <Label text="Username" styleClass="input-label"/>
-        <TextField fx:id="usernameField" promptText="Enter your username" styleClass="input-field"/>
+        <TextField fx:id="usernameField" promptText="Masukkan Username" styleClass="input-field"/>
     </VBox>
 
     <VBox spacing="10.0" alignment="CENTER_LEFT">
         <Label text="Password" styleClass="input-label"/>
-        <PasswordField fx:id="passwordField" promptText="Enter your password" styleClass="input-field"/>
+        <PasswordField fx:id="passwordField" promptText="Masukkan Password" styleClass="input-field"/>
     </VBox>
 
     <Button text="LOGIN" onAction="#handleLogin" defaultButton="true" maxWidth="Infinity" styleClass="login-button"/>
