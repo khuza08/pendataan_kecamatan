@@ -8,8 +8,8 @@ import javax.swing.JOptionPane;
 
 public class DatabaseConnection {
     private static final String URL = "jdbc:mysql://localhost:3306/pendataankecamatan?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
-    private static final String USERNAME = "root";       
-    private static final String PASSWORD = "root";           
+    private static final String USERNAME = "elza";       
+    private static final String PASSWORD = "elza";           
 
     static {
         try {
