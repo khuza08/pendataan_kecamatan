@@ -27,7 +27,7 @@ if [ $? -eq 0 ]; then
     # Copy assets ke build folder jika ada (penting untuk logo/gambar)
     cp -r src/pendataankecamatan/assets build/classes/pendataankecamatan/ 2>/dev/null
     
-    java -cp "$CP" pendataankecamatan.Main
+    java -Dsun.java2d.opengl=true -cp "$CP" pendataankecamatan.Main
 else
     echo "❌ Kompilasi gagal."
 fi
