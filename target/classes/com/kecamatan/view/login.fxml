@@ -26,7 +26,7 @@
         <PasswordField fx:id="passwordField" promptText="Enter your password" styleClass="input-field"/>
     </VBox>
 
-    <Button text="LOGIN" onAction="#handleLogin" maxWidth="Infinity" styleClass="login-button"/>
+    <Button text="LOGIN" onAction="#handleLogin" defaultButton="true" maxWidth="Infinity" styleClass="login-button"/>
 
     <Label fx:id="messageLabel" styleClass="message-label"/>
 
