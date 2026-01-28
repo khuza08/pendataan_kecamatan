@@ -80,47 +80,57 @@ public class DesaController implements Initializable {
     }
 
     private void loadKecamatan() {
-        kecamatanList.clear();
-        String sql = "SELECT * FROM kecamatan ORDER BY nama";
-        try (Connection conn = DatabaseUtil.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                kecamatanList.add(new Kecamatan(
-                    rs.getInt("id"),
-                    rs.getString("kode"),
-                    rs.getString("nama"),
-                    rs.getInt("jumlah_desa"),
-                    rs.getInt("populasi")
-                ));
+        com.kecamatan.util.ThreadManager.execute(() -> {
+            ObservableList<Kecamatan> tempKec = FXCollections.observableArrayList();
+            String sql = "SELECT * FROM kecamatan ORDER BY nama";
+            try (Connection conn = DatabaseUtil.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+                while (rs.next()) {
+                    tempKec.add(new Kecamatan(
+                        rs.getInt("id"),
+                        rs.getString("kode"),
+                        rs.getString("nama"),
+                        rs.getInt("jumlah_desa"),
+                        rs.getInt("populasi")
+                    ));
+                }
+                javafx.application.Platform.runLater(() -> {
+                    kecamatanList.setAll(tempKec);
+                    kecamatanComboBox.setItems(kecamatanList);
+                });
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            kecamatanComboBox.setItems(kecamatanList);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     private void loadDesa() {
-        desaList.clear();
-        String sql = "SELECT d.*, k.nama as kecamatan_nama FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id ORDER BY d.nama";
-        try (Connection conn = DatabaseUtil.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                desaList.add(new Desa(
-                    rs.getInt("id"),
-                    rs.getInt("kecamatan_id"),
-                    rs.getString("kecamatan_nama"),
-                    rs.getString("nama"),
-                    rs.getInt("populasi"),
-                    rs.getInt("jumlah_rt"),
-                    rs.getInt("jumlah_rw")
-                ));
+        com.kecamatan.util.ThreadManager.execute(() -> {
+            ObservableList<Desa> tempDesa = FXCollections.observableArrayList();
+            String sql = "SELECT d.*, k.nama as kecamatan_nama FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id ORDER BY d.nama";
+            try (Connection conn = DatabaseUtil.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+                while (rs.next()) {
+                    tempDesa.add(new Desa(
+                        rs.getInt("id"),
+                        rs.getInt("kecamatan_id"),
+                        rs.getString("kecamatan_nama"),
+                        rs.getString("nama"),
+                        rs.getInt("populasi"),
+                        rs.getInt("jumlah_rt"),
+                        rs.getInt("jumlah_rw")
+                    ));
+                }
+                javafx.application.Platform.runLater(() -> {
+                    desaList.setAll(tempDesa);
+                    desaTable.setItems(desaList);
+                });
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            desaTable.setItems(desaList);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     @FXML

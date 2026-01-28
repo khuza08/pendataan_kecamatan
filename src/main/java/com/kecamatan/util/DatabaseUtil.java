@@ -7,9 +7,13 @@ import java.sql.SQLException;
 public class DatabaseUtil {
     private static final String URL = "jdbc:postgresql://localhost:5432/pendataankecamatan";
     private static final String USER = "elza"; // Berdasarkan environment user
-    private static final String PASSWORD = ""; // Asumsi tanpa password untuk user elza di local
+    private static final String PASSWORD = "";
+    private static Connection connection;
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+        if (connection == null || connection.isClosed()) {
+            connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        }
+        return connection;
     }
 }

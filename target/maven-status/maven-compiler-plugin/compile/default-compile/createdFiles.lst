@@ -1,5 +1,6 @@
 com/kecamatan/App.class
 com/kecamatan/util/DatabaseUtil.class
+com/kecamatan/util/ThreadManager.class
 com/kecamatan/controller/WargaController.class
 com/kecamatan/model/Desa.class
 com/kecamatan/model/Kecamatan.class

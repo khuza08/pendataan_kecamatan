@@ -7,4 +7,5 @@
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/App.java
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/controller/DashboardController.java
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/util/DatabaseUtil.java
+/home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/util/ThreadManager.java
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/model/Warga.java

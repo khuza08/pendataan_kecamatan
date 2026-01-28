@@ -50,24 +50,30 @@ public class KecamatanController implements Initializable {
     }
 
     private void loadData() {
-        kecamatanList.clear();
-        String sql = "SELECT * FROM kecamatan ORDER BY kode";
-        try (Connection conn = DatabaseUtil.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                kecamatanList.add(new Kecamatan(
-                    rs.getInt("id"),
-                    rs.getString("kode"),
-                    rs.getString("nama"),
-                    rs.getInt("jumlah_desa"),
-                    rs.getInt("populasi")
-                ));
+        com.kecamatan.util.ThreadManager.execute(() -> {
+            ObservableList<Kecamatan> tempData = FXCollections.observableArrayList();
+            String sql = "SELECT * FROM kecamatan ORDER BY kode";
+            try (Connection conn = DatabaseUtil.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+                while (rs.next()) {
+                    tempData.add(new Kecamatan(
+                        rs.getInt("id"),
+                        rs.getString("kode"),
+                        rs.getString("nama"),
+                        rs.getInt("jumlah_desa"),
+                        rs.getInt("populasi")
+                    ));
+                }
+                
+                javafx.application.Platform.runLater(() -> {
+                    kecamatanList.setAll(tempData);
+                    kecamatanTable.setItems(kecamatanList);
+                });
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            kecamatanTable.setItems(kecamatanList);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     @FXML

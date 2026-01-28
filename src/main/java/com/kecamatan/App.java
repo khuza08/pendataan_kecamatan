@@ -76,21 +76,48 @@ public class App extends Application {
         }
     }
 
+    private static final java.util.Map<String, Parent> viewCache = new java.util.HashMap<>();
+
+    public static void preloadViews(String... fxmls) {
+        com.kecamatan.util.ThreadManager.execute(() -> {
+            for (String fxml : fxmls) {
+                try {
+                    // This calls loadFXML which populates the cache
+                    Platform.runLater(() -> {
+                        try {
+                            loadFXML(fxml);
+                            System.out.println("Preloaded view: " + fxml);
+                        } catch (IOException e) {
+                            System.err.println("Failed to preload " + fxml + ": " + e.getMessage());
+                        }
+                    });
+                    // Small delay between preloads to avoid CPU spikes during navigation
+                    Thread.sleep(100); 
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
+    }
+
     public static void refresh() throws IOException {
         scene.setRoot(loadFXML(currentFxml));
     }
 
     private static Parent loadFXML(String fxml) throws IOException {
+        if (viewCache.containsKey(fxml)) {
+            return viewCache.get(fxml);
+        }
+
         String path = "/com/kecamatan/view/" + fxml + ".fxml";
+        URL resourceUrl = App.class.getResource(path);
         
-        // Try to load from src/main/resources first for "Live" experience
-        File devFile = new File("src/main/resources" + path);
-        URL resourceUrl;
-        
-        if (devFile.exists()) {
-            resourceUrl = devFile.toURI().toURL();
-        } else {
-            resourceUrl = App.class.getResource(path);
+        if (resourceUrl == null) {
+            // Fallback to dev path if resource is not found (for dev environment)
+            File devFile = new File("src/main/resources" + path);
+            if (devFile.exists()) {
+                resourceUrl = devFile.toURI().toURL();
+            }
         }
         
         if (resourceUrl == null) {
@@ -98,7 +125,14 @@ public class App extends Application {
         }
         
         FXMLLoader fxmlLoader = new FXMLLoader(resourceUrl);
-        return fxmlLoader.load();
+        Parent root = fxmlLoader.load();
+        
+        // Cache all views except login (to allow fresh state if needed)
+        if (!fxml.equals("login")) {
+            viewCache.put(fxml, root);
+        }
+        
+        return root;
     }
 
     public static void main(String[] args) {

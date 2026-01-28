@@ -76,49 +76,59 @@ public class WargaController implements Initializable {
     }
 
     private void loadDesaData() {
-        desaList.clear();
-        String sql = "SELECT d.*, k.nama as kecamatan_nama FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id ORDER BY d.nama";
-        try (Connection conn = DatabaseUtil.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                desaList.add(new Desa(
-                    rs.getInt("id"),
-                    rs.getInt("kecamatan_id"),
-                    rs.getString("kecamatan_nama"),
-                    rs.getString("nama"),
-                    rs.getInt("populasi"),
-                    rs.getInt("jumlah_rt"),
-                    rs.getInt("jumlah_rw")
-                ));
+        com.kecamatan.util.ThreadManager.execute(() -> {
+            ObservableList<Desa> tempDesa = FXCollections.observableArrayList();
+            String sql = "SELECT d.*, k.nama as kecamatan_nama FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id ORDER BY d.nama";
+            try (Connection conn = DatabaseUtil.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+                while (rs.next()) {
+                    tempDesa.add(new Desa(
+                        rs.getInt("id"),
+                        rs.getInt("kecamatan_id"),
+                        rs.getString("kecamatan_nama"),
+                        rs.getString("nama"),
+                        rs.getInt("populasi"),
+                        rs.getInt("jumlah_rt"),
+                        rs.getInt("jumlah_rw")
+                    ));
+                }
+                javafx.application.Platform.runLater(() -> {
+                    desaList.setAll(tempDesa);
+                    desaComboBox.setItems(desaList);
+                });
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            desaComboBox.setItems(desaList);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     private void loadWargaData() {
-        wargaList.clear();
-        String sql = "SELECT w.*, d.nama as desa_nama FROM warga w JOIN desa d ON w.desa_id = d.id ORDER BY w.nama";
-        try (Connection conn = DatabaseUtil.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                wargaList.add(new Warga(
-                    rs.getInt("id"),
-                    rs.getString("nik"),
-                    rs.getString("nama"),
-                    rs.getString("alamat"),
-                    rs.getString("jenis_kelamin"),
-                    rs.getInt("desa_id"),
-                    rs.getString("desa_nama")
-                ));
+        com.kecamatan.util.ThreadManager.execute(() -> {
+            ObservableList<Warga> tempWarga = FXCollections.observableArrayList();
+            String sql = "SELECT w.*, d.nama as desa_nama FROM warga w JOIN desa d ON w.desa_id = d.id ORDER BY w.nama";
+            try (Connection conn = DatabaseUtil.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+                while (rs.next()) {
+                    tempWarga.add(new Warga(
+                        rs.getInt("id"),
+                        rs.getString("nik"),
+                        rs.getString("nama"),
+                        rs.getString("alamat"),
+                        rs.getString("jenis_kelamin"),
+                        rs.getInt("desa_id"),
+                        rs.getString("desa_nama")
+                    ));
+                }
+                javafx.application.Platform.runLater(() -> {
+                    wargaList.setAll(tempWarga);
+                    wargaTable.setItems(wargaList);
+                });
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            wargaTable.setItems(wargaList);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     @FXML
