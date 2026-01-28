@@ -213,5 +213,6 @@ public class WargaController implements Initializable {
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }
     @FXML private void goToKecamatan() throws IOException { App.setRoot("kecamatan", 1200, 800, true); }
     @FXML private void goToDesa() throws IOException { App.setRoot("desa", 1200, 800, true); }
+    @FXML private void goToLaporan() throws IOException { App.setRoot("laporan", 1200, 800, true); }
     @FXML private void handleLogout() throws IOException { App.setRoot("login", 400, 500); }
 }

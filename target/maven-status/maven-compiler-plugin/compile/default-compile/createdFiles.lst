@@ -1,3 +1,4 @@
+com/kecamatan/controller/LaporanController.class
 com/kecamatan/App.class
 com/kecamatan/util/DatabaseUtil.class
 com/kecamatan/util/ThreadManager.class

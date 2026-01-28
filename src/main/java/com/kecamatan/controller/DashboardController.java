@@ -50,6 +50,11 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
+    private void goToLaporan() throws IOException {
+        App.setRoot("laporan", 1200, 800, true);
+    }
+
+    @FXML
     private void handleLogout() throws IOException {
         App.setRoot("login", 400, 500);
     }

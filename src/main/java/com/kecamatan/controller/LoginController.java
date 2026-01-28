@@ -48,7 +48,7 @@ public class LoginController {
                 messageLabel.setStyle("-fx-text-fill: #009C4B;");
                 
                 // Preload all major views in the background
-                App.preloadViews("dashboard", "kecamatan", "desa", "warga");
+                App.preloadViews("dashboard", "kecamatan", "desa", "warga", "laporan");
                 
                 // Navigate to dashboard
                 App.setRoot("dashboard", 1200, 800, true);
