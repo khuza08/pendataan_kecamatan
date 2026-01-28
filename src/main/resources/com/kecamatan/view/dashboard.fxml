@@ -32,7 +32,7 @@
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
             <HBox alignment="CENTER_LEFT" spacing="10">
-                <Text text="Dashboard Overview" styleClass="title-text"/>
+                <Label text="Dashboard Overview" styleClass="title-text"/>
             </HBox>
             
             <GridPane hgap="20" vgap="20">
