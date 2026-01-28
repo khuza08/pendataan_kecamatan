@@ -21,10 +21,14 @@ public class DesaController implements Initializable {
     @FXML private TableColumn<Desa, String> colKecamatan;
     @FXML private TableColumn<Desa, String> colNama;
     @FXML private TableColumn<Desa, Integer> colPopulasi;
+    @FXML private TableColumn<Desa, Integer> colRT;
+    @FXML private TableColumn<Desa, Integer> colRW;
 
     @FXML private ComboBox<Kecamatan> kecamatanComboBox;
     @FXML private TextField namaField;
     @FXML private TextField populasiField;
+    @FXML private TextField rtField;
+    @FXML private TextField rwField;
 
     private ObservableList<Desa> desaList = FXCollections.observableArrayList();
     private ObservableList<Kecamatan> kecamatanList = FXCollections.observableArrayList();
@@ -35,6 +39,8 @@ public class DesaController implements Initializable {
         colKecamatan.setCellValueFactory(cellData -> cellData.getValue().kecamatanNamaProperty());
         colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
         colPopulasi.setCellValueFactory(cellData -> cellData.getValue().populasiProperty().asObject());
+        colRT.setCellValueFactory(cellData -> cellData.getValue().jumlahRtProperty().asObject());
+        colRW.setCellValueFactory(cellData -> cellData.getValue().jumlahRwProperty().asObject());
 
         setupComboBox();
         loadKecamatan();
@@ -45,6 +51,8 @@ public class DesaController implements Initializable {
                 selectedId = newSel.getId();
                 namaField.setText(newSel.getNama());
                 populasiField.setText(String.valueOf(newSel.getPopulasi()));
+                rtField.setText(String.valueOf(newSel.getJumlahRt()));
+                rwField.setText(String.valueOf(newSel.getJumlahRw()));
                 
                 for (Kecamatan k : kecamatanList) {
                     if (k.getId() == newSel.getKecamatanId()) {
@@ -104,7 +112,9 @@ public class DesaController implements Initializable {
                     rs.getInt("kecamatan_id"),
                     rs.getString("kecamatan_nama"),
                     rs.getString("nama"),
-                    rs.getInt("populasi")
+                    rs.getInt("populasi"),
+                    rs.getInt("jumlah_rt"),
+                    rs.getInt("jumlah_rw")
                 ));
             }
             desaTable.setItems(desaList);
@@ -118,25 +128,29 @@ public class DesaController implements Initializable {
         Kecamatan selectedKec = kecamatanComboBox.getSelectionModel().getSelectedItem();
         String nama = namaField.getText();
         String populasiText = populasiField.getText();
+        String rtText = rtField.getText();
+        String rwText = rwField.getText();
 
-        if (selectedKec == null || nama.isEmpty() || populasiText.isEmpty()) {
+        if (selectedKec == null || nama.isEmpty() || populasiText.isEmpty() || rtText.isEmpty() || rwText.isEmpty()) {
             showAlert("Validasi", "Semua field harus diisi!", Alert.AlertType.WARNING);
             return;
         }
 
-        int populasi;
+        int populasi, rt, rw;
         try {
             populasi = Integer.parseInt(populasiText);
+            rt = Integer.parseInt(rtText);
+            rw = Integer.parseInt(rwText);
         } catch (NumberFormatException e) {
-            showAlert("Error", "Populasi harus berupa angka!", Alert.AlertType.ERROR);
+            showAlert("Error", "Populasi, RT, dan RW harus berupa angka!", Alert.AlertType.ERROR);
             return;
         }
 
         String sql;
         if (selectedId == -1) {
-            sql = "INSERT INTO desa (kecamatan_id, nama, populasi) VALUES (?, ?, ?)";
+            sql = "INSERT INTO desa (kecamatan_id, nama, populasi, jumlah_rt, jumlah_rw) VALUES (?, ?, ?, ?, ?)";
         } else {
-            sql = "UPDATE desa SET kecamatan_id = ?, nama = ?, populasi = ? WHERE id = ?";
+            sql = "UPDATE desa SET kecamatan_id = ?, nama = ?, populasi = ?, jumlah_rt = ?, jumlah_rw = ? WHERE id = ?";
         }
 
         try (Connection conn = DatabaseUtil.getConnection();
@@ -144,7 +158,9 @@ public class DesaController implements Initializable {
             pstmt.setInt(1, selectedKec.getId());
             pstmt.setString(2, nama);
             pstmt.setInt(3, populasi);
-            if (selectedId != -1) pstmt.setInt(4, selectedId);
+            pstmt.setInt(4, rt);
+            pstmt.setInt(5, rw);
+            if (selectedId != -1) pstmt.setInt(6, selectedId);
             
             pstmt.executeUpdate();
             loadDesa();
@@ -196,6 +212,11 @@ public class DesaController implements Initializable {
     @FXML
     private void goToKecamatan() throws IOException {
         App.setRoot("kecamatan", 1200, 800, true);
+    }
+
+    @FXML
+    private void goToWarga() throws IOException {
+        App.setRoot("warga", 1200, 800, true);
     }
 
     @FXML

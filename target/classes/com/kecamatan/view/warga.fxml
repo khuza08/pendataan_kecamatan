@@ -4,9 +4,11 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Text?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.kecamatan.controller.KecamatanController"
+            fx:controller="com.kecamatan.controller.WargaController"
             stylesheets="@../style/style.css" styleClass="dashboard-container">
     
     <left>
@@ -16,9 +18,9 @@
             </padding>
             <Text text="MENU" styleClass="sidebar-title"/>
             <Button text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button text="Data Kecamatan" maxWidth="Infinity" styleClass="sidebar-button-active"/>
+            <Button text="Data Kecamatan" onAction="#goToKecamatan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button text="Data Warga" maxWidth="Infinity" styleClass="sidebar-button-active"/>
             <Button text="Laporan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Region VBox.vgrow="ALWAYS"/>
             <Button text="Logout" onAction="#handleLogout" maxWidth="Infinity" styleClass="logout-button"/>
@@ -32,44 +34,58 @@
             </padding>
             
             <HBox alignment="CENTER_LEFT" spacing="10">
-                <Text text="Data Kecamatan" styleClass="title-text"/>
+                <Text text="Data Warga / Penduduk" styleClass="title-text"/>
             </HBox>
 
             <HBox spacing="20" VBox.vgrow="ALWAYS">
                 <!-- Data Table -->
                 <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="card">
-                    <TableView fx:id="kecamatanTable" VBox.vgrow="ALWAYS">
+                    <TableView fx:id="wargaTable" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn fx:id="colKode" text="Kode" prefWidth="100"/>
-                            <TableColumn fx:id="colNama" text="Nama Kecamatan" prefWidth="200"/>
-                            <TableColumn fx:id="colDesa" text="Jumlah Desa" prefWidth="120"/>
-                            <TableColumn fx:id="colPopulasi" text="Populasi" prefWidth="150"/>
+                            <TableColumn fx:id="colNik" text="NIK" prefWidth="140"/>
+                            <TableColumn fx:id="colNama" text="Nama Lengkap" prefWidth="180"/>
+                            <TableColumn fx:id="colJenkel" text="L/P" prefWidth="40"/>
+                            <TableColumn fx:id="colDesa" text="Desa" prefWidth="120"/>
+                            <TableColumn fx:id="colAlamat" text="Alamat" prefWidth="200"/>
                         </columns>
                     </TableView>
                 </VBox>
 
                 <!-- Input Form -->
-                <VBox spacing="15" prefWidth="300" styleClass="card">
-                    <Text text="Form Data" styleClass="card-title"/>
+                <VBox spacing="15" prefWidth="320" styleClass="card">
+                    <Text text="Form Data Warga" styleClass="card-title"/>
                     
                     <VBox spacing="5">
-                        <Label text="Kode Kecamatan" styleClass="input-label"/>
-                        <TextField fx:id="kodeField" styleClass="input-field"/>
+                        <Label text="NIK" styleClass="input-label"/>
+                        <TextField fx:id="nikField" styleClass="input-field"/>
                     </VBox>
                     
                     <VBox spacing="5">
-                        <Label text="Nama Kecamatan" styleClass="input-label"/>
+                        <Label text="Nama Lengkap" styleClass="input-label"/>
                         <TextField fx:id="namaField" styleClass="input-field"/>
                     </VBox>
+
+                    <HBox spacing="10">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Jenis Kelamin" styleClass="input-label"/>
+                            <ComboBox fx:id="jenkelComboBox" maxWidth="Infinity" styleClass="input-field">
+                                <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="L"/>
+                                        <String fx:value="P"/>
+                                    </FXCollections>
+                                </items>
+                            </ComboBox>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Pilih Desa" styleClass="input-label"/>
+                            <ComboBox fx:id="desaComboBox" maxWidth="Infinity" styleClass="input-field"/>
+                        </VBox>
+                    </HBox>
                     
                     <VBox spacing="5">
-                        <Label text="Jumlah Desa" styleClass="input-label"/>
-                        <TextField fx:id="desaField" styleClass="input-field"/>
-                    </VBox>
-                    
-                    <VBox spacing="5">
-                        <Label text="Populasi" styleClass="input-label"/>
-                        <TextField fx:id="populasiField" styleClass="input-field"/>
+                        <Label text="Alamat" styleClass="input-label"/>
+                        <TextArea fx:id="alamatArea" prefHeight="80" wrapText="true" styleClass="input-field"/>
                     </VBox>
 
                     <HBox spacing="10">

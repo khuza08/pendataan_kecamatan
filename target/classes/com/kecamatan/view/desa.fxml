@@ -18,6 +18,7 @@
             <Button text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button text="Data Kecamatan" onAction="#goToKecamatan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button text="Data Desa" maxWidth="Infinity" styleClass="sidebar-button-active"/>
+            <Button text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button text="Laporan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Region VBox.vgrow="ALWAYS"/>
             <Button text="Logout" onAction="#handleLogout" maxWidth="Infinity" styleClass="logout-button"/>

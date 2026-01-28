@@ -45,6 +45,11 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
+    private void goToWarga() throws IOException {
+        App.setRoot("warga", 1200, 800, true);
+    }
+
+    @FXML
     private void handleLogout() throws IOException {
         App.setRoot("login", 400, 500);
     }
