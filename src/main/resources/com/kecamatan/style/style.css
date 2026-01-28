@@ -74,10 +74,22 @@
     -fx-alignment: CENTER_LEFT;
     -fx-padding: 10;
     -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-border-width: 1;
+}
+
+.sidebar-button {
+    -fx-border-color: #e0e0e0;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: #f1f3f5;
+    -fx-border-color: #ced4da;
 }
 
 .sidebar-button-active {
     -fx-background-color: #e9ecef;
+    -fx-border-color: #009C4B;
     -fx-font-weight: bold;
 }
 
