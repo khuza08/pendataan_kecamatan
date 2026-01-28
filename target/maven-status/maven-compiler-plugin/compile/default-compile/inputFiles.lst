@@ -1,4 +1,8 @@
+/home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/model/Desa.java
+/home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/controller/KecamatanController.java
+/home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/controller/DesaController.java
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/controller/LoginController.java
+/home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/model/Kecamatan.java
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/App.java
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/controller/DashboardController.java
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/util/DatabaseUtil.java

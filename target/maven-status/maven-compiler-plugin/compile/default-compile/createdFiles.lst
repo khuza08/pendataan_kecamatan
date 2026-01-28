@@ -1,4 +1,3 @@
-com/kecamatan/controller/DashboardController.class
-com/kecamatan/App.class
-com/kecamatan/util/DatabaseUtil.class
 com/kecamatan/controller/LoginController.class
+com/kecamatan/model/Desa.class
+com/kecamatan/model/Kecamatan.class

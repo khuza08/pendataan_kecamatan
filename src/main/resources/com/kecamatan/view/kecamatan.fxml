@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.kecamatan.controller.KecamatanController"
+            stylesheets="@../style/style.css" styleClass="dashboard-container">
+    
+    <left>
+        <VBox spacing="10" styleClass="sidebar">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <Text text="MENU" styleClass="sidebar-title"/>
+            <Button text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button text="Data Kecamatan" maxWidth="Infinity" styleClass="sidebar-button-active"/>
+            <Button text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button text="Laporan" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button text="Logout" onAction="#handleLogout" maxWidth="Infinity" styleClass="logout-button"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="20">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Text text="Data Kecamatan" styleClass="title-text"/>
+            </HBox>
+
+            <HBox spacing="20" VBox.vgrow="ALWAYS">
+                <!-- Data Table -->
+                <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="card">
+                    <TableView fx:id="kecamatanTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colKode" text="Kode" prefWidth="100"/>
+                            <TableColumn fx:id="colNama" text="Nama Kecamatan" prefWidth="200"/>
+                            <TableColumn fx:id="colDesa" text="Jumlah Desa" prefWidth="120"/>
+                            <TableColumn fx:id="colPopulasi" text="Populasi" prefWidth="150"/>
+                        </columns>
+                    </TableView>
+                </VBox>
+
+                <!-- Input Form -->
+                <VBox spacing="15" prefWidth="300" styleClass="card">
+                    <Text text="Form Data" styleClass="card-title"/>
+                    
+                    <VBox spacing="5">
+                        <Label text="Kode Kecamatan" styleClass="input-label"/>
+                        <TextField fx:id="kodeField" styleClass="input-field"/>
+                    </VBox>
+                    
+                    <VBox spacing="5">
+                        <Label text="Nama Kecamatan" styleClass="input-label"/>
+                        <TextField fx:id="namaField" styleClass="input-field"/>
+                    </VBox>
+                    
+                    <VBox spacing="5">
+                        <Label text="Jumlah Desa" styleClass="input-label"/>
+                        <TextField fx:id="desaField" styleClass="input-field"/>
+                    </VBox>
+                    
+                    <VBox spacing="5">
+                        <Label text="Populasi" styleClass="input-label"/>
+                        <TextField fx:id="populasiField" styleClass="input-field"/>
+                    </VBox>
+
+                    <HBox spacing="10">
+                        <Button text="Simpan" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="login-button"/>
+                        <Button text="Hapus" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="logout-button"/>
+                    </HBox>
+                    <Button text="Reset" onAction="#handleReset" maxWidth="Infinity" styleClass="sidebar-button"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>

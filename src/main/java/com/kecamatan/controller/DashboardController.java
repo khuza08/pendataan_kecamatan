@@ -35,6 +35,16 @@ public class DashboardController implements Initializable {
     }
 
     @FXML
+    private void goToKecamatan() throws IOException {
+        App.setRoot("kecamatan", 1200, 800, true);
+    }
+
+    @FXML
+    private void goToDesa() throws IOException {
+        App.setRoot("desa", 1200, 800, true);
+    }
+
+    @FXML
     private void handleLogout() throws IOException {
         App.setRoot("login", 400, 500);
     }
