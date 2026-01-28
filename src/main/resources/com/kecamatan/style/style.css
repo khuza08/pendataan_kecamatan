@@ -4,17 +4,16 @@
 }
 
 .title-text {
-    -fx-text-fill: #009C4B;
-    -fx-font-size: 18px;
+    -fx-text-fill: #2E261A;
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-font-family: "Segoe UI", sans-serif;
     -fx-padding: 6 16 6 16;
-    -fx-border-color: #009C4B;
-    -fx-border-width: 1.5;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
     -fx-border-radius: 50;
     -fx-background-radius: 50;
-    -fx-background-color: rgba(0, 156, 75, 0.05);
-    /* Subtle background */
+    -fx-background-color: #ffffff;
 }
 
 .subtitle-text {

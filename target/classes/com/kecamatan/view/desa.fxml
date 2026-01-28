@@ -32,7 +32,7 @@
             </padding>
             
             <HBox alignment="CENTER_LEFT" spacing="10">
-                <Text text="Data Desa / Kelurahan" styleClass="title-text"/>
+                <Label text="Data Desa / Kelurahan" styleClass="title-text"/>
             </HBox>
 
             <HBox spacing="20" VBox.vgrow="ALWAYS">

@@ -34,7 +34,7 @@
                 </padding>
                 
                 <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Text text="Laporan Statistik" styleClass="title-text"/>
+                    <Label text="Laporan Statistik" styleClass="title-text"/>
                 </HBox>
                 
                 <GridPane hgap="20" vgap="20">
