@@ -78,13 +78,17 @@ public class DesaController implements Initializable, DataRefreshable {
     private void addRWRow(String rwNo, List<String> rtList) {
         HBox row = new HBox(10);
         row.setAlignment(Pos.CENTER_LEFT);
-        row.setPadding(new Insets(5));
-        row.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;");
+        row.getStyleClass().add("rw-row");
+
+        Label rwLabel = new Label("RW:");
+        rwLabel.getStyleClass().add("rw-label");
+        rwLabel.setMinWidth(30);
 
         TextField rwField = new TextField(rwNo);
-        rwField.setPromptText("RW");
-        rwField.setPrefWidth(60);
-        rwField.getStyleClass().add("input-field");
+        rwField.setPromptText("...");
+        rwField.setPrefWidth(50);
+        rwField.setMinWidth(40); // Prevent squishing
+        rwField.getStyleClass().add("rw-input");
 
         FlowPane rtPane = new FlowPane(5, 5);
         HBox.setHgrow(rtPane, Priority.ALWAYS);
@@ -95,27 +99,45 @@ public class DesaController implements Initializable, DataRefreshable {
         }
 
         Button btnAddRT = new Button("+ RT");
-        btnAddRT.getStyleClass().add("sidebar-button");
+        btnAddRT.getStyleClass().add("rt-add-button");
+        btnAddRT.setMinWidth(Control.USE_PREF_SIZE); // Never truncate
         btnAddRT.setOnAction(e -> {
-            com.kecamatan.util.UIUtil.showInputDialog("Tambah RT", "Masukkan Nomor RT", "Nomor RT:")
-                .ifPresent(name -> {
-                    if (!name.trim().isEmpty()) {
-                        rtPane.getChildren().add(createRTLabel(name.trim(), rtPane));
+            com.kecamatan.util.UIUtil.showInputDialog("Tambah RT", "Masukkan Nomor RT (Pisahkan dengan koma)", "Nomor RT:")
+                .ifPresent(input -> {
+                    if (!input.trim().isEmpty()) {
+                        String[] parts = input.split(",");
+                        for (String part : parts) {
+                            String trimmed = part.trim();
+                            if (!trimmed.isEmpty()) {
+                                // Auto-format numeric RT to 2 digits (e.g., "1" -> "01")
+                                if (trimmed.matches("\\d+")) {
+                                    try {
+                                        int num = Integer.parseInt(trimmed);
+                                        trimmed = String.format("%02d", num);
+                                    } catch (NumberFormatException ex) {
+                                        // Keep as is if parsing fails
+                                    }
+                                }
+                                rtPane.getChildren().add(createRTLabel(trimmed, rtPane));
+                            }
+                        }
                     }
                 });
         });
 
         Button btnDel = new Button("X");
-        btnDel.setStyle("-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-cursor: hand;");
+        btnDel.getStyleClass().add("rt-delete-button");
+        btnDel.setMinWidth(Control.USE_PREF_SIZE); // Never truncate
         btnDel.setOnAction(e -> rwContainer.getChildren().remove(row));
 
-        row.getChildren().addAll(new Label("RW:"), rwField, rtPane, btnAddRT, btnDel);
+        row.getChildren().addAll(rwLabel, rwField, rtPane, btnAddRT, btnDel);
         rwContainer.getChildren().add(row);
     }
 
     private Label createRTLabel(String text, FlowPane parent) {
         Label label = new Label(text);
-        label.setStyle("-fx-background-color: #e9ecef; -fx-padding: 3 8; -fx-background-radius: 10; -fx-font-size: 11px;");
+        label.getStyleClass().add("rt-tag");
+        label.setTooltip(new Tooltip("Klik 2x untuk menghapus"));
         label.setOnMouseClicked(e -> {
             if (e.getClickCount() == 2) parent.getChildren().remove(label);
         });
