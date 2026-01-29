@@ -5,6 +5,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.Screen;
+import javafx.geometry.Rectangle2D;
 
 import java.io.IOException;
 
@@ -45,13 +47,18 @@ public class App extends Application {
         stage.setScene(scene);
         stage.show();
 
-        // 3. Persistent Window Lock Listener (One-time setup)
         stage.maximizedProperty().addListener((obs, oldVal, newVal) -> {
             if (maximizedLock && !newVal) {
                 Platform.runLater(() -> {
                     stage.setResizable(true);
                     stage.setMaximized(true);
                 });
+            }
+        });
+
+        stage.iconifiedProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal && maximizedLock) {
+                Platform.runLater(() -> stage.setMaximized(true));
             }
         });
     }
@@ -76,10 +83,16 @@ public class App extends Application {
         if (stage != null) {
             Platform.runLater(() -> {
                 if (maximized) {
+                    // CRITICAL: Set the "normal" size to the actual screen size before maximizing.
+                    // This ensures that if the OS restores the window (e.g. during dialog opening),
+                    // it restores to the FULL screen size, not some smaller hardcoded value.
+                    Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
                     stage.setResizable(true);
+                    stage.setX(screenBounds.getMinX());
+                    stage.setY(screenBounds.getMinY());
+                    stage.setWidth(screenBounds.getWidth());
+                    stage.setHeight(screenBounds.getHeight());
                     stage.setMaximized(true);
-                    // On many Linux systems, setResizable(false) while maximized 
-                    // triggers a "restore" event. We rely on the listener instead.
                 } else {
                     stage.setResizable(true);
                     stage.setMaximized(false);

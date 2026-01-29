@@ -97,16 +97,12 @@ public class DesaController implements Initializable, DataRefreshable {
         Button btnAddRT = new Button("+ RT");
         btnAddRT.getStyleClass().add("sidebar-button");
         btnAddRT.setOnAction(e -> {
-            TextInputDialog dialog = new TextInputDialog();
-            dialog.setTitle("Tambah RT");
-            dialog.setHeaderText("Masukkan Nomor RT");
-            dialog.setContentText("Nomor RT:");
-            Optional<String> result = dialog.showAndWait();
-            result.ifPresent(name -> {
-                if (!name.trim().isEmpty()) {
-                    rtPane.getChildren().add(createRTLabel(name.trim(), rtPane));
-                }
-            });
+            com.kecamatan.util.UIUtil.showInputDialog("Tambah RT", "Masukkan Nomor RT", "Nomor RT:")
+                .ifPresent(name -> {
+                    if (!name.trim().isEmpty()) {
+                        rtPane.getChildren().add(createRTLabel(name.trim(), rtPane));
+                    }
+                });
         });
 
         Button btnDel = new Button("X");

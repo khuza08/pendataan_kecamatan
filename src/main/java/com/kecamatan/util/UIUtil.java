@@ -34,12 +34,59 @@ public class UIUtil {
         alert.setHeaderText(null);
         alert.setContentText(content);
         
-        // Set owner to prevent window shrinking on Linux
         Stage primary = App.getPrimaryStage();
         if (primary != null) {
             alert.initOwner(primary);
+            
+            // Dimension Lock: Prevent shrinking on Linux while thread is blocked by modal dialog
+            double oldMinW = primary.getMinWidth();
+            double oldMinH = primary.getMinHeight();
+            boolean wasMaximized = primary.isMaximized();
+            
+            if (wasMaximized) {
+                primary.setMinWidth(primary.getWidth());
+                primary.setMinHeight(primary.getHeight());
+            }
+            
+            alert.showAndWait();
+            
+            // Restore original min dimensions
+            primary.setMinWidth(oldMinW);
+            primary.setMinHeight(oldMinH);
+        } else {
+            alert.showAndWait();
         }
-        
-        alert.showAndWait();
+    }
+
+    public static java.util.Optional<String> showInputDialog(String title, String header, String content) {
+        javafx.scene.control.TextInputDialog dialog = new javafx.scene.control.TextInputDialog();
+        dialog.setTitle(title);
+        dialog.setHeaderText(header);
+        dialog.setContentText(content);
+
+        Stage primary = App.getPrimaryStage();
+        if (primary != null) {
+            dialog.initOwner(primary);
+
+            // Dimension Lock
+            double oldMinW = primary.getMinWidth();
+            double oldMinH = primary.getMinHeight();
+            boolean wasMaximized = primary.isMaximized();
+
+            if (wasMaximized) {
+                primary.setMinWidth(primary.getWidth());
+                primary.setMinHeight(primary.getHeight());
+            }
+
+            java.util.Optional<String> result = dialog.showAndWait();
+
+            // Restore
+            primary.setMinWidth(oldMinW);
+            primary.setMinHeight(oldMinH);
+            
+            return result;
+        }
+
+        return dialog.showAndWait();
     }
 }
