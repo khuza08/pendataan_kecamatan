@@ -88,11 +88,11 @@
                     <HBox spacing="10">
                         <VBox spacing="5" HBox.hgrow="ALWAYS">
                             <Label text="Pilih RW" styleClass="input-label"/>
-                            <ComboBox fx:id="rwComboBox" maxWidth="Infinity" styleClass="input-field"/>
+                            <ComboBox fx:id="rwComboBox" maxWidth="Infinity" styleClass="input-field" HBox.hgrow="ALWAYS"/>
                         </VBox>
                         <VBox spacing="5" HBox.hgrow="ALWAYS">
                             <Label text="Pilih RT" styleClass="input-label"/>
-                            <ComboBox fx:id="rtComboBox" maxWidth="Infinity" styleClass="input-field"/>
+                            <ComboBox fx:id="rtComboBox" maxWidth="Infinity" styleClass="input-field" HBox.hgrow="ALWAYS"/>
                         </VBox>
                     </HBox>
                     

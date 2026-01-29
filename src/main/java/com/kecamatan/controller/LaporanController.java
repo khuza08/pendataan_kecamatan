@@ -78,7 +78,18 @@ public class LaporanController implements Initializable, DataRefreshable {
                 try (Statement stmt = conn.createStatement()) {
                     ResultSet rs = stmt.executeQuery("SELECT jenis_kelamin, COUNT(*) as count FROM warga GROUP BY jenis_kelamin");
                     while (rs.next()) {
-                        String label = rs.getString("jenis_kelamin").equals("L") ? "Laki-laki" : "Perempuan";
+                        String jk = rs.getString("jenis_kelamin");
+                        if (jk == null) continue;
+                        
+                        String label;
+                        if (jk.equalsIgnoreCase("L") || jk.equalsIgnoreCase("Laki-laki")) {
+                            label = "Laki-laki";
+                        } else if (jk.equalsIgnoreCase("P") || jk.equalsIgnoreCase("Perempuan")) {
+                            label = "Perempuan";
+                        } else {
+                            label = jk; // Fallback to original value
+                        }
+                        
                         pieData.add(new PieChart.Data(label, rs.getInt("count")));
                     }
                 }

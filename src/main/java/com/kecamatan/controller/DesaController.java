@@ -220,7 +220,7 @@ public class DesaController implements Initializable, DataRefreshable {
                  Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {
                 while (rs.next()) {
-                    tempKec.add(new Kecamatan(
+                    tempKec.add(new Kecamatan(unt
                         rs.getInt("id"),
                         rs.getString("kode"),
                         rs.getString("nama"),
