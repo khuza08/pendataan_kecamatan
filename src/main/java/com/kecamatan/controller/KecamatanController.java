@@ -30,7 +30,6 @@ public class KecamatanController implements Initializable, DataRefreshable {
 
     @FXML private TextField kodeField;
     @FXML private TextField namaField;
-    @FXML private TextField desaField;
 
     private ObservableList<Kecamatan> kecamatanList = FXCollections.observableArrayList();
     private int selectedId = -1;
@@ -49,7 +48,6 @@ public class KecamatanController implements Initializable, DataRefreshable {
                 selectedId = newSel.getId();
                 kodeField.setText(newSel.getKode());
                 namaField.setText(newSel.getNama());
-                desaField.setText(String.valueOf(newSel.getJumlahDesa()));
             }
         });
     }
@@ -57,7 +55,10 @@ public class KecamatanController implements Initializable, DataRefreshable {
     private void loadData() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Kecamatan> tempData = FXCollections.observableArrayList();
-            String sql = "SELECT k.*, (SELECT COUNT(*) FROM warga w JOIN desa d ON w.desa_id = d.id WHERE d.kecamatan_id = k.id) as calculated_pop FROM kecamatan k ORDER BY k.kode";
+            String sql = "SELECT k.*, " +
+                         "(SELECT COUNT(*) FROM desa WHERE kecamatan_id = k.id) as calculated_desa_count, " +
+                         "(SELECT COUNT(*) FROM warga w JOIN desa d ON w.desa_id = d.id WHERE d.kecamatan_id = k.id) as calculated_pop " +
+                         "FROM kecamatan k ORDER BY k.kode";
             try (Connection conn = DatabaseUtil.getConnection();
                  Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {
@@ -66,7 +67,7 @@ public class KecamatanController implements Initializable, DataRefreshable {
                         rs.getInt("id"),
                         rs.getString("kode"),
                         rs.getString("nama"),
-                        rs.getInt("jumlah_desa"),
+                        rs.getInt("calculated_desa_count"),
                         rs.getInt("calculated_pop")
                     ));
                 }
@@ -85,18 +86,15 @@ public class KecamatanController implements Initializable, DataRefreshable {
     private void handleSave() {
         String kode = kodeField.getText();
         String nama = namaField.getText();
-        String desaText = desaField.getText();
 
         // Reset styles
         com.kecamatan.util.UIUtil.setErrorStyle(kodeField, false);
         com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
-        com.kecamatan.util.UIUtil.setErrorStyle(desaField, false);
 
         boolean hasError = false;
 
         if (kode.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(kodeField, true); hasError = true; }
         if (nama.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(namaField, true); hasError = true; }
-        if (desaText.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(desaField, true); hasError = true; }
 
         if (hasError) return;
 
@@ -110,27 +108,18 @@ public class KecamatanController implements Initializable, DataRefreshable {
             return;
         }
 
-        int desa;
-        try {
-            desa = Integer.parseInt(desaText);
-        } catch (NumberFormatException e) {
-            com.kecamatan.util.UIUtil.setErrorStyle(desaField, true);
-            return;
-        }
-
         String sql;
         if (selectedId == -1) {
-            sql = "INSERT INTO kecamatan (kode, nama, jumlah_desa) VALUES (?, ?, ?)";
+            sql = "INSERT INTO kecamatan (kode, nama) VALUES (?, ?)";
         } else {
-            sql = "UPDATE kecamatan SET kode = ?, nama = ?, jumlah_desa = ? WHERE id = ?";
+            sql = "UPDATE kecamatan SET kode = ?, nama = ? WHERE id = ?";
         }
 
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, kode);
             pstmt.setString(2, nama);
-            pstmt.setInt(3, desa);
-            if (selectedId != -1) pstmt.setInt(4, selectedId);
+            if (selectedId != -1) pstmt.setInt(3, selectedId);
             
             pstmt.executeUpdate();
             loadData();
@@ -160,13 +149,11 @@ public class KecamatanController implements Initializable, DataRefreshable {
         selectedId = -1;
         kodeField.clear();
         namaField.clear();
-        desaField.clear();
         kecamatanTable.getSelectionModel().clearSelection();
 
         // Clear error styles
         com.kecamatan.util.UIUtil.setErrorStyle(kodeField, false);
         com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
-        com.kecamatan.util.UIUtil.setErrorStyle(desaField, false);
     }
 
     @FXML

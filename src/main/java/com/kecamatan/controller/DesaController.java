@@ -212,7 +212,10 @@ public class DesaController implements Initializable, DataRefreshable {
     private void loadKecamatan() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Kecamatan> tempKec = FXCollections.observableArrayList();
-            String sql = "SELECT * FROM kecamatan ORDER BY nama";
+            String sql = "SELECT k.*, " +
+                         "(SELECT COUNT(*) FROM desa WHERE kecamatan_id = k.id) as calculated_desa_count, " +
+                         "(SELECT COUNT(*) FROM warga w JOIN desa d ON w.desa_id = d.id WHERE d.kecamatan_id = k.id) as calculated_pop " +
+                         "FROM kecamatan k ORDER BY k.nama";
             try (Connection conn = DatabaseUtil.getConnection();
                  Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {
@@ -221,8 +224,8 @@ public class DesaController implements Initializable, DataRefreshable {
                         rs.getInt("id"),
                         rs.getString("kode"),
                         rs.getString("nama"),
-                        rs.getInt("jumlah_desa"),
-                        rs.getInt("populasi")
+                        rs.getInt("calculated_desa_count"),
+                        rs.getInt("calculated_pop")
                     ));
                 }
                 javafx.application.Platform.runLater(() -> {
