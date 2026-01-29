@@ -9,8 +9,8 @@
 }
 
 .login-sidebar {
-    -fx-background-color: linear-gradient(to bottom right, #1a1c20, #0f1012);
-    -fx-border-color: transparent #2c2f33 transparent transparent;
+    -fx-background-color: linear-gradient(to bottom right, #009C4B, #007d3c);
+    -fx-border-color: transparent #006b33 transparent transparent;
     -fx-border-width: 0 1 0 0;
 }
 
@@ -22,7 +22,7 @@
 }
 
 .sidebar-tagline-text {
-    -fx-fill: #8e8e93;
+    -fx-fill: #e0e0e0;
     -fx-font-size: 14px;
     -fx-font-family: "Inter", "Segoe UI", system-ui;
 }
