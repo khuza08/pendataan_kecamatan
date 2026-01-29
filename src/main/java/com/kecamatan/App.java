@@ -23,8 +23,8 @@ public class App extends Application {
     private static Scene scene;
     private static Stage primaryStage;
     private static String currentFxml = "login";
-    private static double currentWidth = 400;
-    private static double currentHeight = 500;
+    private static double currentWidth = 800;
+    private static double currentHeight = 450;
 
     @Override
     public void start(Stage stage) throws IOException {

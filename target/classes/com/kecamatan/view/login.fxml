@@ -4,30 +4,55 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+<HBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.kecamatan.controller.LoginController"
-      stylesheets="@../style/style.css" styleClass="login-container">
-    
-    <padding>
-        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
-    </padding>
+      stylesheets="@../style/style.css" styleClass="login-root">
 
-    <Text text="Pendataan Kecamatan" styleClass="title-text"/>
-    <Text text="Masukkan Username dan Password" styleClass="subtitle-text"/>
-
-    <VBox spacing="10.0" alignment="CENTER_LEFT">
-        <Label text="Username" styleClass="input-label"/>
-        <TextField fx:id="usernameField" promptText="Masukkan Username" styleClass="input-field"/>
+    <!-- Left Column: Branding/Logo -->
+    <VBox fx:id="loginSidebar" styleClass="login-sidebar" alignment="CENTER" HBox.hgrow="ALWAYS" prefWidth="400">
+        <ImageView fitWidth="200" preserveRatio="true">
+            <image>
+                <Image url="file:/home/elza/Pictures/logos/darjo.png"/>
+            </image>
+        </ImageView>
+        <VBox alignment="CENTER" spacing="5">
+            <padding>
+                <Insets top="20"/>
+            </padding>
+            <Text text="SIDOARJO" styleClass="sidebar-brand-text"/>
+            <Text text="Sistem Informasi Pendataan" styleClass="sidebar-tagline-text"/>
+        </VBox>
     </VBox>
 
-    <VBox spacing="10.0" alignment="CENTER_LEFT">
-        <Label text="Password" styleClass="input-label"/>
-        <PasswordField fx:id="passwordField" promptText="Masukkan Password" styleClass="input-field"/>
+    <!-- Right Column: Login Form -->
+    <VBox alignment="CENTER" spacing="25" HBox.hgrow="ALWAYS" prefWidth="400" styleClass="login-form-container">
+        <padding>
+            <Insets bottom="40.0" left="60.0" right="60.0" top="40.0"/>
+        </padding>
+
+        <VBox spacing="5" alignment="CENTER">
+            <Text text="Selamat Datang" styleClass="login-title-text"/>
+            <Text text="Silakan masuk ke akun Anda" styleClass="login-subtitle-text"/>
+        </VBox>
+
+        <VBox spacing="15.0" alignment="CENTER_LEFT">
+            <VBox spacing="8.0">
+                <Label text="Username" styleClass="input-label"/>
+                <TextField fx:id="usernameField" promptText="Masukkan Username" styleClass="input-field"/>
+            </VBox>
+
+            <VBox spacing="8.0">
+                <Label text="Password" styleClass="input-label"/>
+                <PasswordField fx:id="passwordField" promptText="Masukkan Password" styleClass="input-field"/>
+            </VBox>
+        </VBox>
+
+        <Button text="MASUK" onAction="#handleLogin" defaultButton="true" maxWidth="Infinity" styleClass="login-button"/>
+
+        <Label fx:id="messageLabel" styleClass="message-label"/>
     </VBox>
 
-    <Button text="LOGIN" onAction="#handleLogin" defaultButton="true" maxWidth="Infinity" styleClass="login-button"/>
-
-    <Label fx:id="messageLabel" styleClass="message-label"/>
-
-</VBox>
+</HBox>

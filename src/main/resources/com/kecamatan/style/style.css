@@ -3,6 +3,67 @@
     -fx-background-color: #FEFEFE;
 }
 
+/* NEW Premium Two-Column Login Styles */
+.login-root {
+    -fx-background-color: #ffffff;
+}
+
+.login-sidebar {
+    -fx-background-color: linear-gradient(to bottom right, #1a1c20, #0f1012);
+    -fx-border-color: transparent #2c2f33 transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+.sidebar-brand-text {
+    -fx-fill: #ffffff;
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Inter", "Segoe UI", system-ui;
+}
+
+.sidebar-tagline-text {
+    -fx-fill: #8e8e93;
+    -fx-font-size: 14px;
+    -fx-font-family: "Inter", "Segoe UI", system-ui;
+}
+
+.login-form-container {
+    -fx-background-color: #ffffff;
+}
+
+.login-title-text {
+    -fx-fill: #1c1c1e;
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Inter", "Segoe UI", system-ui;
+}
+
+.login-subtitle-text {
+    -fx-fill: #8e8e93;
+    -fx-font-size: 15px;
+    -fx-font-family: "Inter", "Segoe UI", system-ui;
+}
+
+.login-button-premium {
+    -fx-background-color: linear-gradient(to right, #e67e22, #d35400);
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 12px 30px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(230, 126, 34, 0.3), 10, 0, 0, 4);
+}
+
+.login-button-premium:hover {
+    -fx-background-color: linear-gradient(to right, #d35400, #e67e22);
+}
+
+.login-button-premium:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
 .title-text {
     -fx-text-fill: #2E261A;
     -fx-font-size: 16px;
