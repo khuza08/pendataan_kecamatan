@@ -11,8 +11,10 @@ public class Warga {
     private final SimpleStringProperty jenisKelamin;
     private final SimpleIntegerProperty desaId;
     private final SimpleStringProperty desaNama;
+    private final SimpleStringProperty rt;
+    private final SimpleStringProperty rw;
 
-    public Warga(int id, String nik, String nama, String alamat, String jenisKelamin, int desaId, String desaNama) {
+    public Warga(int id, String nik, String nama, String alamat, String jenisKelamin, int desaId, String desaNama, String rt, String rw) {
         this.id = new SimpleIntegerProperty(id);
         this.nik = new SimpleStringProperty(nik);
         this.nama = new SimpleStringProperty(nama);
@@ -20,6 +22,8 @@ public class Warga {
         this.jenisKelamin = new SimpleStringProperty(jenisKelamin);
         this.desaId = new SimpleIntegerProperty(desaId);
         this.desaNama = new SimpleStringProperty(desaNama);
+        this.rt = new SimpleStringProperty(rt);
+        this.rw = new SimpleStringProperty(rw);
     }
 
     public int getId() { return id.get(); }
@@ -42,4 +46,10 @@ public class Warga {
 
     public String getDesaNama() { return desaNama.get(); }
     public SimpleStringProperty desaNamaProperty() { return desaNama; }
+
+    public String getRt() { return rt.get(); }
+    public SimpleStringProperty rtProperty() { return rt; }
+
+    public String getRw() { return rw.get(); }
+    public SimpleStringProperty rwProperty() { return rw; }
 }

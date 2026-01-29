@@ -45,8 +45,10 @@
                             <TableColumn fx:id="colNik" text="NIK" prefWidth="140"/>
                             <TableColumn fx:id="colNama" text="Nama Lengkap" prefWidth="180"/>
                             <TableColumn fx:id="colJenkel" text="L/P" prefWidth="40"/>
-                            <TableColumn fx:id="colDesa" text="Desa" prefWidth="120"/>
-                            <TableColumn fx:id="colAlamat" text="Alamat" prefWidth="200"/>
+                            <TableColumn fx:id="colDesa" text="Desa" prefWidth="110"/>
+                            <TableColumn fx:id="colRW" text="RW" prefWidth="40"/>
+                            <TableColumn fx:id="colRT" text="RT" prefWidth="40"/>
+                            <TableColumn fx:id="colAlamat" text="Alamat" prefWidth="180"/>
                         </columns>
                     </TableView>
                 </VBox>
@@ -80,6 +82,17 @@
                         <VBox spacing="5" HBox.hgrow="ALWAYS">
                             <Label text="Pilih Desa" styleClass="input-label"/>
                             <ComboBox fx:id="desaComboBox" maxWidth="Infinity" styleClass="input-field"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox spacing="10">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Pilih RW" styleClass="input-label"/>
+                            <ComboBox fx:id="rwComboBox" maxWidth="Infinity" styleClass="input-field"/>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Pilih RT" styleClass="input-label"/>
+                            <ComboBox fx:id="rtComboBox" maxWidth="Infinity" styleClass="input-field"/>
                         </VBox>
                     </HBox>
                     

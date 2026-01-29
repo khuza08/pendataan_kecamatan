@@ -32,12 +32,16 @@ public class WargaController implements Initializable, DataRefreshable {
     @FXML private TableColumn<Warga, String> colNama;
     @FXML private TableColumn<Warga, String> colJenkel;
     @FXML private TableColumn<Warga, String> colDesa;
+    @FXML private TableColumn<Warga, String> colRW;
+    @FXML private TableColumn<Warga, String> colRT;
     @FXML private TableColumn<Warga, String> colAlamat;
 
     @FXML private TextField nikField;
     @FXML private TextField namaField;
     @FXML private ComboBox<String> jenkelComboBox;
     @FXML private ComboBox<Desa> desaComboBox;
+    @FXML private ComboBox<String> rwComboBox;
+    @FXML private ComboBox<String> rtComboBox;
     @FXML private TextArea alamatArea;
 
     private ObservableList<Warga> wargaList = FXCollections.observableArrayList();
@@ -50,6 +54,8 @@ public class WargaController implements Initializable, DataRefreshable {
         colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
         colJenkel.setCellValueFactory(cellData -> cellData.getValue().jenisKelaminProperty());
         colDesa.setCellValueFactory(cellData -> cellData.getValue().desaNamaProperty());
+        colRW.setCellValueFactory(cellData -> cellData.getValue().rwProperty());
+        colRT.setCellValueFactory(cellData -> cellData.getValue().rtProperty());
         colAlamat.setCellValueFactory(cellData -> cellData.getValue().alamatProperty());
 
         setupDesaComboBox();
@@ -67,9 +73,32 @@ public class WargaController implements Initializable, DataRefreshable {
                 for (Desa d : desaList) {
                     if (d.getId() == newSel.getDesaId()) {
                         desaComboBox.getSelectionModel().select(d);
+                        // Trigger RW loading and then select the specific RW
+                        loadRWData(d, newSel.getRw());
+                        // Trigger RT loading and then select the specific RT
+                        loadRTData(d, newSel.getRw(), newSel.getRt());
                         break;
                     }
                 }
+            }
+        });
+
+        // Cascading ComboBox listeners
+        desaComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldDesa, newDesa) -> {
+            if (newDesa != null) {
+                loadRWData(newDesa, null);
+            } else {
+                rwComboBox.getItems().clear();
+                rtComboBox.getItems().clear();
+            }
+        });
+
+        rwComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldRw, newRw) -> {
+            Desa currentDesa = desaComboBox.getSelectionModel().getSelectedItem();
+            if (currentDesa != null && newRw != null) {
+                loadRTData(currentDesa, newRw, null);
+            } else {
+                rtComboBox.getItems().clear();
             }
         });
 
@@ -125,6 +154,49 @@ public class WargaController implements Initializable, DataRefreshable {
         });
     }
 
+    private void loadRWData(Desa d, String autoSelect) {
+        com.kecamatan.util.ThreadManager.execute(() -> {
+            ObservableList<String> rws = FXCollections.observableArrayList();
+            String sql = "SELECT DISTINCT rw_number FROM desa_rtrw WHERE desa_id = ? ORDER BY rw_number";
+            try (Connection conn = DatabaseUtil.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, d.getId());
+                ResultSet rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    rws.add(rs.getString("rw_number"));
+                }
+                javafx.application.Platform.runLater(() -> {
+                    rwComboBox.setItems(rws);
+                    if (autoSelect != null) rwComboBox.getSelectionModel().select(autoSelect);
+                });
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private void loadRTData(Desa d, String rw, String autoSelect) {
+        com.kecamatan.util.ThreadManager.execute(() -> {
+            ObservableList<String> rts = FXCollections.observableArrayList();
+            String sql = "SELECT rt_number FROM desa_rtrw WHERE desa_id = ? AND rw_number = ? ORDER BY rt_number";
+            try (Connection conn = DatabaseUtil.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, d.getId());
+                pstmt.setString(2, rw);
+                ResultSet rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    rts.add(rs.getString("rt_number"));
+                }
+                javafx.application.Platform.runLater(() -> {
+                    rtComboBox.setItems(rts);
+                    if (autoSelect != null) rtComboBox.getSelectionModel().select(autoSelect);
+                });
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     private void loadDesaData() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Desa> tempDesa = FXCollections.observableArrayList();
@@ -168,7 +240,9 @@ public class WargaController implements Initializable, DataRefreshable {
                         rs.getString("alamat"),
                         rs.getString("jenis_kelamin"),
                         rs.getInt("desa_id"),
-                        rs.getString("desa_nama")
+                        rs.getString("desa_nama"),
+                        rs.getString("rt"),
+                        rs.getString("rw")
                     ));
                 }
                 javafx.application.Platform.runLater(() -> {
@@ -187,6 +261,8 @@ public class WargaController implements Initializable, DataRefreshable {
         String nama = namaField.getText();
         String jenkel = jenkelComboBox.getSelectionModel().getSelectedItem();
         Desa selectedDesa = desaComboBox.getSelectionModel().getSelectedItem();
+        String selectedRw = rwComboBox.getSelectionModel().getSelectedItem();
+        String selectedRt = rtComboBox.getSelectionModel().getSelectedItem();
         String alamat = alamatArea.getText();
 
         // Reset styles
@@ -194,6 +270,8 @@ public class WargaController implements Initializable, DataRefreshable {
         com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
         com.kecamatan.util.UIUtil.setErrorStyle(jenkelComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(rwComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(rtComboBox, false);
 
         boolean hasError = false;
 
@@ -201,6 +279,8 @@ public class WargaController implements Initializable, DataRefreshable {
         if (nama.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(namaField, true); hasError = true; }
         if (jenkel == null) { com.kecamatan.util.UIUtil.setErrorStyle(jenkelComboBox, true); hasError = true; }
         if (selectedDesa == null) { com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, true); hasError = true; }
+        if (selectedRw == null) { com.kecamatan.util.UIUtil.setErrorStyle(rwComboBox, true); hasError = true; }
+        if (selectedRt == null) { com.kecamatan.util.UIUtil.setErrorStyle(rtComboBox, true); hasError = true; }
 
         if (hasError) return;
 
@@ -217,14 +297,10 @@ public class WargaController implements Initializable, DataRefreshable {
 
         String sql;
         if (selectedId == -1) {
-            sql = "INSERT INTO warga (nik, nama, jenkel, desa_id, alamat) VALUES (?, ?, ?, ?, ?)";
+            sql = "INSERT INTO warga (nik, nama, jenis_kelamin, desa_id, rw, rt, alamat) VALUES (?, ?, ?, ?, ?, ?, ?)";
         } else {
-            sql = "UPDATE warga SET nik = ?, nama = ?, jenkel = ?, desa_id = ?, alamat = ? WHERE id = ?";
+            sql = "UPDATE warga SET nik = ?, nama = ?, jenis_kelamin = ?, desa_id = ?, rw = ?, rt = ?, alamat = ? WHERE id = ?";
         }
-
-        // Note: I used 'jenkel' as column name in insert/update but table was created with 'jenis_kelamin'
-        // Let's fix that in the SQL below
-        sql = sql.replace("jenkel", "jenis_kelamin");
 
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -232,8 +308,10 @@ public class WargaController implements Initializable, DataRefreshable {
             pstmt.setString(2, nama);
             pstmt.setString(3, jenkel);
             pstmt.setInt(4, selectedDesa.getId());
-            pstmt.setString(5, alamat);
-            if (selectedId != -1) pstmt.setInt(6, selectedId);
+            pstmt.setString(5, selectedRw);
+            pstmt.setString(6, selectedRt);
+            pstmt.setString(7, alamat);
+            if (selectedId != -1) pstmt.setInt(8, selectedId);
             
             pstmt.executeUpdate();
 
@@ -274,6 +352,8 @@ public class WargaController implements Initializable, DataRefreshable {
         namaField.clear();
         jenkelComboBox.getSelectionModel().clearSelection();
         desaComboBox.getSelectionModel().clearSelection();
+        rwComboBox.getSelectionModel().clearSelection();
+        rtComboBox.getSelectionModel().clearSelection();
         alamatArea.clear();
         wargaTable.getSelectionModel().clearSelection();
 
@@ -282,6 +362,8 @@ public class WargaController implements Initializable, DataRefreshable {
         com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
         com.kecamatan.util.UIUtil.setErrorStyle(jenkelComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(rwComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(rtComboBox, false);
     }
 
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }
