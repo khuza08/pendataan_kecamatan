@@ -145,13 +145,23 @@ public class DesaController implements Initializable, DataRefreshable {
         String rtText = rtField.getText();
         String rwText = rwField.getText();
         
-        if (selectedKec == null || nama.isEmpty() || rtText.isEmpty() || rwText.isEmpty()) {
-            com.kecamatan.util.UIUtil.showAlert("Validasi", "Semua field harus diisi!", Alert.AlertType.WARNING);
-            return;
-        }
+        // Reset styles
+        com.kecamatan.util.UIUtil.setErrorStyle(kecamatanComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(rtField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(rwField, false);
+
+        boolean hasError = false;
+
+        if (selectedKec == null) { com.kecamatan.util.UIUtil.setErrorStyle(kecamatanComboBox, true); hasError = true; }
+        if (nama.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(namaField, true); hasError = true; }
+        if (rtText.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(rtField, true); hasError = true; }
+        if (rwText.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(rwField, true); hasError = true; }
+
+        if (hasError) return;
 
         if (nama.length() > 100) {
-            com.kecamatan.util.UIUtil.showAlert("Validasi", "Nama Desa maksimal 100 karakter!", Alert.AlertType.WARNING);
+            com.kecamatan.util.UIUtil.setErrorStyle(namaField, true);
             return;
         }
 
@@ -160,7 +170,8 @@ public class DesaController implements Initializable, DataRefreshable {
             rt = Integer.parseInt(rtText);
             rw = Integer.parseInt(rwText);
         } catch (NumberFormatException e) {
-            com.kecamatan.util.UIUtil.showAlert("Error", "RT dan RW harus berupa angka!", Alert.AlertType.ERROR);
+            if (!rtText.matches("\\d+")) com.kecamatan.util.UIUtil.setErrorStyle(rtField, true);
+            if (!rwText.matches("\\d+")) com.kecamatan.util.UIUtil.setErrorStyle(rwField, true);
             return;
         }
 
@@ -210,6 +221,12 @@ public class DesaController implements Initializable, DataRefreshable {
         rwField.clear();
         kecamatanComboBox.getSelectionModel().clearSelection();
         desaTable.getSelectionModel().clearSelection();
+
+        // Clear error styles
+        com.kecamatan.util.UIUtil.setErrorStyle(kecamatanComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(rtField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(rwField, false);
     }
 
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }

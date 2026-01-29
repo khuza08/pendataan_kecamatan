@@ -42,6 +42,11 @@
     -fx-border-color: #009C4B;
 }
 
+.input-error {
+    -fx-border-color: #d32f2f !important;
+    -fx-background-color: #fff1f1 !important;
+}
+
 /* Snappy button - light theme colors (Green) */
 .login-button {
     -fx-background-color: #009C4B;
@@ -141,6 +146,17 @@
     -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-fill: #2E261A;
+}
+
+/* TableView Styling */
+.table-view .column-header .label {
+    -fx-text-fill: #2E261A;
+    -fx-font-weight: bold;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: transparent transparent #e0e0e0 transparent;
 }
 
 /* Charts */

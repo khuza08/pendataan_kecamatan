@@ -25,7 +25,8 @@ public class DashboardController implements Initializable, DataRefreshable {
 
     @FXML private LineChart<String, Number> wargaChart;
     @FXML private Text totalWargaText;
-    @FXML private Text lpText;
+    @FXML private Text lakiText;
+    @FXML private Text perempuanText;
     @FXML private Text rtrwText;
     @FXML private Text totalKecamatanText;
 
@@ -53,8 +54,8 @@ public class DashboardController implements Initializable, DataRefreshable {
                     while (rs.next()) {
                         String jk = rs.getString(1);
                         if (jk != null) {
-                            if (jk.equalsIgnoreCase("Laki-laki")) male = rs.getInt(2);
-                            else if (jk.equalsIgnoreCase("Perempuan")) female = rs.getInt(2);
+                            if (jk.equalsIgnoreCase("L") || jk.equalsIgnoreCase("Laki-laki")) male += rs.getInt(2);
+                            else if (jk.equalsIgnoreCase("P") || jk.equalsIgnoreCase("Perempuan")) female += rs.getInt(2);
                         }
                     }
                 }
@@ -92,7 +93,8 @@ public class DashboardController implements Initializable, DataRefreshable {
                 final int fw = totalWarga, fm = male, ff = female, frt = totalRT, frw = totalRW, fk = totalKec;
                 Platform.runLater(() -> {
                     totalWargaText.setText(String.format("%,d", fw));
-                    lpText.setText(String.format("%d / %d", fm, ff));
+                    lakiText.setText(String.format("%,d", fm));
+                    perempuanText.setText(String.format("%,d", ff));
                     rtrwText.setText(String.format("%d / %d", frt, frw));
                     totalKecamatanText.setText(String.valueOf(fk));
                     

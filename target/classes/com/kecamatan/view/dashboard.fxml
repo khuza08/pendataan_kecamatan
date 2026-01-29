@@ -41,6 +41,7 @@
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
+                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
                 </columnConstraints>
                 
                 <VBox styleClass="card" GridPane.columnIndex="0">
@@ -49,16 +50,21 @@
                 </VBox>
                 
                 <VBox styleClass="card" GridPane.columnIndex="1">
-                    <Text text="L / P" styleClass="card-label"/>
-                    <Text fx:id="lpText" text="0 / 0" styleClass="card-value-small"/>
+                    <Text text="Laki-laki" styleClass="card-label"/>
+                    <Text fx:id="lakiText" text="0" styleClass="card-value"/>
+                </VBox>
+
+                <VBox styleClass="card" GridPane.columnIndex="2">
+                    <Text text="Perempuan" styleClass="card-label"/>
+                    <Text fx:id="perempuanText" text="0" styleClass="card-value"/>
                 </VBox>
                 
-                <VBox styleClass="card" GridPane.columnIndex="2">
+                <VBox styleClass="card" GridPane.columnIndex="3">
                     <Text text="Total RT / RW" styleClass="card-label"/>
                     <Text fx:id="rtrwText" text="0 / 0" styleClass="card-value-small"/>
                 </VBox>
  
-                <VBox styleClass="card" GridPane.columnIndex="3">
+                <VBox styleClass="card" GridPane.columnIndex="4">
                     <Text text="Kecamatan" styleClass="card-label"/>
                     <Text fx:id="totalKecamatanText" text="0" styleClass="card-value"/>
                 </VBox>

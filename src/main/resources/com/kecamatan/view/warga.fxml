@@ -57,7 +57,7 @@
                     
                     <VBox spacing="5">
                         <Label text="NIK" styleClass="input-label"/>
-                        <TextField fx:id="nikField" styleClass="input-field"/>
+                        <TextField fx:id="nikField" promptText="Masukkan 16 Digit" styleClass="input-field"/>
                     </VBox>
                     
                     <VBox spacing="5">
@@ -71,8 +71,8 @@
                             <ComboBox fx:id="jenkelComboBox" maxWidth="Infinity" styleClass="input-field">
                                 <items>
                                     <FXCollections fx:factory="observableArrayList">
-                                        <String fx:value="L"/>
-                                        <String fx:value="P"/>
+                                        <String fx:value="Laki-laki"/>
+                                        <String fx:value="Perempuan"/>
                                     </FXCollections>
                                 </items>
                             </ComboBox>

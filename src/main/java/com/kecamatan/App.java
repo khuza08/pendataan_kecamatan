@@ -43,9 +43,20 @@ public class App extends Application {
 
         stage.setTitle("Pendataan Kecamatan");
         stage.setScene(scene);
-        stage.setResizable(false);
         stage.show();
+
+        // 3. Persistent Window Lock Listener (One-time setup)
+        stage.maximizedProperty().addListener((obs, oldVal, newVal) -> {
+            if (maximizedLock && !newVal) {
+                Platform.runLater(() -> {
+                    stage.setResizable(true);
+                    stage.setMaximized(true);
+                });
+            }
+        });
     }
+
+    private static boolean maximizedLock = false;
 
     public static Stage getPrimaryStage() {
         return primaryStage;
@@ -55,6 +66,7 @@ public class App extends Application {
         currentFxml = fxml;
         currentWidth = width;
         currentHeight = height;
+        maximizedLock = maximized;
 
         // 1. Swap the content first
         refresh();
@@ -62,16 +74,19 @@ public class App extends Application {
         // 2. Adjust the window state
         Stage stage = (Stage) scene.getWindow();
         if (stage != null) {
-            stage.setResizable(true); // Always allow resize for dashboard
-            
             Platform.runLater(() -> {
                 if (maximized) {
+                    stage.setResizable(true);
                     stage.setMaximized(true);
+                    // On many Linux systems, setResizable(false) while maximized 
+                    // triggers a "restore" event. We rely on the listener instead.
                 } else {
+                    stage.setResizable(true);
                     stage.setMaximized(false);
                     stage.setWidth(width);
                     stage.setHeight(height);
                     stage.centerOnScreen();
+                    stage.setResizable(false); // Locking login
                 }
             });
         }

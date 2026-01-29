@@ -5,7 +5,20 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 
+import javafx.scene.Node;
+
 public class UIUtil {
+
+    public static void setErrorStyle(Node node, boolean error) {
+        if (node == null) return;
+        if (error) {
+            if (!node.getStyleClass().contains("input-error")) {
+                node.getStyleClass().add("input-error");
+            }
+        } else {
+            node.getStyleClass().remove("input-error");
+        }
+    }
 
     public static void showAlert(String title, String content, Alert.AlertType type) {
         if (Platform.isFxApplicationThread()) {
@@ -28,11 +41,5 @@ public class UIUtil {
         }
         
         alert.showAndWait();
-        
-        // Safety measure: re-maximize if it was maximized before
-        if (primary != null && primary.isMaximized()) {
-            primary.setMaximized(false);
-            primary.setMaximized(true);
-        }
     }
 }

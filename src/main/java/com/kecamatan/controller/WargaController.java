@@ -72,6 +72,46 @@ public class WargaController implements Initializable, DataRefreshable {
                 }
             }
         });
+
+        // Real-time NIK length & uniqueness validation
+        nikField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal == null || newVal.isEmpty()) {
+                com.kecamatan.util.UIUtil.setErrorStyle(nikField, false);
+                return;
+            }
+
+            // 1. Format check (must be 16 digits)
+            boolean formatInvalid = newVal.length() != 16 || !newVal.matches("\\d+");
+            if (formatInvalid) {
+                com.kecamatan.util.UIUtil.setErrorStyle(nikField, true);
+                return;
+            }
+
+            // 2. Uniqueness check (if format is valid)
+            com.kecamatan.util.ThreadManager.execute(() -> {
+                boolean isDuplicate = false;
+                String sql = "SELECT COUNT(*) FROM warga WHERE nik = ? AND id != ?";
+                try (Connection conn = DatabaseUtil.getConnection();
+                     PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                    pstmt.setString(1, newVal);
+                    pstmt.setInt(2, selectedId);
+                    ResultSet rs = pstmt.executeQuery();
+                    if (rs.next()) {
+                        isDuplicate = rs.getInt(1) > 0;
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                final boolean duplicateFound = isDuplicate;
+                javafx.application.Platform.runLater(() -> {
+                    // Only update if the field still contains the value we checked
+                    if (nikField.getText().equals(newVal)) {
+                        com.kecamatan.util.UIUtil.setErrorStyle(nikField, duplicateFound);
+                    }
+                });
+            });
+        });
     }
 
     private void setupDesaComboBox() {
@@ -149,19 +189,29 @@ public class WargaController implements Initializable, DataRefreshable {
         Desa selectedDesa = desaComboBox.getSelectionModel().getSelectedItem();
         String alamat = alamatArea.getText();
 
-        if (nik.isEmpty() || nama.isEmpty() || jenkel == null || selectedDesa == null) {
-            com.kecamatan.util.UIUtil.showAlert("Validasi", "Field NIK, Nama, Jenkel, dan Desa wajib diisi!", Alert.AlertType.WARNING);
-            return;
-        }
+        // Reset styles
+        com.kecamatan.util.UIUtil.setErrorStyle(nikField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(jenkelComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, false);
+
+        boolean hasError = false;
+
+        if (nik.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(nikField, true); hasError = true; }
+        if (nama.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(namaField, true); hasError = true; }
+        if (jenkel == null) { com.kecamatan.util.UIUtil.setErrorStyle(jenkelComboBox, true); hasError = true; }
+        if (selectedDesa == null) { com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, true); hasError = true; }
+
+        if (hasError) return;
 
         // Add length and format validation
         if (nik.length() != 16 || !nik.matches("\\d+")) {
-            com.kecamatan.util.UIUtil.showAlert("Validasi", "NIK harus berisi tepat 16 digit angka!", Alert.AlertType.WARNING);
+            com.kecamatan.util.UIUtil.setErrorStyle(nikField, true);
             return;
         }
 
         if (nama.length() > 100) {
-            com.kecamatan.util.UIUtil.showAlert("Validasi", "Nama Lengkap maksimal 100 karakter!", Alert.AlertType.WARNING);
+            com.kecamatan.util.UIUtil.setErrorStyle(namaField, true);
             return;
         }
 
@@ -226,6 +276,12 @@ public class WargaController implements Initializable, DataRefreshable {
         desaComboBox.getSelectionModel().clearSelection();
         alamatArea.clear();
         wargaTable.getSelectionModel().clearSelection();
+
+        // Clear error styles
+        com.kecamatan.util.UIUtil.setErrorStyle(nikField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(jenkelComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, false);
     }
 
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }

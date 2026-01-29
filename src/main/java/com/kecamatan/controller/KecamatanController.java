@@ -87,18 +87,26 @@ public class KecamatanController implements Initializable, DataRefreshable {
         String nama = namaField.getText();
         String desaText = desaField.getText();
 
-        if (kode.isEmpty() || nama.isEmpty() || desaText.isEmpty()) {
-            com.kecamatan.util.UIUtil.showAlert("Validasi", "Semua field harus diisi!", Alert.AlertType.WARNING);
-            return;
-        }
+        // Reset styles
+        com.kecamatan.util.UIUtil.setErrorStyle(kodeField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(desaField, false);
+
+        boolean hasError = false;
+
+        if (kode.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(kodeField, true); hasError = true; }
+        if (nama.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(namaField, true); hasError = true; }
+        if (desaText.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(desaField, true); hasError = true; }
+
+        if (hasError) return;
 
         if (kode.length() > 10) {
-            com.kecamatan.util.UIUtil.showAlert("Validasi", "Kode Kecamatan maksimal 10 karakter!", Alert.AlertType.WARNING);
+            com.kecamatan.util.UIUtil.setErrorStyle(kodeField, true);
             return;
         }
 
         if (nama.length() > 100) {
-            com.kecamatan.util.UIUtil.showAlert("Validasi", "Nama Kecamatan maksimal 100 karakter!", Alert.AlertType.WARNING);
+            com.kecamatan.util.UIUtil.setErrorStyle(namaField, true);
             return;
         }
 
@@ -106,7 +114,7 @@ public class KecamatanController implements Initializable, DataRefreshable {
         try {
             desa = Integer.parseInt(desaText);
         } catch (NumberFormatException e) {
-            com.kecamatan.util.UIUtil.showAlert("Error", "Jumlah Desa harus berupa angka!", Alert.AlertType.ERROR);
+            com.kecamatan.util.UIUtil.setErrorStyle(desaField, true);
             return;
         }
 
@@ -154,6 +162,11 @@ public class KecamatanController implements Initializable, DataRefreshable {
         namaField.clear();
         desaField.clear();
         kecamatanTable.getSelectionModel().clearSelection();
+
+        // Clear error styles
+        com.kecamatan.util.UIUtil.setErrorStyle(kodeField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(desaField, false);
     }
 
     @FXML
