@@ -73,7 +73,7 @@
             <HBox spacing="20" VBox.vgrow="ALWAYS">
                 <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="10">
                     <Text text="Pertumbuhan Warga (6 Bulan Terakhir)" styleClass="card-title"/>
-                    <LineChart fx:id="wargaChart" legendSide="BOTTOM" createSymbols="true">
+                    <LineChart fx:id="wargaChart" legendVisible="false" createSymbols="true">
                         <xAxis><CategoryAxis side="BOTTOM" label="Bulan"/></xAxis>
                         <yAxis><NumberAxis side="LEFT" label="Jumlah"/></yAxis>
                     </LineChart>

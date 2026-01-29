@@ -100,6 +100,19 @@ public class DashboardController implements Initializable, DataRefreshable {
                     
                     wargaChart.getData().clear();
                     wargaChart.getData().add(series);
+
+                    // Apply dynamic colors to bars/nodes
+                    String[] colors = {"#3498db", "#2ecc71", "#9b59b6", "#e67e22", "#e74c3c", "#1abc9c", "#34495e", "#f1c40f"};
+                    for (int i = 0; i < series.getData().size(); i++) {
+                        final int index = i;
+                        XYChart.Data<String, Number> data = series.getData().get(i);
+                        Platform.runLater(() -> {
+                            if (data.getNode() != null) {
+                                String color = colors[index % colors.length];
+                                data.getNode().setStyle("-fx-bar-fill: " + color + "; -fx-background-color: " + color + ";");
+                            }
+                        });
+                    }
                 });
 
             } catch (SQLException e) {

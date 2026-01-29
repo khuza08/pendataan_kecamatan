@@ -138,6 +138,19 @@ public class LaporanController implements Initializable, DataRefreshable {
                     populationChart.getData().clear();
                     populationChart.getData().add(barSeries);
                     summaryTable.setItems(desaList);
+
+                    // Apply dynamic colors to population chart bars
+                    String[] colors = {"#3498db", "#2ecc71", "#9b59b6", "#e67e22", "#e74c3c", "#1abc9c", "#34495e", "#f1c40f"};
+                    for (int i = 0; i < barSeries.getData().size(); i++) {
+                        final int index = i;
+                        XYChart.Data<String, Number> data = barSeries.getData().get(i);
+                        Platform.runLater(() -> {
+                            if (data.getNode() != null) {
+                                String color = colors[index % colors.length];
+                                data.getNode().setStyle("-fx-bar-fill: " + color + ";");
+                            }
+                        });
+                    }
                 });
 
             } catch (SQLException e) {

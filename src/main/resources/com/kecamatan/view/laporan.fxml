@@ -63,12 +63,12 @@
                 <HBox spacing="20">
                     <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="10">
                         <Text text="Distribusi Jenis Kelamin" styleClass="card-title"/>
-                        <PieChart fx:id="genderChart" prefHeight="300"/>
+                        <PieChart fx:id="genderChart" prefHeight="300" legendVisible="false"/>
                     </VBox>
                     
                     <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="10">
                         <Text text="Populasi per Kecamatan" styleClass="card-title"/>
-                        <BarChart fx:id="populationChart" prefHeight="300">
+                        <BarChart fx:id="populationChart" prefHeight="300" legendVisible="false">
                             <xAxis><CategoryAxis side="BOTTOM" label="Kecamatan"/></xAxis>
                             <yAxis><NumberAxis side="LEFT" label="Jiwa"/></yAxis>
                         </BarChart>
