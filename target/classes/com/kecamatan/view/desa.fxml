@@ -63,12 +63,6 @@
                         <TextField fx:id="namaField" styleClass="input-field"/>
                     </VBox>
                     
-                    <HBox spacing="10">
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Populasi" styleClass="input-label"/>
-                            <TextField fx:id="populasiField" styleClass="input-field"/>
-                        </VBox>
-                    </HBox>
 
                     <HBox spacing="10">
                         <VBox spacing="5" HBox.hgrow="ALWAYS">

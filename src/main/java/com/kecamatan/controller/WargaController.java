@@ -4,6 +4,8 @@ import com.kecamatan.App;
 import com.kecamatan.model.Desa;
 import com.kecamatan.model.Warga;
 import com.kecamatan.util.DatabaseUtil;
+import com.kecamatan.util.ThreadManager;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,7 +17,15 @@ import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
 
-public class WargaController implements Initializable {
+import com.kecamatan.util.DataRefreshable;
+
+public class WargaController implements Initializable, DataRefreshable {
+
+    @Override
+    public void refreshData() {
+        loadDesaData();
+        loadWargaData();
+    }
 
     @FXML private TableView<Warga> wargaTable;
     @FXML private TableColumn<Warga, String> colNik;
@@ -78,7 +88,7 @@ public class WargaController implements Initializable {
     private void loadDesaData() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Desa> tempDesa = FXCollections.observableArrayList();
-            String sql = "SELECT d.*, k.nama as kecamatan_nama FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id ORDER BY d.nama";
+            String sql = "SELECT d.*, k.nama as kecamatan_nama, (SELECT COUNT(*) FROM warga WHERE desa_id = d.id) as calculated_pop FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id ORDER BY d.nama";
             try (Connection conn = DatabaseUtil.getConnection();
                  Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {
@@ -88,7 +98,7 @@ public class WargaController implements Initializable {
                         rs.getInt("kecamatan_id"),
                         rs.getString("kecamatan_nama"),
                         rs.getString("nama"),
-                        rs.getInt("populasi"),
+                        rs.getInt("calculated_pop"),
                         rs.getInt("jumlah_rt"),
                         rs.getInt("jumlah_rw")
                     ));
@@ -140,7 +150,18 @@ public class WargaController implements Initializable {
         String alamat = alamatArea.getText();
 
         if (nik.isEmpty() || nama.isEmpty() || jenkel == null || selectedDesa == null) {
-            showAlert("Validasi", "Field NIK, Nama, Jenkel, dan Desa wajib diisi!", Alert.AlertType.WARNING);
+            com.kecamatan.util.UIUtil.showAlert("Validasi", "Field NIK, Nama, Jenkel, dan Desa wajib diisi!", Alert.AlertType.WARNING);
+            return;
+        }
+
+        // Add length and format validation
+        if (nik.length() != 16 || !nik.matches("\\d+")) {
+            com.kecamatan.util.UIUtil.showAlert("Validasi", "NIK harus berisi tepat 16 digit angka!", Alert.AlertType.WARNING);
+            return;
+        }
+
+        if (nama.length() > 100) {
+            com.kecamatan.util.UIUtil.showAlert("Validasi", "Nama Lengkap maksimal 100 karakter!", Alert.AlertType.WARNING);
             return;
         }
 
@@ -165,11 +186,12 @@ public class WargaController implements Initializable {
             if (selectedId != -1) pstmt.setInt(6, selectedId);
             
             pstmt.executeUpdate();
+
             loadWargaData();
             handleReset();
         } catch (SQLException e) {
             if (e.getSQLState().equals("23505")) {
-                showAlert("Error", "NIK sudah terdaftar!", Alert.AlertType.ERROR);
+                com.kecamatan.util.UIUtil.showAlert("Error", "NIK sudah terdaftar!", Alert.AlertType.ERROR);
             } else {
                 e.printStackTrace();
             }
@@ -179,11 +201,15 @@ public class WargaController implements Initializable {
     @FXML
     private void handleDelete() {
         if (selectedId == -1) return;
-        String sql = "DELETE FROM warga WHERE id = ?";
-        try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, selectedId);
-            pstmt.executeUpdate();
+        
+        try (Connection conn = DatabaseUtil.getConnection()) {
+            // Perform delete
+            String sql = "DELETE FROM warga WHERE id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, selectedId);
+                pstmt.executeUpdate();
+            }
+
             loadWargaData();
             handleReset();
         } catch (SQLException e) {
@@ -200,14 +226,6 @@ public class WargaController implements Initializable {
         desaComboBox.getSelectionModel().clearSelection();
         alamatArea.clear();
         wargaTable.getSelectionModel().clearSelection();
-    }
-
-    private void showAlert(String title, String content, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }

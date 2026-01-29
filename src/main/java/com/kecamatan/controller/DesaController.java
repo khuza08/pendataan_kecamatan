@@ -15,7 +15,15 @@ import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
 
-public class DesaController implements Initializable {
+import com.kecamatan.util.DataRefreshable;
+
+public class DesaController implements Initializable, DataRefreshable {
+
+    @Override
+    public void refreshData() {
+        loadKecamatan();
+        loadDesa();
+    }
 
     @FXML private TableView<Desa> desaTable;
     @FXML private TableColumn<Desa, String> colKecamatan;
@@ -26,7 +34,6 @@ public class DesaController implements Initializable {
 
     @FXML private ComboBox<Kecamatan> kecamatanComboBox;
     @FXML private TextField namaField;
-    @FXML private TextField populasiField;
     @FXML private TextField rtField;
     @FXML private TextField rwField;
 
@@ -50,13 +57,11 @@ public class DesaController implements Initializable {
             if (newSel != null) {
                 selectedId = newSel.getId();
                 namaField.setText(newSel.getNama());
-                populasiField.setText(String.valueOf(newSel.getPopulasi()));
                 rtField.setText(String.valueOf(newSel.getJumlahRt()));
                 rwField.setText(String.valueOf(newSel.getJumlahRw()));
                 
                 for (Kecamatan k : kecamatanList) {
                     if (k.getId() == newSel.getKecamatanId()) {
-                        kecamatanComboBox.setSelectionModel(null); // Force update
                         kecamatanComboBox.getSelectionModel().select(k);
                         break;
                     }
@@ -108,7 +113,7 @@ public class DesaController implements Initializable {
     private void loadDesa() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Desa> tempDesa = FXCollections.observableArrayList();
-            String sql = "SELECT d.*, k.nama as kecamatan_nama FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id ORDER BY d.nama";
+            String sql = "SELECT d.*, k.nama as kecamatan_nama, (SELECT COUNT(*) FROM warga WHERE desa_id = d.id) as calculated_pop FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id ORDER BY d.nama";
             try (Connection conn = DatabaseUtil.getConnection();
                  Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {
@@ -118,7 +123,7 @@ public class DesaController implements Initializable {
                         rs.getInt("kecamatan_id"),
                         rs.getString("kecamatan_nama"),
                         rs.getString("nama"),
-                        rs.getInt("populasi"),
+                        rs.getInt("calculated_pop"),
                         rs.getInt("jumlah_rt"),
                         rs.getInt("jumlah_rw")
                     ));
@@ -137,40 +142,42 @@ public class DesaController implements Initializable {
     private void handleSave() {
         Kecamatan selectedKec = kecamatanComboBox.getSelectionModel().getSelectedItem();
         String nama = namaField.getText();
-        String populasiText = populasiField.getText();
         String rtText = rtField.getText();
         String rwText = rwField.getText();
-
-        if (selectedKec == null || nama.isEmpty() || populasiText.isEmpty() || rtText.isEmpty() || rwText.isEmpty()) {
-            showAlert("Validasi", "Semua field harus diisi!", Alert.AlertType.WARNING);
+        
+        if (selectedKec == null || nama.isEmpty() || rtText.isEmpty() || rwText.isEmpty()) {
+            com.kecamatan.util.UIUtil.showAlert("Validasi", "Semua field harus diisi!", Alert.AlertType.WARNING);
             return;
         }
 
-        int populasi, rt, rw;
+        if (nama.length() > 100) {
+            com.kecamatan.util.UIUtil.showAlert("Validasi", "Nama Desa maksimal 100 karakter!", Alert.AlertType.WARNING);
+            return;
+        }
+
+        int rt, rw;
         try {
-            populasi = Integer.parseInt(populasiText);
             rt = Integer.parseInt(rtText);
             rw = Integer.parseInt(rwText);
         } catch (NumberFormatException e) {
-            showAlert("Error", "Populasi, RT, dan RW harus berupa angka!", Alert.AlertType.ERROR);
+            com.kecamatan.util.UIUtil.showAlert("Error", "RT dan RW harus berupa angka!", Alert.AlertType.ERROR);
             return;
         }
 
         String sql;
         if (selectedId == -1) {
-            sql = "INSERT INTO desa (kecamatan_id, nama, populasi, jumlah_rt, jumlah_rw) VALUES (?, ?, ?, ?, ?)";
+            sql = "INSERT INTO desa (kecamatan_id, nama, jumlah_rt, jumlah_rw) VALUES (?, ?, ?, ?)";
         } else {
-            sql = "UPDATE desa SET kecamatan_id = ?, nama = ?, populasi = ?, jumlah_rt = ?, jumlah_rw = ? WHERE id = ?";
+            sql = "UPDATE desa SET kecamatan_id = ?, nama = ?, jumlah_rt = ?, jumlah_rw = ? WHERE id = ?";
         }
 
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, selectedKec.getId());
             pstmt.setString(2, nama);
-            pstmt.setInt(3, populasi);
-            pstmt.setInt(4, rt);
-            pstmt.setInt(5, rw);
-            if (selectedId != -1) pstmt.setInt(6, selectedId);
+            pstmt.setInt(3, rt);
+            pstmt.setInt(4, rw);
+            if (selectedId != -1) pstmt.setInt(5, selectedId);
             
             pstmt.executeUpdate();
             loadDesa();
@@ -178,14 +185,6 @@ public class DesaController implements Initializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    private void showAlert(String title, String content, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     @FXML
@@ -207,7 +206,6 @@ public class DesaController implements Initializable {
     private void handleReset() {
         selectedId = -1;
         namaField.clear();
-        populasiField.clear();
         rtField.clear();
         rwField.clear();
         kecamatanComboBox.getSelectionModel().clearSelection();

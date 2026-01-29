@@ -12,16 +12,21 @@ import javafx.scene.input.KeyCode;
 import java.io.File;
 import java.net.URL;
 import javafx.application.Platform;
+import com.kecamatan.util.DataRefreshable;
+import java.util.Map;
+import java.util.HashMap;
 
 public class App extends Application {
 
     private static Scene scene;
+    private static Stage primaryStage;
     private static String currentFxml = "login";
     private static double currentWidth = 400;
     private static double currentHeight = 500;
 
     @Override
     public void start(Stage stage) throws IOException {
+        primaryStage = stage;
         scene = new Scene(loadFXML(currentFxml), currentWidth, currentHeight);
         
         // F5 Refresh Shortcut
@@ -40,6 +45,10 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
+    }
+
+    public static Stage getPrimaryStage() {
+        return primaryStage;
     }
 
     public static void setRoot(String fxml, double width, double height, boolean maximized) throws IOException {
@@ -76,7 +85,8 @@ public class App extends Application {
         }
     }
 
-    private static final java.util.Map<String, Parent> viewCache = new java.util.HashMap<>();
+    private static final Map<String, Parent> viewCache = new HashMap<>();
+    private static final Map<String, Object> controllerCache = new HashMap<>();
 
     public static void preloadViews(String... fxmls) {
         com.kecamatan.util.ThreadManager.execute(() -> {
@@ -101,7 +111,13 @@ public class App extends Application {
     }
 
     public static void refresh() throws IOException {
-        scene.setRoot(loadFXML(currentFxml));
+        Parent root = loadFXML(currentFxml);
+        scene.setRoot(root);
+        
+        Object controller = controllerCache.get(currentFxml);
+        if (controller instanceof DataRefreshable) {
+            ((DataRefreshable) controller).refreshData();
+        }
     }
 
     private static Parent loadFXML(String fxml) throws IOException {
@@ -126,10 +142,14 @@ public class App extends Application {
         
         FXMLLoader fxmlLoader = new FXMLLoader(resourceUrl);
         Parent root = fxmlLoader.load();
+        Object controller = fxmlLoader.getController();
         
         // Cache all views except login (to allow fresh state if needed)
         if (!fxml.equals("login")) {
             viewCache.put(fxml, root);
+            if (controller != null) {
+                controllerCache.put(fxml, controller);
+            }
         }
         
         return root;

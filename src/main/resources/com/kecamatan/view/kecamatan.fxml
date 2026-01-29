@@ -67,10 +67,6 @@
                         <TextField fx:id="desaField" styleClass="input-field"/>
                     </VBox>
                     
-                    <VBox spacing="5">
-                        <Label text="Populasi" styleClass="input-label"/>
-                        <TextField fx:id="populasiField" styleClass="input-field"/>
-                    </VBox>
 
                     <HBox spacing="10">
                         <Button text="Simpan" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="login-button"/>

@@ -45,22 +45,22 @@
                 
                 <VBox styleClass="card" GridPane.columnIndex="0">
                     <Text text="Total Warga" styleClass="card-label"/>
-                    <Text text="1,245,678" styleClass="card-value"/>
+                    <Text fx:id="totalWargaText" text="0" styleClass="card-value"/>
                 </VBox>
                 
                 <VBox styleClass="card" GridPane.columnIndex="1">
                     <Text text="L / P" styleClass="card-label"/>
-                    <Text text="612K / 633K" styleClass="card-value-small"/>
+                    <Text fx:id="lpText" text="0 / 0" styleClass="card-value-small"/>
                 </VBox>
                 
                 <VBox styleClass="card" GridPane.columnIndex="2">
                     <Text text="Total RT / RW" styleClass="card-label"/>
-                    <Text text="420 / 84" styleClass="card-value-small"/>
+                    <Text fx:id="rtrwText" text="0 / 0" styleClass="card-value-small"/>
                 </VBox>
-
+ 
                 <VBox styleClass="card" GridPane.columnIndex="3">
                     <Text text="Kecamatan" styleClass="card-label"/>
-                    <Text text="12" styleClass="card-value"/>
+                    <Text fx:id="totalKecamatanText" text="0" styleClass="card-value"/>
                 </VBox>
             </GridPane>
 

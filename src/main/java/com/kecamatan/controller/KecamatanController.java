@@ -13,7 +13,14 @@ import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
 
-public class KecamatanController implements Initializable {
+import com.kecamatan.util.DataRefreshable;
+
+public class KecamatanController implements Initializable, DataRefreshable {
+    
+    @Override
+    public void refreshData() {
+        loadData();
+    }
 
     @FXML private TableView<Kecamatan> kecamatanTable;
     @FXML private TableColumn<Kecamatan, String> colKode;
@@ -24,7 +31,6 @@ public class KecamatanController implements Initializable {
     @FXML private TextField kodeField;
     @FXML private TextField namaField;
     @FXML private TextField desaField;
-    @FXML private TextField populasiField;
 
     private ObservableList<Kecamatan> kecamatanList = FXCollections.observableArrayList();
     private int selectedId = -1;
@@ -44,7 +50,6 @@ public class KecamatanController implements Initializable {
                 kodeField.setText(newSel.getKode());
                 namaField.setText(newSel.getNama());
                 desaField.setText(String.valueOf(newSel.getJumlahDesa()));
-                populasiField.setText(String.valueOf(newSel.getPopulasi()));
             }
         });
     }
@@ -52,7 +57,7 @@ public class KecamatanController implements Initializable {
     private void loadData() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Kecamatan> tempData = FXCollections.observableArrayList();
-            String sql = "SELECT * FROM kecamatan ORDER BY kode";
+            String sql = "SELECT k.*, (SELECT COUNT(*) FROM warga w JOIN desa d ON w.desa_id = d.id WHERE d.kecamatan_id = k.id) as calculated_pop FROM kecamatan k ORDER BY k.kode";
             try (Connection conn = DatabaseUtil.getConnection();
                  Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {
@@ -62,7 +67,7 @@ public class KecamatanController implements Initializable {
                         rs.getString("kode"),
                         rs.getString("nama"),
                         rs.getInt("jumlah_desa"),
-                        rs.getInt("populasi")
+                        rs.getInt("calculated_pop")
                     ));
                 }
                 
@@ -81,27 +86,35 @@ public class KecamatanController implements Initializable {
         String kode = kodeField.getText();
         String nama = namaField.getText();
         String desaText = desaField.getText();
-        String populasiText = populasiField.getText();
 
-        if (kode.isEmpty() || nama.isEmpty() || desaText.isEmpty() || populasiText.isEmpty()) {
-            showAlert("Validasi", "Semua field harus diisi!", Alert.AlertType.WARNING);
+        if (kode.isEmpty() || nama.isEmpty() || desaText.isEmpty()) {
+            com.kecamatan.util.UIUtil.showAlert("Validasi", "Semua field harus diisi!", Alert.AlertType.WARNING);
             return;
         }
 
-        int desa, populasi;
+        if (kode.length() > 10) {
+            com.kecamatan.util.UIUtil.showAlert("Validasi", "Kode Kecamatan maksimal 10 karakter!", Alert.AlertType.WARNING);
+            return;
+        }
+
+        if (nama.length() > 100) {
+            com.kecamatan.util.UIUtil.showAlert("Validasi", "Nama Kecamatan maksimal 100 karakter!", Alert.AlertType.WARNING);
+            return;
+        }
+
+        int desa;
         try {
             desa = Integer.parseInt(desaText);
-            populasi = Integer.parseInt(populasiText);
         } catch (NumberFormatException e) {
-            showAlert("Error", "Jumlah Desa dan Populasi harus berupa angka!", Alert.AlertType.ERROR);
+            com.kecamatan.util.UIUtil.showAlert("Error", "Jumlah Desa harus berupa angka!", Alert.AlertType.ERROR);
             return;
         }
 
         String sql;
         if (selectedId == -1) {
-            sql = "INSERT INTO kecamatan (kode, nama, jumlah_desa, populasi) VALUES (?, ?, ?, ?)";
+            sql = "INSERT INTO kecamatan (kode, nama, jumlah_desa) VALUES (?, ?, ?)";
         } else {
-            sql = "UPDATE kecamatan SET kode = ?, nama = ?, jumlah_desa = ?, populasi = ? WHERE id = ?";
+            sql = "UPDATE kecamatan SET kode = ?, nama = ?, jumlah_desa = ? WHERE id = ?";
         }
 
         try (Connection conn = DatabaseUtil.getConnection();
@@ -109,8 +122,7 @@ public class KecamatanController implements Initializable {
             pstmt.setString(1, kode);
             pstmt.setString(2, nama);
             pstmt.setInt(3, desa);
-            pstmt.setInt(4, populasi);
-            if (selectedId != -1) pstmt.setInt(5, selectedId);
+            if (selectedId != -1) pstmt.setInt(4, selectedId);
             
             pstmt.executeUpdate();
             loadData();
@@ -118,14 +130,6 @@ public class KecamatanController implements Initializable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    private void showAlert(String title, String content, Alert.AlertType type) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 
     @FXML
@@ -149,7 +153,6 @@ public class KecamatanController implements Initializable {
         kodeField.clear();
         namaField.clear();
         desaField.clear();
-        populasiField.clear();
         kecamatanTable.getSelectionModel().clearSelection();
     }
 
