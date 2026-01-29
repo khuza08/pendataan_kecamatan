@@ -163,5 +163,5 @@ public class LaporanController implements Initializable, DataRefreshable {
     @FXML private void goToKecamatan() throws IOException { App.setRoot("kecamatan", 1200, 800, true); }
     @FXML private void goToDesa() throws IOException { App.setRoot("desa", 1200, 800, true); }
     @FXML private void goToWarga() throws IOException { App.setRoot("warga", 1200, 800, true); }
-    @FXML private void handleLogout() throws IOException { App.setRoot("login", 400, 500); }
+    @FXML private void handleLogout() throws IOException { App.setRoot("login", 800, 450); }
 }

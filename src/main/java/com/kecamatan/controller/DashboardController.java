@@ -143,6 +143,6 @@ public class DashboardController implements Initializable, DataRefreshable {
 
     @FXML
     private void handleLogout() throws IOException {
-        App.setRoot("login", 400, 500);
+        App.setRoot("login", 800, 450);
     }
 }
