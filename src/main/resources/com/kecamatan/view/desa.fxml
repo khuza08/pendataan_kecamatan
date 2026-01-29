@@ -64,16 +64,17 @@
                     </VBox>
                     
 
-                    <HBox spacing="10">
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Jumlah RT" styleClass="input-label"/>
-                            <TextField fx:id="rtField" styleClass="input-field"/>
-                        </VBox>
-                        <VBox spacing="5" HBox.hgrow="ALWAYS">
-                            <Label text="Jumlah RW" styleClass="input-label"/>
-                            <TextField fx:id="rwField" styleClass="input-field"/>
-                        </VBox>
-                    </HBox>
+                    <VBox spacing="5" VBox.vgrow="ALWAYS">
+                        <Label text="Daftar RW &amp; RT" styleClass="input-label"/>
+                        <ScrollPane fitToWidth="true" prefHeight="200" styleClass="input-field" style="-fx-padding: 0;">
+                            <VBox fx:id="rwContainer" spacing="10">
+                                <padding>
+                                    <Insets top="10" right="10" bottom="10" left="10"/>
+                                </padding>
+                            </VBox>
+                        </ScrollPane>
+                        <Button text="+ Tambah RW" onAction="#handleTambahRW" maxWidth="Infinity" styleClass="sidebar-button"/>
+                    </VBox>
 
                     <HBox spacing="10">
                         <Button text="Simpan" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="login-button"/>

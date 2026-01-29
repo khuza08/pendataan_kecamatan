@@ -7,6 +7,7 @@ com/kecamatan/util/DataRefreshable.class
 com/kecamatan/util/UIUtil.class
 com/kecamatan/model/Desa.class
 com/kecamatan/model/Kecamatan.class
+com/kecamatan/controller/DesaController$RWData.class
 com/kecamatan/controller/DashboardController.class
 com/kecamatan/controller/DesaController$1.class
 com/kecamatan/controller/KecamatanController.class

@@ -9,11 +9,17 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.geometry.Pos;
+import javafx.geometry.Insets;
 import javafx.util.StringConverter;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import com.kecamatan.util.DataRefreshable;
 
@@ -34,8 +40,7 @@ public class DesaController implements Initializable, DataRefreshable {
 
     @FXML private ComboBox<Kecamatan> kecamatanComboBox;
     @FXML private TextField namaField;
-    @FXML private TextField rtField;
-    @FXML private TextField rwField;
+    @FXML private VBox rwContainer;
 
     private ObservableList<Desa> desaList = FXCollections.observableArrayList();
     private ObservableList<Kecamatan> kecamatanList = FXCollections.observableArrayList();
@@ -57,8 +62,6 @@ public class DesaController implements Initializable, DataRefreshable {
             if (newSel != null) {
                 selectedId = newSel.getId();
                 namaField.setText(newSel.getNama());
-                rtField.setText(String.valueOf(newSel.getJumlahRt()));
-                rwField.setText(String.valueOf(newSel.getJumlahRw()));
                 
                 for (Kecamatan k : kecamatanList) {
                     if (k.getId() == newSel.getKecamatanId()) {
@@ -66,8 +69,112 @@ public class DesaController implements Initializable, DataRefreshable {
                         break;
                     }
                 }
+
+                loadRTRWDetails(selectedId);
             }
         });
+    }
+
+    private void addRWRow(String rwNo, List<String> rtList) {
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setPadding(new Insets(5));
+        row.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;");
+
+        TextField rwField = new TextField(rwNo);
+        rwField.setPromptText("RW");
+        rwField.setPrefWidth(60);
+        rwField.getStyleClass().add("input-field");
+
+        FlowPane rtPane = new FlowPane(5, 5);
+        HBox.setHgrow(rtPane, Priority.ALWAYS);
+        if (rtList != null) {
+            for (String rt : rtList) {
+                rtPane.getChildren().add(createRTLabel(rt, rtPane));
+            }
+        }
+
+        Button btnAddRT = new Button("+ RT");
+        btnAddRT.getStyleClass().add("sidebar-button");
+        btnAddRT.setOnAction(e -> {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Tambah RT");
+            dialog.setHeaderText("Masukkan Nomor RT");
+            dialog.setContentText("Nomor RT:");
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(name -> {
+                if (!name.trim().isEmpty()) {
+                    rtPane.getChildren().add(createRTLabel(name.trim(), rtPane));
+                }
+            });
+        });
+
+        Button btnDel = new Button("X");
+        btnDel.setStyle("-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-cursor: hand;");
+        btnDel.setOnAction(e -> rwContainer.getChildren().remove(row));
+
+        row.getChildren().addAll(new Label("RW:"), rwField, rtPane, btnAddRT, btnDel);
+        rwContainer.getChildren().add(row);
+    }
+
+    private Label createRTLabel(String text, FlowPane parent) {
+        Label label = new Label(text);
+        label.setStyle("-fx-background-color: #e9ecef; -fx-padding: 3 8; -fx-background-radius: 10; -fx-font-size: 11px;");
+        label.setOnMouseClicked(e -> {
+            if (e.getClickCount() == 2) parent.getChildren().remove(label);
+        });
+        return label;
+    }
+
+    private void loadRTRWDetails(int desaId) {
+        rwContainer.getChildren().clear();
+        com.kecamatan.util.ThreadManager.execute(() -> {
+            String sql = "SELECT rw_number, rt_number FROM desa_rtrw WHERE desa_id = ? ORDER BY rw_number, rt_number";
+            try (Connection conn = DatabaseUtil.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, desaId);
+                ResultSet rs = pstmt.executeQuery();
+                
+                String currentRW = "";
+                List<String> currentRTs = new ArrayList<>();
+                List<RWData> rwDataList = new ArrayList<>();
+
+                while (rs.next()) {
+                    String rw = rs.getString("rw_number");
+                    String rt = rs.getString("rt_number");
+                    if (!rw.equals(currentRW)) {
+                        if (!currentRW.isEmpty()) {
+                            rwDataList.add(new RWData(currentRW, new ArrayList<>(currentRTs)));
+                        }
+                        currentRW = rw;
+                        currentRTs.clear();
+                    }
+                    currentRTs.add(rt);
+                }
+                if (!currentRW.isEmpty()) {
+                    rwDataList.add(new RWData(currentRW, currentRTs));
+                }
+
+                javafx.application.Platform.runLater(() -> {
+                    for (RWData rwd : rwDataList) {
+                        addRWRow(rwd.rw, rwd.rtList);
+                    }
+                });
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    private static class RWData {
+        String rw;
+        List<String> rtList;
+        RWData(String rw, List<String> rtList) { this.rw = rw; this.rtList = rtList; }
+    }
+
+    @FXML
+    private void handleTambahRW() {
+        addRWRow("", new ArrayList<>());
     }
 
     private void setupComboBox() {
@@ -142,57 +249,98 @@ public class DesaController implements Initializable, DataRefreshable {
     private void handleSave() {
         Kecamatan selectedKec = kecamatanComboBox.getSelectionModel().getSelectedItem();
         String nama = namaField.getText();
-        String rtText = rtField.getText();
-        String rwText = rwField.getText();
-        
+
         // Reset styles
         com.kecamatan.util.UIUtil.setErrorStyle(kecamatanComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
-        com.kecamatan.util.UIUtil.setErrorStyle(rtField, false);
-        com.kecamatan.util.UIUtil.setErrorStyle(rwField, false);
 
         boolean hasError = false;
-
         if (selectedKec == null) { com.kecamatan.util.UIUtil.setErrorStyle(kecamatanComboBox, true); hasError = true; }
         if (nama.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(namaField, true); hasError = true; }
-        if (rtText.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(rtField, true); hasError = true; }
-        if (rwText.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(rwField, true); hasError = true; }
 
         if (hasError) return;
 
-        if (nama.length() > 100) {
-            com.kecamatan.util.UIUtil.setErrorStyle(namaField, true);
-            return;
+        // Collect dynamic data
+        List<RWData> collectedData = new ArrayList<>();
+        int totalRTCount = 0;
+        java.util.Set<String> uniqueRWs = new java.util.HashSet<>();
+
+        for (javafx.scene.Node node : rwContainer.getChildren()) {
+            if (node instanceof HBox) {
+                HBox row = (HBox) node;
+                TextField rwF = (TextField) row.getChildren().get(1);
+                FlowPane rtP = (FlowPane) row.getChildren().get(2);
+                
+                String rwVal = rwF.getText().trim();
+                if (!rwVal.isEmpty()) {
+                    List<String> rts = new ArrayList<>();
+                    for (javafx.scene.Node rtNode : rtP.getChildren()) {
+                        if (rtNode instanceof Label) {
+                            String rtVal = ((Label) rtNode).getText();
+                            rts.add(rtVal);
+                            totalRTCount++;
+                        }
+                    }
+                    collectedData.add(new RWData(rwVal, rts));
+                    uniqueRWs.add(rwVal);
+                }
+            }
         }
 
-        int rt, rw;
-        try {
-            rt = Integer.parseInt(rtText);
-            rw = Integer.parseInt(rwText);
-        } catch (NumberFormatException e) {
-            if (!rtText.matches("\\d+")) com.kecamatan.util.UIUtil.setErrorStyle(rtField, true);
-            if (!rwText.matches("\\d+")) com.kecamatan.util.UIUtil.setErrorStyle(rwField, true);
-            return;
-        }
+        final int finalRT = totalRTCount;
+        final int finalRW = uniqueRWs.size();
 
-        String sql;
-        if (selectedId == -1) {
-            sql = "INSERT INTO desa (kecamatan_id, nama, jumlah_rt, jumlah_rw) VALUES (?, ?, ?, ?)";
-        } else {
-            sql = "UPDATE desa SET kecamatan_id = ?, nama = ?, jumlah_rt = ?, jumlah_rw = ? WHERE id = ?";
-        }
+        try (Connection conn = DatabaseUtil.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                if (selectedId == -1) {
+                    String sql = "INSERT INTO desa (kecamatan_id, nama, jumlah_rt, jumlah_rw) VALUES (?, ?, ?, ?) RETURNING id";
+                    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                        pstmt.setInt(1, selectedKec.getId());
+                        pstmt.setString(2, nama);
+                        pstmt.setInt(3, finalRT);
+                        pstmt.setInt(4, finalRW);
+                        ResultSet rs = pstmt.executeQuery();
+                        if (rs.next()) selectedId = rs.getInt(1);
+                    }
+                } else {
+                    String sql = "UPDATE desa SET kecamatan_id = ?, nama = ?, jumlah_rt = ?, jumlah_rw = ? WHERE id = ?";
+                    try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                        pstmt.setInt(1, selectedKec.getId());
+                        pstmt.setString(2, nama);
+                        pstmt.setInt(3, finalRT);
+                        pstmt.setInt(4, finalRW);
+                        pstmt.setInt(5, selectedId);
+                        pstmt.executeUpdate();
+                    }
+                    // Clear old details
+                    try (PreparedStatement delStmt = conn.prepareStatement("DELETE FROM desa_rtrw WHERE desa_id = ?")) {
+                        delStmt.setInt(1, selectedId);
+                        delStmt.executeUpdate();
+                    }
+                }
 
-        try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, selectedKec.getId());
-            pstmt.setString(2, nama);
-            pstmt.setInt(3, rt);
-            pstmt.setInt(4, rw);
-            if (selectedId != -1) pstmt.setInt(5, selectedId);
-            
-            pstmt.executeUpdate();
-            loadDesa();
-            handleReset();
+                // Insert new details
+                String insSql = "INSERT INTO desa_rtrw (desa_id, rw_number, rt_number) VALUES (?, ?, ?)";
+                try (PreparedStatement insStmt = conn.prepareStatement(insSql)) {
+                    for (RWData rwd : collectedData) {
+                        for (String rt : rwd.rtList) {
+                            insStmt.setInt(1, selectedId);
+                            insStmt.setString(2, rwd.rw);
+                            insStmt.setString(3, rt);
+                            insStmt.addBatch();
+                        }
+                    }
+                    insStmt.executeBatch();
+                }
+
+                conn.commit();
+                loadDesa();
+                handleReset();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -201,11 +349,13 @@ public class DesaController implements Initializable, DataRefreshable {
     @FXML
     private void handleDelete() {
         if (selectedId == -1) return;
-        String sql = "DELETE FROM desa WHERE id = ?";
-        try (Connection conn = DatabaseUtil.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, selectedId);
-            pstmt.executeUpdate();
+        
+        try (Connection conn = DatabaseUtil.getConnection()) {
+            String sql = "DELETE FROM desa WHERE id = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                pstmt.setInt(1, selectedId);
+                pstmt.executeUpdate();
+            }
             loadDesa();
             handleReset();
         } catch (SQLException e) {
@@ -216,17 +366,14 @@ public class DesaController implements Initializable, DataRefreshable {
     @FXML
     private void handleReset() {
         selectedId = -1;
-        namaField.clear();
-        rtField.clear();
-        rwField.clear();
         kecamatanComboBox.getSelectionModel().clearSelection();
-        desaTable.getSelectionModel().clearSelection();
+        namaField.clear();
+        rwContainer.getChildren().clear();
+        if (desaTable != null) desaTable.getSelectionModel().clearSelection();
 
         // Clear error styles
         com.kecamatan.util.UIUtil.setErrorStyle(kecamatanComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
-        com.kecamatan.util.UIUtil.setErrorStyle(rtField, false);
-        com.kecamatan.util.UIUtil.setErrorStyle(rwField, false);
     }
 
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }
