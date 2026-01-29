@@ -24,7 +24,7 @@ public class App extends Application {
     private static Stage primaryStage;
     private static String currentFxml = "login";
     private static double currentWidth = 800;
-    private static double currentHeight = 450;
+    private static double currentHeight = 384;
 
     @Override
     public void start(Stage stage) throws IOException {
