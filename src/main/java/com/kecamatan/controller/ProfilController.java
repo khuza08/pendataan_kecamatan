@@ -23,7 +23,6 @@ public class ProfilController implements Initializable {
     @FXML private TextField tglLahirField;
     @FXML private TextField desaField;
     @FXML private TextField rtrwField;
-    @FXML private TextField roleField;
     @FXML private TextArea alamatArea;
 
     @FXML private Button btnKecamatan;
@@ -76,7 +75,6 @@ public class ProfilController implements Initializable {
                 namaField.setText(rs.getString("nama"));
                 jenkelField.setText(rs.getString("jenis_kelamin"));
                 tglLahirField.setText(rs.getString("tanggal_lahir"));
-                roleField.setText(UserSession.getRole());
                 desaField.setText(rs.getString("desa_nama"));
                 rtrwField.setText(rs.getString("rt") + " / " + rs.getString("rw"));
                 alamatArea.setText(rs.getString("alamat"));

@@ -66,8 +66,6 @@
                     <Label text="Tanggal Lahir" styleClass="input-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
                     <TextField fx:id="tglLahirField" editable="false" styleClass="input-field" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-                    <Label text="Role" styleClass="input-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-                    <TextField fx:id="roleField" editable="false" styleClass="input-field" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
 
                     <Label text="Desa" styleClass="input-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
                     <TextField fx:id="desaField" editable="false" styleClass="input-field" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
