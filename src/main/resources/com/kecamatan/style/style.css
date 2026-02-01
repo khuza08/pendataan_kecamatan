@@ -159,6 +159,37 @@
     -fx-font-weight: bold;
 }
 
+.user-info-pane {
+    -fx-alignment: CENTER_LEFT;
+}
+
+.user-name-text {
+    -fx-text-fill: #2E261A;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+.role-badge-admin,
+.role-badge-warga {
+    -fx-padding: 2 10 2 10;
+    -fx-background-radius: 20;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.role-badge-admin {
+    -fx-background-color: #009C4B;
+}
+
+.role-badge-warga {
+    -fx-background-color: #e67e22;
+}
+
+.sidebar-separator {
+    -fx-padding: 0 0 10 0;
+}
+
 .sidebar-button,
 .sidebar-button-active {
     -fx-background-color: transparent;

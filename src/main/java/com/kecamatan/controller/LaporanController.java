@@ -12,6 +12,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.text.Text;
@@ -45,8 +47,16 @@ public class LaporanController implements Initializable, DataRefreshable {
     @FXML private TableColumn<Desa, Integer> colRT;
     @FXML private TableColumn<Desa, Integer> colRW;
 
+    @FXML private Button btnKecamatan;
+    @FXML private Button btnDesa;
+    @FXML private Button btnWarga;
+    @FXML private Button btnLaporan;
+    @FXML private Label userNameLabel;
+    @FXML private Label userRoleLabel;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        applyRBAC();
         colDesa.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
         colKec.setCellValueFactory(cellData -> cellData.getValue().kecamatanNamaProperty());
         colPop.setCellValueFactory(cellData -> cellData.getValue().populasiProperty().asObject());
@@ -159,9 +169,38 @@ public class LaporanController implements Initializable, DataRefreshable {
         });
     }
 
+    private void applyRBAC() {
+        if (userNameLabel != null) userNameLabel.setText(com.kecamatan.util.UserSession.getUsername());
+        if (userRoleLabel != null) {
+            String role = com.kecamatan.util.UserSession.getRole();
+            userRoleLabel.setText(role);
+            userRoleLabel.getStyleClass().clear();
+            if ("ADMIN".equals(role)) {
+                userRoleLabel.getStyleClass().add("role-badge-admin");
+            } else {
+                userRoleLabel.getStyleClass().add("role-badge-warga");
+            }
+        }
+
+        if (!com.kecamatan.util.UserSession.isAdmin()) {
+            if (btnKecamatan != null) btnKecamatan.setManaged(false);
+            if (btnKecamatan != null) btnKecamatan.setVisible(false);
+            if (btnDesa != null) btnDesa.setManaged(false);
+            if (btnDesa != null) btnDesa.setVisible(false);
+            if (btnWarga != null) btnWarga.setManaged(false);
+            if (btnWarga != null) btnWarga.setVisible(false);
+            if (btnLaporan != null) btnLaporan.setManaged(false);
+            if (btnLaporan != null) btnLaporan.setVisible(false);
+        }
+    }
+
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }
     @FXML private void goToKecamatan() throws IOException { App.setRoot("kecamatan", 1200, 800, true); }
     @FXML private void goToDesa() throws IOException { App.setRoot("desa", 1200, 800, true); }
     @FXML private void goToWarga() throws IOException { App.setRoot("warga", 1200, 800, true); }
-    @FXML private void handleLogout() throws IOException { App.setRoot("login", 800, 450); }
+    @FXML private void goToProfil() throws IOException { App.setRoot("profil", 1200, 800, true); }
+    @FXML private void handleLogout() throws IOException { 
+        com.kecamatan.util.UserSession.logout();
+        App.setRoot("login", 800, 450); 
+    }
 }

@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
@@ -31,11 +32,19 @@ public class KecamatanController implements Initializable, DataRefreshable {
     @FXML private TextField kodeField;
     @FXML private TextField namaField;
 
+    @FXML private Button btnKecamatan;
+    @FXML private Button btnDesa;
+    @FXML private Button btnWarga;
+    @FXML private Button btnLaporan;
+    @FXML private Label userNameLabel;
+    @FXML private Label userRoleLabel;
+
     private ObservableList<Kecamatan> kecamatanList = FXCollections.observableArrayList();
     private int selectedId = -1;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        applyRBAC();
         colKode.setCellValueFactory(cellData -> cellData.getValue().kodeProperty());
         colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
         colDesa.setCellValueFactory(cellData -> cellData.getValue().jumlahDesaProperty().asObject());
@@ -50,6 +59,31 @@ public class KecamatanController implements Initializable, DataRefreshable {
                 namaField.setText(newSel.getNama());
             }
         });
+    }
+
+    private void applyRBAC() {
+        if (userNameLabel != null) userNameLabel.setText(com.kecamatan.util.UserSession.getUsername());
+        if (userRoleLabel != null) {
+            String role = com.kecamatan.util.UserSession.getRole();
+            userRoleLabel.setText(role);
+            userRoleLabel.getStyleClass().clear();
+            if ("ADMIN".equals(role)) {
+                userRoleLabel.getStyleClass().add("role-badge-admin");
+            } else {
+                userRoleLabel.getStyleClass().add("role-badge-warga");
+            }
+        }
+
+        if (!com.kecamatan.util.UserSession.isAdmin()) {
+            if (btnKecamatan != null) btnKecamatan.setManaged(false);
+            if (btnKecamatan != null) btnKecamatan.setVisible(false);
+            if (btnDesa != null) btnDesa.setManaged(false);
+            if (btnDesa != null) btnDesa.setVisible(false);
+            if (btnWarga != null) btnWarga.setManaged(false);
+            if (btnWarga != null) btnWarga.setVisible(false);
+            if (btnLaporan != null) btnLaporan.setManaged(false);
+            if (btnLaporan != null) btnLaporan.setVisible(false);
+        }
     }
 
     private void loadData() {
@@ -164,5 +198,9 @@ public class KecamatanController implements Initializable, DataRefreshable {
     @FXML private void goToDesa() throws IOException { App.setRoot("desa", 1200, 800, true); }
     @FXML private void goToWarga() throws IOException { App.setRoot("warga", 1200, 800, true); }
     @FXML private void goToLaporan() throws IOException { App.setRoot("laporan", 1200, 800, true); }
-    @FXML private void handleLogout() throws IOException { App.setRoot("login", 800, 450); }
+    @FXML private void goToProfil() throws IOException { App.setRoot("profil", 1200, 800, true); }
+    @FXML private void handleLogout() throws IOException { 
+        com.kecamatan.util.UserSession.logout();
+        App.setRoot("login", 800, 450); 
+    }
 }

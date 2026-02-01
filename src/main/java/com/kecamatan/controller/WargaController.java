@@ -10,7 +10,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.util.StringConverter;
 import java.io.IOException;
 import java.net.URL;
@@ -48,6 +58,13 @@ public class WargaController implements Initializable, DataRefreshable {
     @FXML private DatePicker tglLahirPicker;
     @FXML private TextArea alamatArea;
 
+    @FXML private Button btnKecamatan;
+    @FXML private Button btnDesa;
+    @FXML private Button btnWarga;
+    @FXML private Button btnLaporan;
+    @FXML private Label userNameLabel;
+    @FXML private Label userRoleLabel;
+
     private ObservableList<Warga> wargaList = FXCollections.observableArrayList();
     private ObservableList<Desa> desaList = FXCollections.observableArrayList();
     private int selectedId = -1;
@@ -55,6 +72,7 @@ public class WargaController implements Initializable, DataRefreshable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        applyRBAC();
         colNik.setCellValueFactory(cellData -> cellData.getValue().nikProperty());
         colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
         colJenkel.setCellValueFactory(cellData -> cellData.getValue().jenisKelaminProperty());
@@ -163,6 +181,31 @@ public class WargaController implements Initializable, DataRefreshable {
                 });
             });
         });
+    }
+
+    private void applyRBAC() {
+        if (userNameLabel != null) userNameLabel.setText(com.kecamatan.util.UserSession.getUsername());
+        if (userRoleLabel != null) {
+            String role = com.kecamatan.util.UserSession.getRole();
+            userRoleLabel.setText(role);
+            userRoleLabel.getStyleClass().clear();
+            if ("ADMIN".equals(role)) {
+                userRoleLabel.getStyleClass().add("role-badge-admin");
+            } else {
+                userRoleLabel.getStyleClass().add("role-badge-warga");
+            }
+        }
+
+        if (!com.kecamatan.util.UserSession.isAdmin()) {
+            if (btnKecamatan != null) btnKecamatan.setManaged(false);
+            if (btnKecamatan != null) btnKecamatan.setVisible(false);
+            if (btnDesa != null) btnDesa.setManaged(false);
+            if (btnDesa != null) btnDesa.setVisible(false);
+            if (btnWarga != null) btnWarga.setManaged(false);
+            if (btnWarga != null) btnWarga.setVisible(false);
+            if (btnLaporan != null) btnLaporan.setManaged(false);
+            if (btnLaporan != null) btnLaporan.setVisible(false);
+        }
     }
 
     private void setupDatePicker() {
@@ -426,5 +469,9 @@ public class WargaController implements Initializable, DataRefreshable {
     @FXML private void goToKecamatan() throws IOException { App.setRoot("kecamatan", 1200, 800, true); }
     @FXML private void goToDesa() throws IOException { App.setRoot("desa", 1200, 800, true); }
     @FXML private void goToLaporan() throws IOException { App.setRoot("laporan", 1200, 800, true); }
-    @FXML private void handleLogout() throws IOException { App.setRoot("login", 800, 450); }
+    @FXML private void goToProfil() throws IOException { App.setRoot("profil", 1200, 800, true); }
+    @FXML private void handleLogout() throws IOException { 
+        com.kecamatan.util.UserSession.logout();
+        App.setRoot("login", 800, 450); 
+    }
 }

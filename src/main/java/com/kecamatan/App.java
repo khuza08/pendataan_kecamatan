@@ -70,6 +70,10 @@ public class App extends Application {
     }
 
     public static void setRoot(String fxml, double width, double height, boolean maximized) throws IOException {
+        if ("login".equals(fxml)) {
+            viewCache.clear();
+            controllerCache.clear();
+        }
         currentFxml = fxml;
         currentWidth = width;
         currentHeight = height;

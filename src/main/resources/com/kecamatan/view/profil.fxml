@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.kecamatan.controller.ProfilController"
+            stylesheets="@../style/style.css" styleClass="dashboard-container">
+    
+    <left>
+        <VBox spacing="10" styleClass="sidebar">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            <Text text="MENU" styleClass="sidebar-title"/>
+            <Button text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnKecamatan" text="Data Kecamatan" onAction="#goToKecamatan" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnDesa" text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnWarga" text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnLaporan" text="Laporan" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button text="Profil Saya" maxWidth="Infinity" styleClass="sidebar-button-active"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <HBox spacing="10" alignment="CENTER" styleClass="user-info-pane">
+                <padding>
+                    <Insets bottom="10"/>
+                </padding>
+                <Label fx:id="userNameLabel" text="User Name" styleClass="user-name-text"/>
+                <Label fx:id="userRoleLabel" text="ROLE" styleClass="role-badge-admin"/>
+            </HBox>
+            <Button text="Logout" onAction="#handleLogout" maxWidth="Infinity" styleClass="logout-button"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="20">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20"/>
+            </padding>
+            
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <Label text="Profil Saya" styleClass="title-text"/>
+            </HBox>
+
+            <VBox spacing="20" styleClass="card" maxWidth="600">
+                <padding>
+                    <Insets top="30" right="30" bottom="30" left="30"/>
+                </padding>
+                
+                <GridPane hgap="20" vgap="15">
+                    <columnConstraints>
+                        <ColumnConstraints prefWidth="150" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+
+                    <Label text="NIK" styleClass="input-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                    <TextField fx:id="nikField" editable="false" styleClass="input-field" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+                    <Label text="Nama Lengkap" styleClass="input-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                    <TextField fx:id="namaField" editable="false" styleClass="input-field" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+                    <Label text="Jenis Kelamin" styleClass="input-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <TextField fx:id="jenkelField" editable="false" styleClass="input-field" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                    <Label text="Tanggal Lahir" styleClass="input-label" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                    <TextField fx:id="tglLahirField" editable="false" styleClass="input-field" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                    <Label text="Role" styleClass="input-label" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                    <TextField fx:id="roleField" editable="false" styleClass="input-field" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+
+                    <Label text="Desa" styleClass="input-label" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                    <TextField fx:id="desaField" editable="false" styleClass="input-field" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+
+                    <Label text="RT / RW" styleClass="input-label" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
+                    <TextField fx:id="rtrwField" editable="false" styleClass="input-field" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
+
+                    <Label text="Alamat" styleClass="input-label" GridPane.rowIndex="7" GridPane.columnIndex="0"/>
+                    <TextArea fx:id="alamatArea" editable="false" prefHeight="100" wrapText="true" styleClass="input-field" GridPane.rowIndex="7" GridPane.columnIndex="1"/>
+                </GridPane>
+                
+                <Separator />
+                <Text text="* Hubungi Admin jika ada kesalahan data" styleClass="subtitle-text" style="-fx-font-style: italic;"/>
+            </VBox>
+        </VBox>
+    </center>
+</BorderPane>

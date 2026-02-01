@@ -36,30 +36,54 @@ public class LoginController {
         }
 
         try (Connection conn = DatabaseUtil.getConnection()) {
-            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, username);
-            pstmt.setString(2, password);
+            // 1. Try Admin Login
+            String adminSql = "SELECT * FROM users WHERE username = ? AND password = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(adminSql)) {
+                pstmt.setString(1, username);
+                pstmt.setString(2, password);
+                ResultSet rs = pstmt.executeQuery();
 
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                messageLabel.setText("Login successful!");
-                messageLabel.setStyle("-fx-text-fill: #009C4B;");
-                
-                // Preload all major views in the background
-                App.preloadViews("dashboard", "kecamatan", "desa", "warga", "laporan");
-                
-                // Navigate to dashboard
-                App.setRoot("dashboard", 1200, 800, true);
-            } else {
-                messageLabel.setText("Invalid credentials.");
-                messageLabel.setStyle("-fx-text-fill: #2E261A;");
+                if (rs.next()) {
+                    com.kecamatan.util.UserSession.login(rs.getInt("id"), rs.getString("username"), "ADMIN");
+                    onLoginSuccess("ADMIN");
+                    return;
+                }
             }
+
+            // 2. Try Warga Login (Username = NIK, Password = Tgl Lahir dd-mm-yyyy)
+            String wargaSql = "SELECT * FROM warga WHERE nik = ? AND tanggal_lahir = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(wargaSql)) {
+                pstmt.setString(1, username);
+                pstmt.setString(2, password);
+                ResultSet rs = pstmt.executeQuery();
+
+                if (rs.next()) {
+                    com.kecamatan.util.UserSession.loginWarga(rs.getInt("id"), rs.getString("nama"), rs.getString("nik"));
+                    onLoginSuccess("WARGA");
+                    return;
+                }
+            }
+
+            messageLabel.setText("Invalid credentials.");
+            messageLabel.setStyle("-fx-text-fill: #2E261A;");
+            
         } catch (SQLException | IOException e) {
             messageLabel.setText("Database error: " + e.getMessage());
             messageLabel.setStyle("-fx-text-fill: #2E261A;");
             e.printStackTrace();
         }
+    }
+
+    private void onLoginSuccess(String role) throws IOException {
+        messageLabel.setText("Login successful!");
+        messageLabel.setStyle("-fx-text-fill: #009C4B;");
+        
+        if ("ADMIN".equals(role)) {
+            App.preloadViews("dashboard", "kecamatan", "desa", "warga", "laporan");
+        } else {
+            App.preloadViews("dashboard"); // Warga sees limited views
+        }
+        
+        App.setRoot("dashboard", 1200, 800, true);
     }
 }

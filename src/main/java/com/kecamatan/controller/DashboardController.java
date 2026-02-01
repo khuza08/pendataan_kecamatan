@@ -2,6 +2,8 @@ package com.kecamatan.controller;
 
 import com.kecamatan.App;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.layout.VBox;
 import java.io.IOException;
 
 import javafx.fxml.Initializable;
@@ -16,6 +18,8 @@ import com.kecamatan.util.DataRefreshable;
 import javafx.application.Platform;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 import java.sql.*;
 import java.net.URL;
@@ -29,10 +33,45 @@ public class DashboardController implements Initializable, DataRefreshable {
     @FXML private Text perempuanText;
     @FXML private Text rtrwText;
     @FXML private Text totalKecamatanText;
+    @FXML private Button btnKecamatan;
+    @FXML private Button btnDesa;
+    @FXML private Button btnWarga;
+    @FXML private Button btnLaporan;
+    @FXML private VBox recentActivitiesBox;
+    @FXML private Label userNameLabel;
+    @FXML private Label userRoleLabel;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        applyRBAC();
         refreshData();
+    }
+
+    private void applyRBAC() {
+        if (userNameLabel != null) userNameLabel.setText(com.kecamatan.util.UserSession.getUsername());
+        if (userRoleLabel != null) {
+            String role = com.kecamatan.util.UserSession.getRole();
+            userRoleLabel.setText(role);
+            userRoleLabel.getStyleClass().clear();
+            if ("ADMIN".equals(role)) {
+                userRoleLabel.getStyleClass().add("role-badge-admin");
+            } else {
+                userRoleLabel.getStyleClass().add("role-badge-warga");
+            }
+        }
+
+        if (!com.kecamatan.util.UserSession.isAdmin()) {
+            if (btnKecamatan != null) btnKecamatan.setManaged(false);
+            if (btnKecamatan != null) btnKecamatan.setVisible(false);
+            if (btnDesa != null) btnDesa.setManaged(false);
+            if (btnDesa != null) btnDesa.setVisible(false);
+            if (btnWarga != null) btnWarga.setManaged(false);
+            if (btnWarga != null) btnWarga.setVisible(false);
+            if (btnLaporan != null) btnLaporan.setManaged(false);
+            if (btnLaporan != null) btnLaporan.setVisible(false);
+            if (recentActivitiesBox != null) recentActivitiesBox.setManaged(false);
+            if (recentActivitiesBox != null) recentActivitiesBox.setVisible(false);
+        }
     }
 
     @Override
@@ -142,7 +181,13 @@ public class DashboardController implements Initializable, DataRefreshable {
     }
 
     @FXML
+    private void goToProfil() throws IOException {
+        App.setRoot("profil", 1200, 800, true);
+    }
+
+    @FXML
     private void handleLogout() throws IOException {
+        com.kecamatan.util.UserSession.logout();
         App.setRoot("login", 800, 450);
     }
 }

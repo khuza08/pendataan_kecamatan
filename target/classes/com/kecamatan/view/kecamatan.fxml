@@ -16,11 +16,19 @@
             </padding>
             <Text text="MENU" styleClass="sidebar-title"/>
             <Button text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button text="Data Kecamatan" maxWidth="Infinity" styleClass="sidebar-button-active"/>
-            <Button text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button text="Laporan" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnKecamatan" text="Data Kecamatan" maxWidth="Infinity" styleClass="sidebar-button-active"/>
+            <Button fx:id="btnDesa" text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnWarga" text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnLaporan" text="Laporan" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button text="Profil Saya" onAction="#goToProfil" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Region VBox.vgrow="ALWAYS"/>
+            <HBox spacing="10" alignment="CENTER" styleClass="user-info-pane">
+                <padding>
+                    <Insets bottom="10"/>
+                </padding>
+                <Label fx:id="userNameLabel" text="User Name" styleClass="user-name-text"/>
+                <Label fx:id="userRoleLabel" text="ROLE" styleClass="role-badge-admin"/>
+            </HBox>
             <Button text="Logout" onAction="#handleLogout" maxWidth="Infinity" styleClass="logout-button"/>
         </VBox>
     </left>

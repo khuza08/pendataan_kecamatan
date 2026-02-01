@@ -8,8 +8,10 @@ com/kecamatan/controller/DesaController$1.class
 com/kecamatan/controller/KecamatanController.class
 com/kecamatan/controller/WargaController$1.class
 com/kecamatan/controller/LoginController.class
+com/kecamatan/util/UserSession.class
 com/kecamatan/controller/LaporanController.class
 com/kecamatan/App.class
+com/kecamatan/controller/ProfilController.class
 com/kecamatan/controller/WargaController$3.class
 com/kecamatan/util/DataRefreshable.class
 com/kecamatan/model/Desa.class
