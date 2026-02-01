@@ -45,6 +45,7 @@ public class DesaController implements Initializable, DataRefreshable {
     @FXML private Button btnKecamatan;
     @FXML private Button btnDesa;
     @FXML private Button btnWarga;
+    @FXML private Button btnDashboard;
     @FXML private Button btnLaporan;
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
@@ -97,14 +98,11 @@ public class DesaController implements Initializable, DataRefreshable {
         }
 
         if (!com.kecamatan.util.UserSession.isAdmin()) {
-            if (btnKecamatan != null) btnKecamatan.setManaged(false);
-            if (btnKecamatan != null) btnKecamatan.setVisible(false);
-            if (btnDesa != null) btnDesa.setManaged(false);
-            if (btnDesa != null) btnDesa.setVisible(false);
-            if (btnWarga != null) btnWarga.setManaged(false);
-            if (btnWarga != null) btnWarga.setVisible(false);
-            if (btnLaporan != null) btnLaporan.setManaged(false);
-            if (btnLaporan != null) btnLaporan.setVisible(false);
+            if (btnKecamatan != null) { btnKecamatan.setManaged(false); btnKecamatan.setVisible(false); }
+            if (btnDesa != null) { btnDesa.setManaged(false); btnDesa.setVisible(false); }
+            if (btnWarga != null) { btnWarga.setManaged(false); btnWarga.setVisible(false); }
+            if (btnLaporan != null) { btnLaporan.setManaged(false); btnLaporan.setVisible(false); }
+            if (btnDashboard != null) { btnDashboard.setManaged(false); btnDashboard.setVisible(false); }
         }
     }
 

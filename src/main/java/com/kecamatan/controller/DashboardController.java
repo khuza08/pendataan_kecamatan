@@ -36,8 +36,11 @@ public class DashboardController implements Initializable, DataRefreshable {
     @FXML private Button btnKecamatan;
     @FXML private Button btnDesa;
     @FXML private Button btnWarga;
+    @FXML private Button btnDashboard;
     @FXML private Button btnLaporan;
     @FXML private VBox recentActivitiesBox;
+    @FXML private VBox adminContent;
+    @FXML private VBox wargaContent;
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
 
@@ -61,16 +64,22 @@ public class DashboardController implements Initializable, DataRefreshable {
         }
 
         if (!com.kecamatan.util.UserSession.isAdmin()) {
-            if (btnKecamatan != null) btnKecamatan.setManaged(false);
-            if (btnKecamatan != null) btnKecamatan.setVisible(false);
-            if (btnDesa != null) btnDesa.setManaged(false);
-            if (btnDesa != null) btnDesa.setVisible(false);
-            if (btnWarga != null) btnWarga.setManaged(false);
-            if (btnWarga != null) btnWarga.setVisible(false);
-            if (btnLaporan != null) btnLaporan.setManaged(false);
-            if (btnLaporan != null) btnLaporan.setVisible(false);
-            if (recentActivitiesBox != null) recentActivitiesBox.setManaged(false);
-            if (recentActivitiesBox != null) recentActivitiesBox.setVisible(false);
+            // Hide Admin Sidebar Buttons
+            if (btnKecamatan != null) { btnKecamatan.setManaged(false); btnKecamatan.setVisible(false); }
+            if (btnDesa != null) { btnDesa.setManaged(false); btnDesa.setVisible(false); }
+            if (btnWarga != null) { btnWarga.setManaged(false); btnWarga.setVisible(false); }
+            if (btnLaporan != null) { btnLaporan.setManaged(false); btnLaporan.setVisible(false); }
+            if (btnDashboard != null) { btnDashboard.setManaged(false); btnDashboard.setVisible(false); }
+            
+            // Hide Admin Dashboard Content
+            if (adminContent != null) { adminContent.setManaged(false); adminContent.setVisible(false); }
+            
+            // Show Warga Welcome Content
+            if (wargaContent != null) { wargaContent.setManaged(true); wargaContent.setVisible(true); }
+        } else {
+            // Admin View: Ensure Admin content is visible and Warga content is hidden
+            if (adminContent != null) { adminContent.setManaged(true); adminContent.setVisible(true); }
+            if (wargaContent != null) { wargaContent.setManaged(false); wargaContent.setVisible(false); }
         }
     }
 

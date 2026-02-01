@@ -16,7 +16,7 @@
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
             <Text text="MENU" styleClass="sidebar-title"/>
-            <Button text="Dashboard" maxWidth="Infinity" styleClass="sidebar-button-active"/>
+            <Button fx:id="btnDashboard" text="Dashboard" maxWidth="Infinity" styleClass="sidebar-button-active"/>
             <Button fx:id="btnKecamatan" text="Data Kecamatan" onAction="#goToKecamatan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnDesa" text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnWarga" text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
@@ -43,58 +43,73 @@
                 <Label text="Dashboard Overview" styleClass="title-text"/>
             </HBox>
             
-            <GridPane hgap="20" vgap="20">
-                <columnConstraints>
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
-                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
-                </columnConstraints>
-                
-                <VBox styleClass="card" GridPane.columnIndex="0">
-                    <Text text="Total Warga" styleClass="card-label"/>
-                    <Text fx:id="totalWargaText" text="0" styleClass="card-value"/>
-                </VBox>
-                
-                <VBox styleClass="card" GridPane.columnIndex="1">
-                    <Text text="Laki-laki" styleClass="card-label"/>
-                    <Text fx:id="lakiText" text="0" styleClass="card-value"/>
-                </VBox>
+            <!-- Admin Only Content -->
+            <VBox fx:id="adminContent" spacing="20">
+                <GridPane hgap="20" vgap="20">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10" prefWidth="100" />
+                    </columnConstraints>
+                    
+                    <VBox styleClass="card" GridPane.columnIndex="0">
+                        <Text text="Total Warga" styleClass="card-label"/>
+                        <Text fx:id="totalWargaText" text="0" styleClass="card-value"/>
+                    </VBox>
+                    
+                    <VBox styleClass="card" GridPane.columnIndex="1">
+                        <Text text="Laki-laki" styleClass="card-label"/>
+                        <Text fx:id="lakiText" text="0" styleClass="card-value"/>
+                    </VBox>
 
-                <VBox styleClass="card" GridPane.columnIndex="2">
-                    <Text text="Perempuan" styleClass="card-label"/>
-                    <Text fx:id="perempuanText" text="0" styleClass="card-value"/>
-                </VBox>
-                
-                <VBox styleClass="card" GridPane.columnIndex="3">
-                    <Text text="Total RT / RW" styleClass="card-label"/>
-                    <Text fx:id="rtrwText" text="0 / 0" styleClass="card-value-small"/>
-                </VBox>
- 
-                <VBox styleClass="card" GridPane.columnIndex="4">
-                    <Text text="Kecamatan" styleClass="card-label"/>
-                    <Text fx:id="totalKecamatanText" text="0" styleClass="card-value"/>
-                </VBox>
-            </GridPane>
+                    <VBox styleClass="card" GridPane.columnIndex="2">
+                        <Text text="Perempuan" styleClass="card-label"/>
+                        <Text fx:id="perempuanText" text="0" styleClass="card-value"/>
+                    </VBox>
+                    
+                    <VBox styleClass="card" GridPane.columnIndex="3">
+                        <Text text="Total RT / RW" styleClass="card-label"/>
+                        <Text fx:id="rtrwText" text="0 / 0" styleClass="card-value-small"/>
+                    </VBox>
+    
+                    <VBox styleClass="card" GridPane.columnIndex="4">
+                        <Text text="Kecamatan" styleClass="card-label"/>
+                        <Text fx:id="totalKecamatanText" text="0" styleClass="card-value"/>
+                    </VBox>
+                </GridPane>
 
-            <HBox spacing="20" VBox.vgrow="ALWAYS">
-                <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="10">
-                    <Text text="Pertumbuhan Warga (6 Bulan Terakhir)" styleClass="card-title"/>
-                    <LineChart fx:id="wargaChart" legendVisible="false" createSymbols="true">
-                        <xAxis><CategoryAxis side="BOTTOM" label="Bulan"/></xAxis>
-                        <yAxis><NumberAxis side="LEFT" label="Jumlah"/></yAxis>
-                    </LineChart>
+                <HBox spacing="20" VBox.vgrow="ALWAYS">
+                    <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="10">
+                        <Text text="Pertumbuhan Warga (6 Bulan Terakhir)" styleClass="card-title"/>
+                        <LineChart fx:id="wargaChart" legendVisible="false" createSymbols="true">
+                            <xAxis><CategoryAxis side="BOTTOM" label="Bulan"/></xAxis>
+                            <yAxis><NumberAxis side="LEFT" label="Jumlah"/></yAxis>
+                        </LineChart>
+                    </VBox>
+                    
+                    <VBox fx:id="recentActivitiesBox" prefWidth="250" styleClass="card" spacing="10">
+                        <Text text="Recent Activities" styleClass="card-title"/>
+                        <Label text="• Admin logged in" styleClass="activity-item"/>
+                        <Label text="• Database synchronized" styleClass="activity-item"/>
+                        <Label text="• New citizen data added" styleClass="activity-item"/>
+                        <Label text="• Report exported to PDF" styleClass="activity-item"/>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+            <!-- Warga Only Content -->
+            <VBox fx:id="wargaContent" spacing="20" visible="false" managed="false" alignment="CENTER" VBox.vgrow="ALWAYS">
+                <VBox styleClass="card" alignment="CENTER" spacing="15" maxWidth="600">
+                    <padding>
+                        <Insets top="40" right="40" bottom="40" left="40"/>
+                    </padding>
+                    <Label text="Selamat Datang di Aplikasi Pendataan Kecamatan" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2E261A;"/>
+                    <Label text="Silakan akses menu 'Profil Saya' untuk melihat data kependudukan Anda." style="-fx-font-size: 16px; -fx-text-fill: #555555;"/>
+                    <Button text="Lihat Profil Saya" onAction="#goToProfil" styleClass="login-button"/>
                 </VBox>
-                
-                <VBox fx:id="recentActivitiesBox" prefWidth="250" styleClass="card" spacing="10">
-                    <Text text="Recent Activities" styleClass="card-title"/>
-                    <Label text="• Admin logged in" styleClass="activity-item"/>
-                    <Label text="• Database synchronized" styleClass="activity-item"/>
-                    <Label text="• New citizen data added" styleClass="activity-item"/>
-                    <Label text="• Report exported to PDF" styleClass="activity-item"/>
-                </VBox>
-            </HBox>
+            </VBox>
         </VBox>
     </center>
 </BorderPane>

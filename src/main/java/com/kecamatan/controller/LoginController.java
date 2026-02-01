@@ -80,10 +80,10 @@ public class LoginController {
         
         if ("ADMIN".equals(role)) {
             App.preloadViews("dashboard", "kecamatan", "desa", "warga", "laporan");
+            App.setRoot("dashboard", 1200, 800, true);
         } else {
-            App.preloadViews("dashboard"); // Warga sees limited views
+            App.preloadViews("profil"); // Warga only needs Profil
+            App.setRoot("profil", 1200, 800, true);
         }
-        
-        App.setRoot("dashboard", 1200, 800, true);
     }
 }
