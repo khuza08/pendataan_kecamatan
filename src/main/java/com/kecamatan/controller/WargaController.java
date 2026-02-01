@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 import com.kecamatan.util.DataRefreshable;
@@ -50,6 +51,7 @@ public class WargaController implements Initializable, DataRefreshable {
     private ObservableList<Warga> wargaList = FXCollections.observableArrayList();
     private ObservableList<Desa> desaList = FXCollections.observableArrayList();
     private int selectedId = -1;
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -60,7 +62,22 @@ public class WargaController implements Initializable, DataRefreshable {
         colRW.setCellValueFactory(cellData -> cellData.getValue().rwProperty());
         colRT.setCellValueFactory(cellData -> cellData.getValue().rtProperty());
         colTglLahir.setCellValueFactory(cellData -> cellData.getValue().tanggalLahirProperty());
+        colTglLahir.setCellFactory(column -> {
+            return new TableCell<Warga, LocalDate>() {
+                @Override
+                protected void updateItem(LocalDate item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(formatter.format(item));
+                    }
+                }
+            };
+        });
         colAlamat.setCellValueFactory(cellData -> cellData.getValue().alamatProperty());
+
+        setupDatePicker();
 
         setupDesaComboBox();
         loadDesaData();
@@ -145,6 +162,32 @@ public class WargaController implements Initializable, DataRefreshable {
                     }
                 });
             });
+        });
+    }
+
+    private void setupDatePicker() {
+        tglLahirPicker.setConverter(new StringConverter<LocalDate>() {
+            @Override
+            public String toString(LocalDate date) {
+                if (date != null) {
+                    return formatter.format(date);
+                } else {
+                    return "";
+                }
+            }
+
+            @Override
+            public LocalDate fromString(String string) {
+                if (string != null && !string.isEmpty()) {
+                    try {
+                        return LocalDate.parse(string, formatter);
+                    } catch (Exception e) {
+                        return null;
+                    }
+                } else {
+                    return null;
+                }
+            }
         });
     }
 
@@ -248,7 +291,8 @@ public class WargaController implements Initializable, DataRefreshable {
                         rs.getString("desa_nama"),
                         rs.getString("rt"),
                         rs.getString("rw"),
-                        rs.getDate("tanggal_lahir") != null ? rs.getDate("tanggal_lahir").toLocalDate() : null
+                        rs.getString("tanggal_lahir") != null && !rs.getString("tanggal_lahir").isEmpty() ? 
+                            LocalDate.parse(rs.getString("tanggal_lahir"), formatter) : null
                     ));
                 }
                 javafx.application.Platform.runLater(() -> {
@@ -319,7 +363,7 @@ public class WargaController implements Initializable, DataRefreshable {
             pstmt.setInt(4, selectedDesa.getId());
             pstmt.setString(5, selectedRw);
             pstmt.setString(6, selectedRt);
-            pstmt.setDate(7, tanggalLahir != null ? java.sql.Date.valueOf(tanggalLahir) : null);
+            pstmt.setString(7, tanggalLahir != null ? formatter.format(tanggalLahir) : null);
             pstmt.setString(8, alamat);
             if (selectedId != -1) pstmt.setInt(9, selectedId);
             
