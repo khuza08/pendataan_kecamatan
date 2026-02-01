@@ -15,6 +15,7 @@ import javafx.util.StringConverter;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ResourceBundle;
 
 import com.kecamatan.util.DataRefreshable;
@@ -31,6 +32,7 @@ public class WargaController implements Initializable, DataRefreshable {
     @FXML private TableColumn<Warga, String> colNik;
     @FXML private TableColumn<Warga, String> colNama;
     @FXML private TableColumn<Warga, String> colJenkel;
+    @FXML private TableColumn<Warga, LocalDate> colTglLahir;
     @FXML private TableColumn<Warga, String> colDesa;
     @FXML private TableColumn<Warga, String> colRW;
     @FXML private TableColumn<Warga, String> colRT;
@@ -42,6 +44,7 @@ public class WargaController implements Initializable, DataRefreshable {
     @FXML private ComboBox<Desa> desaComboBox;
     @FXML private ComboBox<String> rwComboBox;
     @FXML private ComboBox<String> rtComboBox;
+    @FXML private DatePicker tglLahirPicker;
     @FXML private TextArea alamatArea;
 
     private ObservableList<Warga> wargaList = FXCollections.observableArrayList();
@@ -56,6 +59,7 @@ public class WargaController implements Initializable, DataRefreshable {
         colDesa.setCellValueFactory(cellData -> cellData.getValue().desaNamaProperty());
         colRW.setCellValueFactory(cellData -> cellData.getValue().rwProperty());
         colRT.setCellValueFactory(cellData -> cellData.getValue().rtProperty());
+        colTglLahir.setCellValueFactory(cellData -> cellData.getValue().tanggalLahirProperty());
         colAlamat.setCellValueFactory(cellData -> cellData.getValue().alamatProperty());
 
         setupDesaComboBox();
@@ -68,6 +72,7 @@ public class WargaController implements Initializable, DataRefreshable {
                 nikField.setText(newSel.getNik());
                 namaField.setText(newSel.getNama());
                 jenkelComboBox.getSelectionModel().select(newSel.getJenisKelamin());
+                tglLahirPicker.setValue(newSel.getTanggalLahir());
                 alamatArea.setText(newSel.getAlamat());
                 
                 for (Desa d : desaList) {
@@ -242,7 +247,8 @@ public class WargaController implements Initializable, DataRefreshable {
                         rs.getInt("desa_id"),
                         rs.getString("desa_nama"),
                         rs.getString("rt"),
-                        rs.getString("rw")
+                        rs.getString("rw"),
+                        rs.getDate("tanggal_lahir") != null ? rs.getDate("tanggal_lahir").toLocalDate() : null
                     ));
                 }
                 javafx.application.Platform.runLater(() -> {
@@ -263,6 +269,7 @@ public class WargaController implements Initializable, DataRefreshable {
         Desa selectedDesa = desaComboBox.getSelectionModel().getSelectedItem();
         String selectedRw = rwComboBox.getSelectionModel().getSelectedItem();
         String selectedRt = rtComboBox.getSelectionModel().getSelectedItem();
+        LocalDate tanggalLahir = tglLahirPicker.getValue();
         String alamat = alamatArea.getText();
 
         // Reset styles
@@ -272,6 +279,7 @@ public class WargaController implements Initializable, DataRefreshable {
         com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(rwComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(rtComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(tglLahirPicker, false);
 
         boolean hasError = false;
 
@@ -281,6 +289,7 @@ public class WargaController implements Initializable, DataRefreshable {
         if (selectedDesa == null) { com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, true); hasError = true; }
         if (selectedRw == null) { com.kecamatan.util.UIUtil.setErrorStyle(rwComboBox, true); hasError = true; }
         if (selectedRt == null) { com.kecamatan.util.UIUtil.setErrorStyle(rtComboBox, true); hasError = true; }
+        if (tanggalLahir == null) { com.kecamatan.util.UIUtil.setErrorStyle(tglLahirPicker, true); hasError = true; }
 
         if (hasError) return;
 
@@ -297,9 +306,9 @@ public class WargaController implements Initializable, DataRefreshable {
 
         String sql;
         if (selectedId == -1) {
-            sql = "INSERT INTO warga (nik, nama, jenis_kelamin, desa_id, rw, rt, alamat) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            sql = "INSERT INTO warga (nik, nama, jenis_kelamin, desa_id, rw, rt, tanggal_lahir, alamat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         } else {
-            sql = "UPDATE warga SET nik = ?, nama = ?, jenis_kelamin = ?, desa_id = ?, rw = ?, rt = ?, alamat = ? WHERE id = ?";
+            sql = "UPDATE warga SET nik = ?, nama = ?, jenis_kelamin = ?, desa_id = ?, rw = ?, rt = ?, tanggal_lahir = ?, alamat = ? WHERE id = ?";
         }
 
         try (Connection conn = DatabaseUtil.getConnection();
@@ -310,8 +319,9 @@ public class WargaController implements Initializable, DataRefreshable {
             pstmt.setInt(4, selectedDesa.getId());
             pstmt.setString(5, selectedRw);
             pstmt.setString(6, selectedRt);
-            pstmt.setString(7, alamat);
-            if (selectedId != -1) pstmt.setInt(8, selectedId);
+            pstmt.setDate(7, tanggalLahir != null ? java.sql.Date.valueOf(tanggalLahir) : null);
+            pstmt.setString(8, alamat);
+            if (selectedId != -1) pstmt.setInt(9, selectedId);
             
             pstmt.executeUpdate();
 
@@ -354,6 +364,7 @@ public class WargaController implements Initializable, DataRefreshable {
         desaComboBox.getSelectionModel().clearSelection();
         rwComboBox.getSelectionModel().clearSelection();
         rtComboBox.getSelectionModel().clearSelection();
+        tglLahirPicker.setValue(null);
         alamatArea.clear();
         wargaTable.getSelectionModel().clearSelection();
 
@@ -364,6 +375,7 @@ public class WargaController implements Initializable, DataRefreshable {
         com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(rwComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(rtComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(tglLahirPicker, false);
     }
 
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }

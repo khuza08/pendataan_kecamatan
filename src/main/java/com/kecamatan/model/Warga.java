@@ -2,6 +2,8 @@ package com.kecamatan.model;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import java.time.LocalDate;
 
 public class Warga {
     private final SimpleIntegerProperty id;
@@ -13,8 +15,9 @@ public class Warga {
     private final SimpleStringProperty desaNama;
     private final SimpleStringProperty rt;
     private final SimpleStringProperty rw;
+    private final SimpleObjectProperty<LocalDate> tanggalLahir;
 
-    public Warga(int id, String nik, String nama, String alamat, String jenisKelamin, int desaId, String desaNama, String rt, String rw) {
+    public Warga(int id, String nik, String nama, String alamat, String jenisKelamin, int desaId, String desaNama, String rt, String rw, LocalDate tanggalLahir) {
         this.id = new SimpleIntegerProperty(id);
         this.nik = new SimpleStringProperty(nik);
         this.nama = new SimpleStringProperty(nama);
@@ -24,6 +27,7 @@ public class Warga {
         this.desaNama = new SimpleStringProperty(desaNama);
         this.rt = new SimpleStringProperty(rt);
         this.rw = new SimpleStringProperty(rw);
+        this.tanggalLahir = new SimpleObjectProperty<>(tanggalLahir);
     }
 
     public int getId() { return id.get(); }
@@ -52,4 +56,7 @@ public class Warga {
 
     public String getRw() { return rw.get(); }
     public SimpleStringProperty rwProperty() { return rw; }
+
+    public LocalDate getTanggalLahir() { return tanggalLahir.get(); }
+    public SimpleObjectProperty<LocalDate> tanggalLahirProperty() { return tanggalLahir; }
 }
