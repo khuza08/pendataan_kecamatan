@@ -49,7 +49,7 @@
                 </VBox>
 
                 <!-- Input Form -->
-                <VBox spacing="15" prefWidth="300" styleClass="card">
+                <VBox spacing="15" prefWidth="300" styleClass="card" maxHeight="Infinity">
                     <Text text="Form Data" styleClass="card-title"/>
                     
                     <VBox spacing="5">
@@ -63,11 +63,16 @@
                     </VBox>
                     
 
-                    <HBox spacing="10">
+                    <Region VBox.vgrow="ALWAYS"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
                         <Button text="Simpan" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="login-button"/>
                         <Button text="Hapus" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="logout-button"/>
+                        <Button onAction="#handleReset" styleClass="reset-icon-button" text="↻">
+                            <tooltip>
+                                <Tooltip text="Reset Form"/>
+                            </tooltip>
+                        </Button>
                     </HBox>
-                    <Button text="Reset" onAction="#handleReset" maxWidth="Infinity" styleClass="sidebar-button"/>
                 </VBox>
             </HBox>
         </VBox>

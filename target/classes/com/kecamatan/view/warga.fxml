@@ -55,7 +55,7 @@
                 </VBox>
 
                 <!-- Input Form -->
-                <VBox spacing="15" prefWidth="320" styleClass="card">
+                <VBox spacing="15" prefWidth="300" styleClass="card" maxHeight="Infinity">
                     <Text text="Form Data Warga" styleClass="card-title"/>
                     
                     <VBox spacing="5">
@@ -110,8 +110,12 @@
                     <HBox spacing="10">
                         <Button text="Simpan" onAction="#handleSave" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="login-button"/>
                         <Button text="Hapus" onAction="#handleDelete" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="logout-button"/>
+                        <Button onAction="#handleReset" styleClass="reset-icon-button" text="↻">
+                            <tooltip>
+                                <Tooltip text="Reset Form"/>
+                            </tooltip>
+                        </Button>
                     </HBox>
-                    <Button text="Reset" onAction="#handleReset" maxWidth="Infinity" styleClass="sidebar-button"/>
                 </VBox>
             </HBox>
         </VBox>

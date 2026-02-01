@@ -113,7 +113,9 @@
     -fx-background-color: #009C4B;
     -fx-text-fill: #FEFEFE;
     -fx-font-weight: bold;
-    -fx-padding: 12;
+    -fx-min-height: 42px;
+    -fx-max-height: 42px;
+    -fx-padding: 0 20px;
     -fx-background-radius: 4;
     -fx-cursor: hand;
 }
@@ -124,6 +126,24 @@
 
 .message-label {
     -fx-font-size: 12px;
+}
+
+.reset-icon-button {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-min-width: 42px;
+    -fx-min-height: 42px;
+    -fx-max-width: 42px;
+    -fx-max-height: 42px;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+
+.reset-icon-button:hover {
+    -fx-background-color: #5a6268;
 }
 
 /* Dashboard Styles */
@@ -169,8 +189,11 @@
     -fx-background-color: #2E261A;
     -fx-text-fill: #FEFEFE;
     -fx-font-weight: bold;
-    -fx-padding: 10;
+    -fx-min-height: 42px;
+    -fx-max-height: 42px;
+    -fx-padding: 0 20px;
     -fx-background-radius: 4;
+    -fx-cursor: hand;
 }
 
 .card {
