@@ -15,6 +15,7 @@ import java.io.File;
 import java.net.URL;
 import javafx.application.Platform;
 import com.kecamatan.util.DataRefreshable;
+import com.kecamatan.util.DatabaseUtil;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -60,6 +61,12 @@ public class App extends Application {
             if (!newVal && maximizedLock) {
                 Platform.runLater(() -> stage.setMaximized(true));
             }
+        });
+
+        // Graceful shutdown of connection pool when window is closed
+        stage.setOnCloseRequest(event -> {
+            DatabaseUtil.shutdown();
+            Platform.exit();
         });
     }
 

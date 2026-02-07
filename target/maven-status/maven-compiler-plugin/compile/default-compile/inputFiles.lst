@@ -4,6 +4,7 @@
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/util/DataRefreshable.java
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/util/DatabaseUtil.java
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/util/ThreadManager.java
+/home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/util/RBACUtil.java
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/model/Warga.java
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/model/Desa.java
 /home/elza/repository/pendataankecamatan/src/main/java/com/kecamatan/controller/WargaController.java

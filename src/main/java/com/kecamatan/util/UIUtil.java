@@ -89,4 +89,41 @@ public class UIUtil {
 
         return dialog.showAndWait();
     }
+
+    /**
+     * Shows a user-friendly database error message.
+     * Call this from catch blocks when database operations fail.
+     * 
+     * @param operation Description of what operation failed (e.g., "memuat data", "menyimpan data")
+     * @param e The SQLException that was caught
+     */
+    public static void showDatabaseError(String operation, java.sql.SQLException e) {
+        String message;
+        
+        // Translate common PostgreSQL error codes to user-friendly messages
+        if (e.getSQLState() != null) {
+            switch (e.getSQLState()) {
+                case "23505": // Unique violation
+                    message = "Data sudah ada di database (duplikat).";
+                    break;
+                case "23503": // Foreign key violation
+                    message = "Data tidak dapat dihapus karena masih digunakan oleh data lain.";
+                    break;
+                case "08001": // Connection error
+                case "08006":
+                    message = "Tidak dapat terhubung ke database. Pastikan PostgreSQL berjalan.";
+                    break;
+                case "28P01": // Authentication failed
+                    message = "Gagal login ke database. Periksa username dan password.";
+                    break;
+                default:
+                    message = "Terjadi kesalahan: " + e.getMessage();
+            }
+        } else {
+            message = "Kesalahan database: " + e.getMessage();
+        }
+        
+        showAlert("Error " + operation, message, Alert.AlertType.ERROR);
+        e.printStackTrace(); // Still log for debugging
+    }
 }

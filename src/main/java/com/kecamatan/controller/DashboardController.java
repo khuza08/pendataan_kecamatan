@@ -15,6 +15,8 @@ import java.util.ResourceBundle;
 import com.kecamatan.util.DatabaseUtil;
 import com.kecamatan.util.ThreadManager;
 import com.kecamatan.util.DataRefreshable;
+import com.kecamatan.util.RBACUtil;
+import com.kecamatan.util.UIUtil;
 import javafx.application.Platform;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
@@ -51,33 +53,16 @@ public class DashboardController implements Initializable, DataRefreshable {
     }
 
     private void applyRBAC() {
-        if (userNameLabel != null) userNameLabel.setText(com.kecamatan.util.UserSession.getUsername());
-        if (userRoleLabel != null) {
-            String role = com.kecamatan.util.UserSession.getRole();
-            userRoleLabel.setText(role);
-            userRoleLabel.getStyleClass().clear();
-            if ("ADMIN".equals(role)) {
-                userRoleLabel.getStyleClass().add("role-badge-admin");
-            } else {
-                userRoleLabel.getStyleClass().add("role-badge-warga");
-            }
-        }
+        // Use centralized RBAC utility
+        RBACUtil.applyRBAC(userNameLabel, userRoleLabel, 
+            btnKecamatan, btnDesa, btnWarga, btnLaporan, btnDashboard);
 
         if (!com.kecamatan.util.UserSession.isAdmin()) {
-            // Hide Admin Sidebar Buttons
-            if (btnKecamatan != null) { btnKecamatan.setManaged(false); btnKecamatan.setVisible(false); }
-            if (btnDesa != null) { btnDesa.setManaged(false); btnDesa.setVisible(false); }
-            if (btnWarga != null) { btnWarga.setManaged(false); btnWarga.setVisible(false); }
-            if (btnLaporan != null) { btnLaporan.setManaged(false); btnLaporan.setVisible(false); }
-            if (btnDashboard != null) { btnDashboard.setManaged(false); btnDashboard.setVisible(false); }
-            
-            // Hide Admin Dashboard Content
+            // Hide Admin Dashboard Content, Show Warga Welcome
             if (adminContent != null) { adminContent.setManaged(false); adminContent.setVisible(false); }
-            
-            // Show Warga Welcome Content
             if (wargaContent != null) { wargaContent.setManaged(true); wargaContent.setVisible(true); }
         } else {
-            // Admin View: Ensure Admin content is visible and Warga content is hidden
+            // Admin View
             if (adminContent != null) { adminContent.setManaged(true); adminContent.setVisible(true); }
             if (wargaContent != null) { wargaContent.setManaged(false); wargaContent.setVisible(false); }
         }
@@ -164,7 +149,7 @@ public class DashboardController implements Initializable, DataRefreshable {
                 });
 
             } catch (SQLException e) {
-                e.printStackTrace();
+                UIUtil.showDatabaseError("Memuat Dashboard", e);
             }
         });
     }

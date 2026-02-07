@@ -30,6 +30,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 import com.kecamatan.util.DataRefreshable;
+import com.kecamatan.util.RBACUtil;
+import com.kecamatan.util.UIUtil;
 
 public class WargaController implements Initializable, DataRefreshable {
 
@@ -185,25 +187,8 @@ public class WargaController implements Initializable, DataRefreshable {
     }
 
     private void applyRBAC() {
-        if (userNameLabel != null) userNameLabel.setText(com.kecamatan.util.UserSession.getUsername());
-        if (userRoleLabel != null) {
-            String role = com.kecamatan.util.UserSession.getRole();
-            userRoleLabel.setText(role);
-            userRoleLabel.getStyleClass().clear();
-            if ("ADMIN".equals(role)) {
-                userRoleLabel.getStyleClass().add("role-badge-admin");
-            } else {
-                userRoleLabel.getStyleClass().add("role-badge-warga");
-            }
-        }
-
-        if (!com.kecamatan.util.UserSession.isAdmin()) {
-            if (btnKecamatan != null) { btnKecamatan.setManaged(false); btnKecamatan.setVisible(false); }
-            if (btnDesa != null) { btnDesa.setManaged(false); btnDesa.setVisible(false); }
-            if (btnWarga != null) { btnWarga.setManaged(false); btnWarga.setVisible(false); }
-            if (btnLaporan != null) { btnLaporan.setManaged(false); btnLaporan.setVisible(false); }
-            if (btnDashboard != null) { btnDashboard.setManaged(false); btnDashboard.setVisible(false); }
-        }
+        RBACUtil.applyRBAC(userNameLabel, userRoleLabel, 
+            btnKecamatan, btnDesa, btnWarga, btnLaporan, btnDashboard);
     }
 
     private void setupDatePicker() {
@@ -341,7 +326,7 @@ public class WargaController implements Initializable, DataRefreshable {
                     wargaTable.setItems(wargaList);
                 });
             } catch (SQLException e) {
-                e.printStackTrace();
+                UIUtil.showDatabaseError("Memuat Data Warga", e);
             }
         });
     }
@@ -413,10 +398,10 @@ public class WargaController implements Initializable, DataRefreshable {
             loadWargaData();
             handleReset();
         } catch (SQLException e) {
-            if (e.getSQLState().equals("23505")) {
-                com.kecamatan.util.UIUtil.showAlert("Error", "NIK sudah terdaftar!", Alert.AlertType.ERROR);
+            if (e.getSQLState() != null && e.getSQLState().equals("23505")) {
+                UIUtil.showAlert("Error", "NIK sudah terdaftar!", Alert.AlertType.ERROR);
             } else {
-                e.printStackTrace();
+                UIUtil.showDatabaseError("Menyimpan Data Warga", e);
             }
         }
     }
@@ -436,7 +421,7 @@ public class WargaController implements Initializable, DataRefreshable {
             loadWargaData();
             handleReset();
         } catch (SQLException e) {
-            e.printStackTrace();
+            UIUtil.showDatabaseError("Menghapus Data Warga", e);
         }
     }
 

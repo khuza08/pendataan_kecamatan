@@ -15,6 +15,9 @@ import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
 
+import com.kecamatan.util.RBACUtil;
+import com.kecamatan.util.UIUtil;
+
 public class ProfilController implements Initializable {
 
     @FXML private TextField nikField;
@@ -40,25 +43,8 @@ public class ProfilController implements Initializable {
     }
 
     private void applyRBAC() {
-        if (userNameLabel != null) userNameLabel.setText(UserSession.getUsername());
-        if (userRoleLabel != null) {
-            String role = UserSession.getRole();
-            userRoleLabel.setText(role);
-            userRoleLabel.getStyleClass().clear();
-            if ("ADMIN".equals(role)) {
-                userRoleLabel.getStyleClass().add("role-badge-admin");
-            } else {
-                userRoleLabel.getStyleClass().add("role-badge-warga");
-            }
-        }
-
-        if (!UserSession.isAdmin()) {
-            if (btnKecamatan != null) { btnKecamatan.setManaged(false); btnKecamatan.setVisible(false); }
-            if (btnDesa != null) { btnDesa.setManaged(false); btnDesa.setVisible(false); }
-            if (btnWarga != null) { btnWarga.setManaged(false); btnWarga.setVisible(false); }
-            if (btnLaporan != null) { btnLaporan.setManaged(false); btnLaporan.setVisible(false); }
-            if (btnDashboard != null) { btnDashboard.setManaged(false); btnDashboard.setVisible(false); }
-        }
+        RBACUtil.applyRBAC(userNameLabel, userRoleLabel, 
+            btnKecamatan, btnDesa, btnWarga, btnLaporan, btnDashboard);
     }
 
     private void loadProfileData() {
@@ -78,7 +64,7 @@ public class ProfilController implements Initializable {
                 alamatArea.setText(rs.getString("alamat"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            UIUtil.showDatabaseError("Memuat Data Profil", e);
         }
     }
 
