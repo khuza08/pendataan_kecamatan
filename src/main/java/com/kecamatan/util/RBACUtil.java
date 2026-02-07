@@ -64,4 +64,39 @@ public class RBACUtil {
             hideAdminButtons(adminButtons);
         }
     }
+
+    /**
+     * Hides buttons that should only be visible to WARGA users.
+     * Call this method for ADMIN users.
+     * 
+     * @param buttons Variable number of buttons to hide
+     */
+    public static void hideWargaButtons(Button... buttons) {
+        for (Button btn : buttons) {
+            if (btn != null) {
+                btn.setManaged(false);
+                btn.setVisible(false);
+            }
+        }
+    }
+
+    /**
+     * Applies full RBAC settings including both admin-only and warga-only buttons.
+     * 
+     * @param nameLabel User name label
+     * @param roleLabel Role badge label
+     * @param btnProfil Profil Saya button (warga-only, hidden for admin)
+     * @param adminButtons Buttons to hide if user is not admin
+     */
+    public static void applyFullRBAC(Label nameLabel, Label roleLabel, Button btnProfil, Button... adminButtons) {
+        setupUserLabels(nameLabel, roleLabel);
+        
+        if (UserSession.isAdmin()) {
+            // Admin: hide warga-only buttons (Profil Saya)
+            hideWargaButtons(btnProfil);
+        } else {
+            // Warga: hide admin-only buttons
+            hideAdminButtons(adminButtons);
+        }
+    }
 }

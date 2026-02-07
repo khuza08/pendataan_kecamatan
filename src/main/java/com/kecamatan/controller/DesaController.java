@@ -49,6 +49,7 @@ public class DesaController implements Initializable, DataRefreshable {
     @FXML private Button btnWarga;
     @FXML private Button btnDashboard;
     @FXML private Button btnLaporan;
+    @FXML private Button btnProfil;
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
 
@@ -87,7 +88,7 @@ public class DesaController implements Initializable, DataRefreshable {
     }
 
     private void applyRBAC() {
-        RBACUtil.applyRBAC(userNameLabel, userRoleLabel, 
+        RBACUtil.applyFullRBAC(userNameLabel, userRoleLabel, btnProfil,
             btnKecamatan, btnDesa, btnWarga, btnLaporan, btnDashboard);
     }
 

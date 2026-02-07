@@ -40,6 +40,7 @@ public class DashboardController implements Initializable, DataRefreshable {
     @FXML private Button btnWarga;
     @FXML private Button btnDashboard;
     @FXML private Button btnLaporan;
+    @FXML private Button btnProfil;
     @FXML private VBox recentActivitiesBox;
     @FXML private VBox adminContent;
     @FXML private VBox wargaContent;
@@ -53,8 +54,8 @@ public class DashboardController implements Initializable, DataRefreshable {
     }
 
     private void applyRBAC() {
-        // Use centralized RBAC utility
-        RBACUtil.applyRBAC(userNameLabel, userRoleLabel, 
+        // Use centralized RBAC utility with full support for both admin and warga buttons
+        RBACUtil.applyFullRBAC(userNameLabel, userRoleLabel, btnProfil,
             btnKecamatan, btnDesa, btnWarga, btnLaporan, btnDashboard);
 
         if (!com.kecamatan.util.UserSession.isAdmin()) {

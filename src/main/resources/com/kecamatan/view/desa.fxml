@@ -20,7 +20,7 @@
             <Button fx:id="btnDesa" text="Data Desa" maxWidth="Infinity" styleClass="sidebar-button-active"/>
             <Button fx:id="btnWarga" text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnLaporan" text="Laporan" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button text="Profil Saya" onAction="#goToProfil" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnProfil" text="Profil Saya" onAction="#goToProfil" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Region VBox.vgrow="ALWAYS"/>
             <HBox spacing="10" alignment="CENTER" styleClass="user-info-pane">
                 <padding>
