@@ -19,6 +19,13 @@ import java.util.ResourceBundle;
 import com.kecamatan.util.RBACUtil;
 import com.kecamatan.util.UIUtil;
 import com.kecamatan.util.UserSession;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+import java.time.LocalTime;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import javafx.scene.text.Text;
 
 public class KepalaDesaWargaController implements Initializable {
 
@@ -33,6 +40,8 @@ public class KepalaDesaWargaController implements Initializable {
     @FXML private Button btnProfil;
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
+    @FXML private Text clockTimeText;
+    @FXML private Text clockDateText;
 
     private ObservableList<KepalaDesa> kepalaDesaList = FXCollections.observableArrayList();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -41,6 +50,7 @@ public class KepalaDesaWargaController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // Setup user info
         RBACUtil.setupUserLabels(userNameLabel, userRoleLabel);
+        startClock();
 
         // Setup table columns
         colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
@@ -87,6 +97,21 @@ public class KepalaDesaWargaController implements Initializable {
         });
 
         loadData();
+    }
+
+    private void startClock() {
+        if (clockTimeText != null && clockDateText != null) {
+            Timeline clock = new Timeline(new KeyFrame(Duration.ZERO, e -> {
+                LocalTime time = LocalTime.now();
+                clockTimeText.setText(time.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                LocalDate date = LocalDate.now();
+                String dayName = date.getDayOfWeek().getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.forLanguageTag("id"));
+                String monthName = date.getMonth().getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.forLanguageTag("id"));
+                clockDateText.setText(String.format("%s, %d %s %d", dayName, date.getDayOfMonth(), monthName, date.getYear()));
+            }), new KeyFrame(Duration.seconds(1)));
+            clock.setCycleCount(Timeline.INDEFINITE);
+            clock.play();
+        }
     }
 
     private void loadData() {

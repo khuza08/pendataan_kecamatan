@@ -22,6 +22,8 @@ import com.kecamatan.util.ThreadManager;
 import com.kecamatan.util.DataRefreshable;
 import com.kecamatan.util.RBACUtil;
 import com.kecamatan.util.UIUtil;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
@@ -30,7 +32,11 @@ import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 import java.sql.*;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
+import javafx.util.Duration;
 
 public class DashboardController implements Initializable, DataRefreshable {
 
@@ -41,6 +47,8 @@ public class DashboardController implements Initializable, DataRefreshable {
     @FXML private Text rtrwText;
     @FXML private Text totalKecamatanText;
     @FXML private Text totalDesaText;
+    @FXML private Text clockTimeText;
+    @FXML private Text clockDateText;
     @FXML private Button btnDesa;
     @FXML private Button btnKepalaDesa;
     @FXML private Button btnWarga;
@@ -65,7 +73,8 @@ public class DashboardController implements Initializable, DataRefreshable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         applyRBAC();
-        
+        startClock();
+
         // Initialize table columns
         if (colNik != null) {
             colNik.setCellValueFactory(cellData -> cellData.getValue().nikProperty());
@@ -91,6 +100,23 @@ public class DashboardController implements Initializable, DataRefreshable {
             // Admin View
             if (adminContent != null) { adminContent.setManaged(true); adminContent.setVisible(true); }
             if (wargaContent != null) { wargaContent.setManaged(false); wargaContent.setVisible(false); }
+        }
+    }
+
+    private void startClock() {
+        if (clockTimeText != null && clockDateText != null) {
+            Timeline clock = new Timeline(new KeyFrame(Duration.ZERO, e -> {
+                LocalTime time = LocalTime.now();
+                clockTimeText.setText(time.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                
+                LocalDate date = LocalDate.now();
+                String dayName = date.getDayOfWeek().getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.forLanguageTag("id"));
+                String monthName = date.getMonth().getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.forLanguageTag("id"));
+                clockDateText.setText(String.format("%s, %d %s %d", dayName, date.getDayOfMonth(), monthName, date.getYear()));
+            }),
+            new KeyFrame(Duration.seconds(1)));
+            clock.setCycleCount(Timeline.INDEFINITE);
+            clock.play();
         }
     }
 

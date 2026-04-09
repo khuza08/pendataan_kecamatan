@@ -35,6 +35,13 @@ import java.util.ResourceBundle;
 import com.kecamatan.util.DataRefreshable;
 import com.kecamatan.util.RBACUtil;
 import com.kecamatan.util.UIUtil;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
+import java.time.LocalTime;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import javafx.scene.text.Text;
 
 public class WargaController implements Initializable, DataRefreshable {
 
@@ -78,6 +85,8 @@ public class WargaController implements Initializable, DataRefreshable {
     @FXML private Button btnProfil;
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
+    @FXML private Text clockTimeText;
+    @FXML private Text clockDateText;
 
     @FXML private ComboBox<Desa> filterDesaComboBox;
     @FXML private TextField searchField;
@@ -234,6 +243,23 @@ public class WargaController implements Initializable, DataRefreshable {
                 noHpField.positionCaret(noHpField.getCaretPosition() - 1);
             }
         });
+
+        startClock();
+    }
+
+    private void startClock() {
+        if (clockTimeText != null && clockDateText != null) {
+            Timeline clock = new Timeline(new KeyFrame(Duration.ZERO, e -> {
+                LocalTime time = LocalTime.now();
+                clockTimeText.setText(time.format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+                LocalDate date = LocalDate.now();
+                String dayName = date.getDayOfWeek().getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.forLanguageTag("id"));
+                String monthName = date.getMonth().getDisplayName(java.time.format.TextStyle.FULL, java.util.Locale.forLanguageTag("id"));
+                clockDateText.setText(String.format("%s, %d %s %d", dayName, date.getDayOfMonth(), monthName, date.getYear()));
+            }), new KeyFrame(Duration.seconds(1)));
+            clock.setCycleCount(Timeline.INDEFINITE);
+            clock.play();
+        }
     }
 
     private void applyRBAC() {

@@ -376,6 +376,28 @@
     -fx-border-color: #adb5bd;
 }
 
+/* Clock Widget */
+.clock-container {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+    -fx-alignment: CENTER;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+.clock-time {
+    -fx-fill: #2E261A;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Consolas", monospace;
+}
+
+.clock-date {
+    -fx-fill: #7A7778;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
 /* Filter Styles */
 .filter-label {
     -fx-text-fill: #7A7778;

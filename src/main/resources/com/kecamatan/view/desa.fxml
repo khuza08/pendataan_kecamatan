@@ -14,6 +14,13 @@
             <padding>
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
+            
+            <!-- Clock Widget -->
+            <VBox alignment="CENTER" spacing="5" styleClass="clock-container">
+                <Text fx:id="clockTimeText" text="00:00:00" styleClass="clock-time"/>
+                <Text fx:id="clockDateText" text="Senin, 01 Januari" styleClass="clock-date"/>
+            </VBox>
+
             <Text text="MENU" styleClass="sidebar-title"/>
             <Button fx:id="btnDashboard" text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnDesa" text="Data Desa" maxWidth="Infinity" styleClass="sidebar-button-active"/>
