@@ -41,7 +41,6 @@ public class DashboardController implements Initializable, DataRefreshable {
     @FXML private Text rtrwText;
     @FXML private Text totalKecamatanText;
     @FXML private Text totalDesaText;
-    @FXML private Button btnKecamatan;
     @FXML private Button btnDesa;
     @FXML private Button btnWarga;
     @FXML private Button btnDashboard;
@@ -81,7 +80,7 @@ public class DashboardController implements Initializable, DataRefreshable {
     private void applyRBAC() {
         // Use centralized RBAC utility with full support for both admin and warga buttons
         RBACUtil.applyFullRBAC(userNameLabel, userRoleLabel, btnProfil,
-            btnKecamatan, btnDesa, btnWarga, btnLaporan, btnDashboard);
+            btnDesa, btnWarga, btnLaporan, btnDashboard);
 
         if (!com.kecamatan.util.UserSession.isAdmin()) {
             // Hide Admin Dashboard Content, Show Warga Welcome
@@ -129,21 +128,14 @@ public class DashboardController implements Initializable, DataRefreshable {
                     }
                 }
 
-                // 4. Total Kecamatan
-                int totalKec = 0;
-                try (Statement stmt = conn.createStatement();
-                     ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM kecamatan")) {
-                    if (rs.next()) totalKec = rs.getInt(1);
-                }
-
-                // 5. Total Desa
+                // 4. Total Desa
                 int totalDesa = 0;
                 try (Statement stmt = conn.createStatement();
                      ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM desa")) {
                     if (rs.next()) totalDesa = rs.getInt(1);
                 }
 
-                // 6. Chart Data (Top 6 Kecamatan)
+                // 5. Chart Data (Top 6 Kecamatan)
                 XYChart.Series<String, Number> series = new XYChart.Series<>();
                 series.setName("Populasi per Kecamatan");
                 String chartSql = "SELECT k.nama, (SELECT COUNT(*) FROM warga w JOIN desa d ON w.desa_id = d.id WHERE d.kecamatan_id = k.id) as calculated_pop " +
@@ -186,13 +178,12 @@ public class DashboardController implements Initializable, DataRefreshable {
                 }
 
                 // UI Updates
-                final int fw = totalWarga, fm = male, ff = female, frt = totalRT, frw = totalRW, fk = totalKec, fd = totalDesa;
+                final int fw = totalWarga, fm = male, ff = female, frt = totalRT, frw = totalRW, fd = totalDesa;
                 Platform.runLater(() -> {
                     totalWargaText.setText(String.format("%,d", fw));
                     lakiText.setText(String.format("%,d", fm));
                     perempuanText.setText(String.format("%,d", ff));
                     rtrwText.setText(String.format("%d / %d", frt, frw));
-                    totalKecamatanText.setText(String.valueOf(fk));
                     totalDesaText.setText(String.valueOf(fd));
                     
                     if (dashboardWargaTable != null) {
@@ -221,11 +212,6 @@ public class DashboardController implements Initializable, DataRefreshable {
                 UIUtil.showDatabaseError("Memuat Dashboard", e);
             }
         });
-    }
-
-    @FXML
-    private void goToKecamatan() throws IOException {
-        App.setRoot("kecamatan", 1200, 800, true);
     }
 
     @FXML

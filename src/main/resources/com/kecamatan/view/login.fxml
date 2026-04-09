@@ -15,7 +15,7 @@
     <VBox fx:id="loginSidebar" styleClass="login-sidebar" alignment="CENTER" HBox.hgrow="ALWAYS" prefWidth="400">
         <ImageView fitWidth="200" preserveRatio="true">
             <image>
-                <Image url="file:/home/elza/Pictures/logos/darjo.png"/>
+                <Image url="@logo.png"/>
             </image>
         </ImageView>
         <VBox alignment="CENTER" spacing="5">

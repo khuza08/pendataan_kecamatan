@@ -30,7 +30,7 @@ public class DesaController implements Initializable, DataRefreshable {
 
     @Override
     public void refreshData() {
-        loadKecamatan();
+        loadSiwalanpanjiId();
         loadDesa();
     }
 
@@ -41,11 +41,10 @@ public class DesaController implements Initializable, DataRefreshable {
     @FXML private TableColumn<Desa, Integer> colRT;
     @FXML private TableColumn<Desa, Integer> colRW;
 
-    @FXML private ComboBox<Kecamatan> kecamatanComboBox;
     @FXML private TextField namaField;
+    @FXML private TextField kecamatanField;
     @FXML private VBox rwContainer;
 
-    @FXML private Button btnKecamatan;
     @FXML private Button btnDesa;
     @FXML private Button btnWarga;
     @FXML private Button btnDashboard;
@@ -54,13 +53,11 @@ public class DesaController implements Initializable, DataRefreshable {
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
 
-    @FXML private ComboBox<Kecamatan> filterKecamatanComboBox;
     @FXML private TextField searchField;
 
     private ObservableList<Desa> desaList = FXCollections.observableArrayList();
-    private ObservableList<Kecamatan> kecamatanList = FXCollections.observableArrayList();
-    private ObservableList<Kecamatan> filterKecamatanList = FXCollections.observableArrayList();
     private int selectedId = -1;
+    private int siwalanpanjoId = -1;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -71,24 +68,13 @@ public class DesaController implements Initializable, DataRefreshable {
         colRT.setCellValueFactory(cellData -> cellData.getValue().jumlahRtProperty().asObject());
         colRW.setCellValueFactory(cellData -> cellData.getValue().jumlahRwProperty().asObject());
 
-        setupComboBox();
-        setupFilterComboBox();
-        loadKecamatan();
-        loadFilterKecamatan();
+        loadSiwalanpanjiId();
         loadDesa();
 
         desaTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
                 selectedId = newSel.getId();
                 namaField.setText(newSel.getNama());
-
-                for (Kecamatan k : kecamatanList) {
-                    if (k.getId() == newSel.getKecamatanId()) {
-                        kecamatanComboBox.getSelectionModel().select(k);
-                        break;
-                    }
-                }
-
                 loadRTRWDetails(selectedId);
             }
         });
@@ -100,7 +86,7 @@ public class DesaController implements Initializable, DataRefreshable {
 
     private void applyRBAC() {
         RBACUtil.applyFullRBAC(userNameLabel, userRoleLabel, btnProfil,
-            btnKecamatan, btnDesa, btnWarga, btnLaporan, btnDashboard);
+            btnDesa, btnWarga, btnLaporan, btnDashboard);
     }
 
     private void addRWRow(String rwNo, List<String> rtList) {
@@ -223,101 +209,17 @@ public class DesaController implements Initializable, DataRefreshable {
         addRWRow("", new ArrayList<>());
     }
 
-    private void setupComboBox() {
-        kecamatanComboBox.setConverter(new StringConverter<Kecamatan>() {
-            @Override
-            public String toString(Kecamatan k) {
-                return k == null ? "" : k.getNama();
-            }
-
-            @Override
-            public Kecamatan fromString(String string) {
-                return null;
-            }
-        });
-    }
-
-    private void setupFilterComboBox() {
-        filterKecamatanComboBox.setConverter(new StringConverter<Kecamatan>() {
-            @Override
-            public String toString(Kecamatan k) {
-                return k == null ? "" : k.getNama();
-            }
-
-            @Override
-            public Kecamatan fromString(String string) {
-                return null;
-            }
-        });
-
-        filterKecamatanComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            loadDesa();
-        });
-    }
-
-    private void loadFilterKecamatan() {
+    private void loadSiwalanpanjiId() {
         com.kecamatan.util.ThreadManager.execute(() -> {
-            ObservableList<Kecamatan> tempKec = FXCollections.observableArrayList();
-            String sql = "SELECT k.*, " +
-                         "(SELECT COUNT(*) FROM desa WHERE kecamatan_id = k.id) as calculated_desa_count, " +
-                         "(SELECT COUNT(*) FROM warga w JOIN desa d ON w.desa_id = d.id WHERE d.kecamatan_id = k.id) as calculated_pop " +
-                         "FROM kecamatan k ORDER BY k.nama";
+            String sql = "SELECT id FROM kecamatan WHERE nama = 'Siwalanpanji'";
             try (Connection conn = DatabaseUtil.getConnection();
                  Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {
-                while (rs.next()) {
-                    tempKec.add(new Kecamatan(
-                        rs.getInt("id"),
-                        rs.getString("kode"),
-                        rs.getString("nama"),
-                        rs.getInt("calculated_desa_count"),
-                        rs.getInt("calculated_pop")
-                    ));
+                if (rs.next()) {
+                    siwalanpanjoId = rs.getInt("id");
                 }
-                javafx.application.Platform.runLater(() -> {
-                    filterKecamatanList.setAll(tempKec);
-                    filterKecamatanComboBox.setItems(filterKecamatanList);
-                });
             } catch (SQLException e) {
                 e.printStackTrace();
-            }
-        });
-    }
-
-    @FXML
-    private void handleResetFilter() {
-        filterKecamatanComboBox.getSelectionModel().clearSelection();
-        filterKecamatanList.clear();
-        loadKecamatan();
-        loadFilterKecamatan();
-        loadDesa();
-    }
-
-    private void loadKecamatan() {
-        com.kecamatan.util.ThreadManager.execute(() -> {
-            ObservableList<Kecamatan> tempKec = FXCollections.observableArrayList();
-            String sql = "SELECT k.*, " +
-                         "(SELECT COUNT(*) FROM desa WHERE kecamatan_id = k.id) as calculated_desa_count, " +
-                         "(SELECT COUNT(*) FROM warga w JOIN desa d ON w.desa_id = d.id WHERE d.kecamatan_id = k.id) as calculated_pop " +
-                         "FROM kecamatan k ORDER BY k.nama";
-            try (Connection conn = DatabaseUtil.getConnection();
-                 Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(sql)) {
-                while (rs.next()) {
-                    tempKec.add(new Kecamatan(
-                        rs.getInt("id"),
-                        rs.getString("kode"),
-                        rs.getString("nama"),
-                        rs.getInt("calculated_desa_count"),
-                        rs.getInt("calculated_pop")
-                    ));
-                }
-                javafx.application.Platform.runLater(() -> {
-                    kecamatanList.setAll(tempKec);
-                    kecamatanComboBox.setItems(kecamatanList);
-                });
-            } catch (SQLException e) {
-                UIUtil.showDatabaseError("Memuat Data Kecamatan", e);
             }
         });
     }
@@ -325,27 +227,18 @@ public class DesaController implements Initializable, DataRefreshable {
     private void loadDesa() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Desa> tempDesa = FXCollections.observableArrayList();
-
-            Kecamatan selectedKecamatan = filterKecamatanComboBox.getSelectionModel().getSelectedItem();
             String searchQuery = searchField != null ? searchField.getText() : null;
             boolean hasSearch = searchQuery != null && !searchQuery.trim().isEmpty();
 
             StringBuilder sql = new StringBuilder(
                 "SELECT d.*, k.nama as kecamatan_nama, (SELECT COUNT(*) FROM warga WHERE desa_id = d.id) as calculated_pop " +
-                "FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id"
+                "FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id WHERE d.kecamatan_id = ?"
             );
             List<Object> params = new ArrayList<>();
+            params.add(siwalanpanjoId);
 
-            if (selectedKecamatan != null) {
-                sql.append(" WHERE d.kecamatan_id = ?");
-                params.add(selectedKecamatan.getId());
-
-                if (hasSearch) {
-                    sql.append(" AND LOWER(d.nama) LIKE LOWER(?)");
-                    params.add("%" + searchQuery.trim() + "%");
-                }
-            } else if (hasSearch) {
-                sql.append(" WHERE LOWER(d.nama) LIKE LOWER(?)");
+            if (hasSearch) {
+                sql.append(" AND LOWER(d.nama) LIKE LOWER(?)");
                 params.add("%" + searchQuery.trim() + "%");
             }
 
@@ -380,18 +273,20 @@ public class DesaController implements Initializable, DataRefreshable {
 
     @FXML
     private void handleSave() {
-        Kecamatan selectedKec = kecamatanComboBox.getSelectionModel().getSelectedItem();
         String nama = namaField.getText();
 
+        if (siwalanpanjoId == -1) {
+            UIUtil.showAlert("Error", "Kecamatan Siwalanpanji tidak ditemukan!", Alert.AlertType.ERROR);
+            return;
+        }
+
         // Reset styles
-        com.kecamatan.util.UIUtil.setErrorStyle(kecamatanComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
 
-        boolean hasError = false;
-        if (selectedKec == null) { com.kecamatan.util.UIUtil.setErrorStyle(kecamatanComboBox, true); hasError = true; }
-        if (nama.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(namaField, true); hasError = true; }
-
-        if (hasError) return;
+        if (nama.isEmpty()) {
+            com.kecamatan.util.UIUtil.setErrorStyle(namaField, true);
+            return;
+        }
 
         if (nama.length() > 100) {
             com.kecamatan.util.UIUtil.setErrorStyle(namaField, true);
@@ -441,7 +336,7 @@ public class DesaController implements Initializable, DataRefreshable {
                 if (selectedId == -1) {
                     String sql = "INSERT INTO desa (kecamatan_id, nama, jumlah_rt, jumlah_rw) VALUES (?, ?, ?, ?) RETURNING id";
                     try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                        pstmt.setInt(1, selectedKec.getId());
+                        pstmt.setInt(1, siwalanpanjoId);
                         pstmt.setString(2, nama);
                         pstmt.setInt(3, finalRT);
                         pstmt.setInt(4, finalRW);
@@ -451,7 +346,7 @@ public class DesaController implements Initializable, DataRefreshable {
                 } else {
                     String sql = "UPDATE desa SET kecamatan_id = ?, nama = ?, jumlah_rt = ?, jumlah_rw = ? WHERE id = ?";
                     try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                        pstmt.setInt(1, selectedKec.getId());
+                        pstmt.setInt(1, siwalanpanjoId);
                         pstmt.setString(2, nama);
                         pstmt.setInt(3, finalRT);
                         pstmt.setInt(4, finalRW);
@@ -511,18 +406,15 @@ public class DesaController implements Initializable, DataRefreshable {
     @FXML
     private void handleReset() {
         selectedId = -1;
-        kecamatanComboBox.getSelectionModel().clearSelection();
         namaField.clear();
         rwContainer.getChildren().clear();
         if (desaTable != null) desaTable.getSelectionModel().clearSelection();
 
         // Clear error styles
-        com.kecamatan.util.UIUtil.setErrorStyle(kecamatanComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
     }
 
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }
-    @FXML private void goToKecamatan() throws IOException { App.setRoot("kecamatan", 1200, 800, true); }
     @FXML private void goToWarga() throws IOException { App.setRoot("warga", 1200, 800, true); }
     @FXML private void goToLaporan() throws IOException { App.setRoot("laporan", 1200, 800, true); }
     @FXML private void goToProfil() throws IOException { App.setRoot("profil", 1200, 800, true); }

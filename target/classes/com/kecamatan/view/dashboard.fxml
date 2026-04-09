@@ -17,7 +17,6 @@
             </padding>
             <Text text="MENU" styleClass="sidebar-title"/>
             <Button fx:id="btnDashboard" text="Dashboard" maxWidth="Infinity" styleClass="sidebar-button-active"/>
-            <Button fx:id="btnKecamatan" text="Data Kecamatan" onAction="#goToKecamatan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnDesa" text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnWarga" text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnLaporan" text="Statistik" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
@@ -54,12 +53,12 @@
                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10" percentWidth="33.33" />
                                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10" percentWidth="33.33" />
                             </columnConstraints>
-                            
+
                             <VBox styleClass="card" GridPane.columnIndex="0" GridPane.rowIndex="0">
                                 <Text text="Total Warga" styleClass="card-label"/>
                                 <Text fx:id="totalWargaText" text="0" styleClass="card-value"/>
                             </VBox>
-                            
+
                             <VBox styleClass="card" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                 <Text text="Laki-laki" styleClass="card-label"/>
                                 <Text fx:id="lakiText" text="0" styleClass="card-value"/>
@@ -69,18 +68,13 @@
                                 <Text text="Perempuan" styleClass="card-label"/>
                                 <Text fx:id="perempuanText" text="0" styleClass="card-value"/>
                             </VBox>
-                            
+
                             <VBox styleClass="card" GridPane.columnIndex="0" GridPane.rowIndex="1">
                                 <Text text="Total RT / RW" styleClass="card-label"/>
                                 <Text fx:id="rtrwText" text="0 / 0" styleClass="card-value-small"/>
                             </VBox>
-            
-                            <VBox styleClass="card" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                <Text text="Kecamatan" styleClass="card-label"/>
-                                <Text fx:id="totalKecamatanText" text="0" styleClass="card-value"/>
-                            </VBox>
 
-                            <VBox styleClass="card" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                            <VBox styleClass="card" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                 <Text text="Total Desa" styleClass="card-label"/>
                                 <Text fx:id="totalDesaText" text="0" styleClass="card-value"/>
                             </VBox>

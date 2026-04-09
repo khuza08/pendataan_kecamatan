@@ -70,7 +70,6 @@ public class WargaController implements Initializable, DataRefreshable {
     @FXML private DatePicker tglLahirPicker;
     @FXML private TextArea alamatArea;
 
-    @FXML private Button btnKecamatan;
     @FXML private Button btnDesa;
     @FXML private Button btnWarga;
     @FXML private Button btnDashboard;
@@ -79,13 +78,11 @@ public class WargaController implements Initializable, DataRefreshable {
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
 
-    @FXML private ComboBox<Kecamatan> filterKecamatanComboBox;
     @FXML private ComboBox<Desa> filterDesaComboBox;
     @FXML private TextField searchField;
 
     private ObservableList<Warga> wargaList = FXCollections.observableArrayList();
     private ObservableList<Desa> desaList = FXCollections.observableArrayList();
-    private ObservableList<Kecamatan> filterKecamatanList = FXCollections.observableArrayList();
     private ObservableList<Desa> filterDesaList = FXCollections.observableArrayList();
     private int selectedId = -1;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
@@ -122,7 +119,6 @@ public class WargaController implements Initializable, DataRefreshable {
 
         setupDesaComboBox();
         setupFilterComboBoxes();
-        loadFilterKecamatanData();
         loadDesaData();
         loadWargaData();
 
@@ -227,7 +223,7 @@ public class WargaController implements Initializable, DataRefreshable {
 
     private void applyRBAC() {
         RBACUtil.applyFullRBAC(userNameLabel, userRoleLabel, btnProfil,
-            btnKecamatan, btnDesa, btnWarga, btnLaporan, btnDashboard);
+            btnDesa, btnWarga, btnLaporan, btnDashboard);
     }
 
     private void setupDatePicker() {
@@ -268,15 +264,6 @@ public class WargaController implements Initializable, DataRefreshable {
     }
 
     private void setupFilterComboBoxes() {
-        filterKecamatanComboBox.setConverter(new StringConverter<Kecamatan>() {
-            @Override
-            public String toString(Kecamatan k) {
-                return k == null ? "" : k.getNama();
-            }
-            @Override
-            public Kecamatan fromString(String string) { return null; }
-        });
-
         filterDesaComboBox.setConverter(new StringConverter<Desa>() {
             @Override
             public String toString(Desa d) {
@@ -286,83 +273,13 @@ public class WargaController implements Initializable, DataRefreshable {
             public Desa fromString(String string) { return null; }
         });
 
-        filterKecamatanComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            if (newVal != null) {
-                loadFilterDesaData(newVal);
-            } else {
-                filterDesaComboBox.getItems().clear();
-                filterDesaComboBox.getSelectionModel().clearSelection();
-            }
-            loadWargaData();
-        });
-
         filterDesaComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             loadWargaData();
         });
     }
 
-    private void loadFilterKecamatanData() {
-        ThreadManager.execute(() -> {
-            ObservableList<Kecamatan> tempKecamatan = FXCollections.observableArrayList();
-            String sql = "SELECT k.id, k.nama, (SELECT COUNT(*) FROM desa d WHERE d.kecamatan_id = k.id) as calculated_jumlah, " +
-                         "(SELECT COUNT(*) FROM warga w JOIN desa d ON w.desa_id = d.id WHERE d.kecamatan_id = k.id) as calculated_pop " +
-                         "FROM kecamatan k ORDER BY k.nama";
-            try (Connection conn = DatabaseUtil.getConnection();
-                 Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(sql)) {
-                while (rs.next()) {
-                    tempKecamatan.add(new Kecamatan(
-                        rs.getInt("id"),
-                        null,
-                        rs.getString("nama"),
-                        rs.getInt("calculated_jumlah"),
-                        rs.getInt("calculated_pop")
-                    ));
-                }
-                Platform.runLater(() -> {
-                    filterKecamatanList.setAll(tempKecamatan);
-                    filterKecamatanComboBox.setItems(filterKecamatanList);
-                });
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    private void loadFilterDesaData(Kecamatan kecamatan) {
-        ThreadManager.execute(() -> {
-            ObservableList<Desa> tempDesa = FXCollections.observableArrayList();
-            String sql = "SELECT d.*, k.nama as kecamatan_nama, (SELECT COUNT(*) FROM warga WHERE desa_id = d.id) as calculated_pop " +
-                         "FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id " +
-                         "WHERE d.kecamatan_id = ? ORDER BY d.nama";
-            try (Connection conn = DatabaseUtil.getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setInt(1, kecamatan.getId());
-                ResultSet rs = pstmt.executeQuery();
-                while (rs.next()) {
-                    tempDesa.add(new Desa(
-                        rs.getInt("id"),
-                        rs.getInt("kecamatan_id"),
-                        rs.getString("kecamatan_nama"),
-                        rs.getString("nama"),
-                        rs.getInt("calculated_pop"),
-                        rs.getInt("jumlah_rt"),
-                        rs.getInt("jumlah_rw")
-                    ));
-                }
-                Platform.runLater(() -> {
-                    filterDesaList.setAll(tempDesa);
-                    filterDesaComboBox.setItems(filterDesaList);
-                });
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
     @FXML
     private void handleResetFilter() {
-        filterKecamatanComboBox.getSelectionModel().clearSelection();
         filterDesaComboBox.getSelectionModel().clearSelection();
         filterDesaComboBox.getItems().clear();
         filterDesaList.clear();
@@ -415,7 +332,9 @@ public class WargaController implements Initializable, DataRefreshable {
     private void loadDesaData() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Desa> tempDesa = FXCollections.observableArrayList();
-            String sql = "SELECT d.*, k.nama as kecamatan_nama, (SELECT COUNT(*) FROM warga WHERE desa_id = d.id) as calculated_pop FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id ORDER BY d.nama";
+            String sql = "SELECT d.*, k.nama as kecamatan_nama, (SELECT COUNT(*) FROM warga WHERE desa_id = d.id) as calculated_pop " +
+                         "FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id " +
+                         "WHERE d.kecamatan_id = (SELECT id FROM kecamatan WHERE nama = 'Siwalanpanji') ORDER BY d.nama";
             try (Connection conn = DatabaseUtil.getConnection();
                  Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {
@@ -443,8 +362,6 @@ public class WargaController implements Initializable, DataRefreshable {
     private void loadWargaData() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Warga> tempWarga = FXCollections.observableArrayList();
-
-            Kecamatan selectedKecamatan = filterKecamatanComboBox.getSelectionModel().getSelectedItem();
             Desa selectedDesa = filterDesaComboBox.getSelectionModel().getSelectedItem();
             String searchQuery = searchField != null ? searchField.getText() : null;
             boolean hasSearch = searchQuery != null && !searchQuery.trim().isEmpty();
@@ -453,34 +370,18 @@ public class WargaController implements Initializable, DataRefreshable {
                 "SELECT w.*, d.nama as desa_nama, k.nama as kecamatan_nama " +
                 "FROM warga w " +
                 "JOIN desa d ON w.desa_id = d.id " +
-                "JOIN kecamatan k ON d.kecamatan_id = k.id"
+                "JOIN kecamatan k ON d.kecamatan_id = k.id " +
+                "WHERE d.kecamatan_id = (SELECT id FROM kecamatan WHERE nama = 'Siwalanpanji')"
             );
             List<Object> params = new ArrayList<>();
 
-            boolean hasFilters = selectedKecamatan != null || selectedDesa != null;
+            if (selectedDesa != null) {
+                sql.append(" AND w.desa_id = ?");
+                params.add(selectedDesa.getId());
+            }
 
-            if (hasFilters) {
-                sql.append(" WHERE");
-                if (selectedKecamatan != null) {
-                    sql.append(" d.kecamatan_id = ?");
-                    params.add(selectedKecamatan.getId());
-                    if (selectedDesa != null) {
-                        sql.append(" AND w.desa_id = ?");
-                        params.add(selectedDesa.getId());
-                    }
-                } else {
-                    sql.append(" w.desa_id = ?");
-                    params.add(selectedDesa.getId());
-                }
-
-                if (hasSearch) {
-                    sql.append(" AND (w.nik LIKE ? OR LOWER(w.nama) LIKE LOWER(?))");
-                    String likeQuery = "%" + searchQuery.trim() + "%";
-                    params.add(likeQuery);
-                    params.add(likeQuery);
-                }
-            } else if (hasSearch) {
-                sql.append(" WHERE (w.nik LIKE ? OR LOWER(w.nama) LIKE LOWER(?))");
+            if (hasSearch) {
+                sql.append(" AND (w.nik LIKE ? OR LOWER(w.nama) LIKE LOWER(?))");
                 String likeQuery = "%" + searchQuery.trim() + "%";
                 params.add(likeQuery);
                 params.add(likeQuery);
@@ -682,7 +583,6 @@ public class WargaController implements Initializable, DataRefreshable {
     }
 
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }
-    @FXML private void goToKecamatan() throws IOException { App.setRoot("kecamatan", 1200, 800, true); }
     @FXML private void goToDesa() throws IOException { App.setRoot("desa", 1200, 800, true); }
     @FXML private void goToLaporan() throws IOException { App.setRoot("laporan", 1200, 800, true); }
     @FXML private void goToProfil() throws IOException { App.setRoot("profil", 1200, 800, true); }

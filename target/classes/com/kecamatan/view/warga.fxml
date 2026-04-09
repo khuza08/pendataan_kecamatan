@@ -18,7 +18,6 @@
             </padding>
             <Text text="MENU" styleClass="sidebar-title"/>
             <Button fx:id="btnDashboard" text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button fx:id="btnKecamatan" text="Data Kecamatan" onAction="#goToKecamatan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnDesa" text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnWarga" text="Data Warga" maxWidth="Infinity" styleClass="sidebar-button-active"/>
             <Button fx:id="btnLaporan" text="Statistik" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
@@ -45,8 +44,6 @@
             <HBox alignment="CENTER_LEFT" spacing="15">
                 <Label text="Data Warga / Penduduk" styleClass="title-text"/>
                 <TextField fx:id="searchField" promptText="Cari NIK atau Nama..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
-                <Label text="Kecamatan:" styleClass="filter-label"/>
-                <ComboBox fx:id="filterKecamatanComboBox" prefWidth="180" styleClass="filter-combobox" promptText="Semua Kecamatan"/>
                 <Label text="Desa:" styleClass="filter-label"/>
                 <ComboBox fx:id="filterDesaComboBox" prefWidth="180" styleClass="filter-combobox" promptText="Semua Desa"/>
                 <Button onAction="#handleResetFilter" styleClass="reset-filter-button" text="Reset">

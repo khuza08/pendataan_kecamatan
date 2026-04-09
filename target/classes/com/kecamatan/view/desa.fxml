@@ -16,7 +16,6 @@
             </padding>
             <Text text="MENU" styleClass="sidebar-title"/>
             <Button fx:id="btnDashboard" text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button fx:id="btnKecamatan" text="Data Kecamatan" onAction="#goToKecamatan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnDesa" text="Data Desa" maxWidth="Infinity" styleClass="sidebar-button-active"/>
             <Button fx:id="btnWarga" text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnLaporan" text="Statistik" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
@@ -42,13 +41,6 @@
             <HBox alignment="CENTER_LEFT" spacing="15">
                 <Label text="Data Desa / Kelurahan" styleClass="title-text"/>
                 <TextField fx:id="searchField" promptText="Cari Nama Desa..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
-                <Label text="Kecamatan:" styleClass="filter-label"/>
-                <ComboBox fx:id="filterKecamatanComboBox" prefWidth="200" styleClass="filter-combobox" promptText="Semua Kecamatan"/>
-                <Button onAction="#handleResetFilter" styleClass="reset-filter-button" text="Reset">
-                    <tooltip>
-                        <Tooltip text="Reset Filter"/>
-                    </tooltip>
-                </Button>
             </HBox>
 
             <HBox spacing="20" VBox.vgrow="ALWAYS">
@@ -70,10 +62,10 @@
                     <Text text="Form Data Desa" styleClass="card-title"/>
                     
                     <VBox spacing="5">
-                        <Label text="Pilih Kecamatan" styleClass="input-label"/>
-                        <ComboBox fx:id="kecamatanComboBox" maxWidth="Infinity" promptText="Pilih Kecamatan" styleClass="input-field"/>
+                        <Label text="Kecamatan" styleClass="input-label"/>
+                        <TextField fx:id="kecamatanField" editable="false" text="Siwalanpanji" styleClass="input-field"/>
                     </VBox>
-                    
+
                     <VBox spacing="5">
                         <Label text="Nama Desa" styleClass="input-label"/>
                         <TextField fx:id="namaField" styleClass="input-field"/>

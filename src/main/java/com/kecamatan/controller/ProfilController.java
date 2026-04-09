@@ -33,7 +33,6 @@ public class ProfilController implements Initializable {
     @FXML private TextField rtrwField;
     @FXML private TextArea alamatArea;
 
-    @FXML private Button btnKecamatan;
     @FXML private Button btnDesa;
     @FXML private Button btnWarga;
     @FXML private Button btnDashboard;
@@ -49,7 +48,7 @@ public class ProfilController implements Initializable {
 
     private void applyRBAC() {
         RBACUtil.applyRBAC(userNameLabel, userRoleLabel, 
-            btnKecamatan, btnDesa, btnWarga, btnLaporan, btnDashboard);
+            btnDesa, btnWarga, btnLaporan, btnDashboard);
     }
 
     private void loadProfileData() {
@@ -83,7 +82,6 @@ public class ProfilController implements Initializable {
     }
 
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }
-    @FXML private void goToKecamatan() throws IOException { App.setRoot("kecamatan", 1200, 800, true); }
     @FXML private void goToDesa() throws IOException { App.setRoot("desa", 1200, 800, true); }
     @FXML private void goToWarga() throws IOException { App.setRoot("warga", 1200, 800, true); }
     @FXML private void goToLaporan() throws IOException { App.setRoot("laporan", 1200, 800, true); }
