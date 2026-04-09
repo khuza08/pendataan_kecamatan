@@ -296,8 +296,6 @@ public class WargaController implements Initializable, DataRefreshable {
     @FXML
     private void handleResetFilter() {
         filterDesaComboBox.getSelectionModel().clearSelection();
-        filterDesaComboBox.getItems().clear();
-        filterDesaList.clear();
         loadWargaData();
     }
 
@@ -367,6 +365,8 @@ public class WargaController implements Initializable, DataRefreshable {
                 javafx.application.Platform.runLater(() -> {
                     desaList.setAll(tempDesa);
                     desaComboBox.setItems(desaList);
+                    filterDesaList.setAll(tempDesa);
+                    filterDesaComboBox.setItems(filterDesaList);
                 });
             } catch (SQLException e) {
                 e.printStackTrace();
