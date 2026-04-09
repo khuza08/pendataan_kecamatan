@@ -2,6 +2,7 @@ com/kecamatan/controller/WargaController$4.class
 com/kecamatan/util/DatabaseUtil.class
 com/kecamatan/util/ThreadManager.class
 com/kecamatan/controller/WargaController.class
+com/kecamatan/controller/DesaController$2.class
 com/kecamatan/controller/WargaController$2.class
 com/kecamatan/util/UIUtil.class
 com/kecamatan/controller/DashboardController.class

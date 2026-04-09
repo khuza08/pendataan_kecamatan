@@ -20,6 +20,7 @@ import java.util.ResourceBundle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.kecamatan.util.DataRefreshable;
 import com.kecamatan.util.RBACUtil;
@@ -53,8 +54,12 @@ public class DesaController implements Initializable, DataRefreshable {
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
 
+    @FXML private ComboBox<Kecamatan> filterKecamatanComboBox;
+    @FXML private TextField searchField;
+
     private ObservableList<Desa> desaList = FXCollections.observableArrayList();
     private ObservableList<Kecamatan> kecamatanList = FXCollections.observableArrayList();
+    private ObservableList<Kecamatan> filterKecamatanList = FXCollections.observableArrayList();
     private int selectedId = -1;
 
     @Override
@@ -67,14 +72,16 @@ public class DesaController implements Initializable, DataRefreshable {
         colRW.setCellValueFactory(cellData -> cellData.getValue().jumlahRwProperty().asObject());
 
         setupComboBox();
+        setupFilterComboBox();
         loadKecamatan();
+        loadFilterKecamatan();
         loadDesa();
 
         desaTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
                 selectedId = newSel.getId();
                 namaField.setText(newSel.getNama());
-                
+
                 for (Kecamatan k : kecamatanList) {
                     if (k.getId() == newSel.getKecamatanId()) {
                         kecamatanComboBox.getSelectionModel().select(k);
@@ -84,6 +91,10 @@ public class DesaController implements Initializable, DataRefreshable {
 
                 loadRTRWDetails(selectedId);
             }
+        });
+
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            loadDesa();
         });
     }
 
@@ -226,6 +237,62 @@ public class DesaController implements Initializable, DataRefreshable {
         });
     }
 
+    private void setupFilterComboBox() {
+        filterKecamatanComboBox.setConverter(new StringConverter<Kecamatan>() {
+            @Override
+            public String toString(Kecamatan k) {
+                return k == null ? "" : k.getNama();
+            }
+
+            @Override
+            public Kecamatan fromString(String string) {
+                return null;
+            }
+        });
+
+        filterKecamatanComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            loadDesa();
+        });
+    }
+
+    private void loadFilterKecamatan() {
+        com.kecamatan.util.ThreadManager.execute(() -> {
+            ObservableList<Kecamatan> tempKec = FXCollections.observableArrayList();
+            String sql = "SELECT k.*, " +
+                         "(SELECT COUNT(*) FROM desa WHERE kecamatan_id = k.id) as calculated_desa_count, " +
+                         "(SELECT COUNT(*) FROM warga w JOIN desa d ON w.desa_id = d.id WHERE d.kecamatan_id = k.id) as calculated_pop " +
+                         "FROM kecamatan k ORDER BY k.nama";
+            try (Connection conn = DatabaseUtil.getConnection();
+                 Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+                while (rs.next()) {
+                    tempKec.add(new Kecamatan(
+                        rs.getInt("id"),
+                        rs.getString("kode"),
+                        rs.getString("nama"),
+                        rs.getInt("calculated_desa_count"),
+                        rs.getInt("calculated_pop")
+                    ));
+                }
+                javafx.application.Platform.runLater(() -> {
+                    filterKecamatanList.setAll(tempKec);
+                    filterKecamatanComboBox.setItems(filterKecamatanList);
+                });
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @FXML
+    private void handleResetFilter() {
+        filterKecamatanComboBox.getSelectionModel().clearSelection();
+        filterKecamatanList.clear();
+        loadKecamatan();
+        loadFilterKecamatan();
+        loadDesa();
+    }
+
     private void loadKecamatan() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Kecamatan> tempKec = FXCollections.observableArrayList();
@@ -258,10 +325,38 @@ public class DesaController implements Initializable, DataRefreshable {
     private void loadDesa() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Desa> tempDesa = FXCollections.observableArrayList();
-            String sql = "SELECT d.*, k.nama as kecamatan_nama, (SELECT COUNT(*) FROM warga WHERE desa_id = d.id) as calculated_pop FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id ORDER BY d.nama";
+
+            Kecamatan selectedKecamatan = filterKecamatanComboBox.getSelectionModel().getSelectedItem();
+            String searchQuery = searchField != null ? searchField.getText() : null;
+            boolean hasSearch = searchQuery != null && !searchQuery.trim().isEmpty();
+
+            StringBuilder sql = new StringBuilder(
+                "SELECT d.*, k.nama as kecamatan_nama, (SELECT COUNT(*) FROM warga WHERE desa_id = d.id) as calculated_pop " +
+                "FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id"
+            );
+            List<Object> params = new ArrayList<>();
+
+            if (selectedKecamatan != null) {
+                sql.append(" WHERE d.kecamatan_id = ?");
+                params.add(selectedKecamatan.getId());
+
+                if (hasSearch) {
+                    sql.append(" AND LOWER(d.nama) LIKE LOWER(?)");
+                    params.add("%" + searchQuery.trim() + "%");
+                }
+            } else if (hasSearch) {
+                sql.append(" WHERE LOWER(d.nama) LIKE LOWER(?)");
+                params.add("%" + searchQuery.trim() + "%");
+            }
+
+            sql.append(" ORDER BY d.nama");
+
             try (Connection conn = DatabaseUtil.getConnection();
-                 Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(sql)) {
+                 PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+                for (int i = 0; i < params.size(); i++) {
+                    pstmt.setObject(i + 1, params.get(i));
+                }
+                ResultSet rs = pstmt.executeQuery();
                 while (rs.next()) {
                     tempDesa.add(new Desa(
                         rs.getInt("id"),

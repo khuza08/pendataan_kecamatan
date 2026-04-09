@@ -75,6 +75,7 @@ public class WargaController implements Initializable, DataRefreshable {
 
     @FXML private ComboBox<Kecamatan> filterKecamatanComboBox;
     @FXML private ComboBox<Desa> filterDesaComboBox;
+    @FXML private TextField searchField;
 
     private ObservableList<Warga> wargaList = FXCollections.observableArrayList();
     private ObservableList<Desa> desaList = FXCollections.observableArrayList();
@@ -196,6 +197,11 @@ public class WargaController implements Initializable, DataRefreshable {
                     }
                 });
             });
+        });
+
+        // Real-time search listener
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            loadWargaData();
         });
     }
 
@@ -420,6 +426,8 @@ public class WargaController implements Initializable, DataRefreshable {
 
             Kecamatan selectedKecamatan = filterKecamatanComboBox.getSelectionModel().getSelectedItem();
             Desa selectedDesa = filterDesaComboBox.getSelectionModel().getSelectedItem();
+            String searchQuery = searchField != null ? searchField.getText() : null;
+            boolean hasSearch = searchQuery != null && !searchQuery.trim().isEmpty();
 
             StringBuilder sql = new StringBuilder(
                 "SELECT w.*, d.nama as desa_nama, k.nama as kecamatan_nama " +
@@ -429,16 +437,33 @@ public class WargaController implements Initializable, DataRefreshable {
             );
             List<Object> params = new ArrayList<>();
 
-            if (selectedKecamatan != null) {
-                sql.append(" WHERE d.kecamatan_id = ?");
-                params.add(selectedKecamatan.getId());
-                if (selectedDesa != null) {
-                    sql.append(" AND w.desa_id = ?");
+            boolean hasFilters = selectedKecamatan != null || selectedDesa != null;
+
+            if (hasFilters) {
+                sql.append(" WHERE");
+                if (selectedKecamatan != null) {
+                    sql.append(" d.kecamatan_id = ?");
+                    params.add(selectedKecamatan.getId());
+                    if (selectedDesa != null) {
+                        sql.append(" AND w.desa_id = ?");
+                        params.add(selectedDesa.getId());
+                    }
+                } else {
+                    sql.append(" w.desa_id = ?");
                     params.add(selectedDesa.getId());
                 }
-            } else if (selectedDesa != null) {
-                sql.append(" WHERE w.desa_id = ?");
-                params.add(selectedDesa.getId());
+
+                if (hasSearch) {
+                    sql.append(" AND (w.nik LIKE ? OR LOWER(w.nama) LIKE LOWER(?))");
+                    String likeQuery = "%" + searchQuery.trim() + "%";
+                    params.add(likeQuery);
+                    params.add(likeQuery);
+                }
+            } else if (hasSearch) {
+                sql.append(" WHERE (w.nik LIKE ? OR LOWER(w.nama) LIKE LOWER(?))");
+                String likeQuery = "%" + searchQuery.trim() + "%";
+                params.add(likeQuery);
+                params.add(likeQuery);
             }
 
             sql.append(" ORDER BY w.nama");

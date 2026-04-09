@@ -44,7 +44,7 @@
 
             <HBox alignment="CENTER_LEFT" spacing="15">
                 <Label text="Data Warga / Penduduk" styleClass="title-text"/>
-                <Region HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="searchField" promptText="Cari NIK atau Nama..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
                 <Label text="Kecamatan:" styleClass="filter-label"/>
                 <ComboBox fx:id="filterKecamatanComboBox" prefWidth="180" styleClass="filter-combobox" promptText="Semua Kecamatan"/>
                 <Label text="Desa:" styleClass="filter-label"/>
