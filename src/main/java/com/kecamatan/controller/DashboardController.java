@@ -1,7 +1,12 @@
 package com.kecamatan.controller;
 
 import com.kecamatan.App;
+import com.kecamatan.model.Warga;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 import java.io.IOException;
@@ -47,10 +52,29 @@ public class DashboardController implements Initializable, DataRefreshable {
     @FXML private VBox wargaContent;
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
+ 
+    @FXML private TableView<Warga> dashboardWargaTable;
+    @FXML private TableColumn<Warga, String> colNik;
+    @FXML private TableColumn<Warga, String> colNama;
+    @FXML private TableColumn<Warga, String> colDesa;
+    @FXML private TableColumn<Warga, String> colKecamatan;
+    @FXML private TableColumn<Warga, String> colJenkel;
+ 
+    private ObservableList<Warga> dashboardWargaList = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         applyRBAC();
+        
+        // Initialize table columns
+        if (colNik != null) {
+            colNik.setCellValueFactory(cellData -> cellData.getValue().nikProperty());
+            colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
+            colDesa.setCellValueFactory(cellData -> cellData.getValue().desaNamaProperty());
+            colKecamatan.setCellValueFactory(cellData -> cellData.getValue().kecamatanNamaProperty());
+            colJenkel.setCellValueFactory(cellData -> cellData.getValue().jenisKelaminProperty());
+        }
+        
         refreshData();
     }
 
@@ -130,6 +154,32 @@ public class DashboardController implements Initializable, DataRefreshable {
                         series.getData().add(new XYChart.Data<>(rs.getString("nama"), rs.getInt("calculated_pop")));
                     }
                 }
+ 
+                // 7. Recent Warga Table
+                ObservableList<Warga> recentWarga = FXCollections.observableArrayList();
+                String recentSql = "SELECT w.*, d.nama as desa_nama, k.nama as kecamatan_nama " +
+                                  "FROM warga w " +
+                                  "JOIN desa d ON w.desa_id = d.id " +
+                                  "JOIN kecamatan k ON d.kecamatan_id = k.id " +
+                                  "ORDER BY w.id DESC LIMIT 10";
+                try (Statement stmt = conn.createStatement();
+                     ResultSet rs = stmt.executeQuery(recentSql)) {
+                    while (rs.next()) {
+                        recentWarga.add(new Warga(
+                            rs.getInt("id"),
+                            rs.getString("nik"),
+                            rs.getString("nama"),
+                            rs.getString("alamat"),
+                            rs.getString("jenis_kelamin"),
+                            rs.getInt("desa_id"),
+                            rs.getString("desa_nama"),
+                            rs.getString("kecamatan_nama"),
+                            rs.getString("rt"),
+                            rs.getString("rw"),
+                            rs.getString("tanggal_lahir") != null ? java.time.LocalDate.parse(rs.getString("tanggal_lahir"), java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")) : null
+                        ));
+                    }
+                }
 
                 // UI Updates
                 final int fw = totalWarga, fm = male, ff = female, frt = totalRT, frw = totalRW, fk = totalKec, fd = totalDesa;
@@ -140,6 +190,11 @@ public class DashboardController implements Initializable, DataRefreshable {
                     rtrwText.setText(String.format("%d / %d", frt, frw));
                     totalKecamatanText.setText(String.valueOf(fk));
                     totalDesaText.setText(String.valueOf(fd));
+                    
+                    if (dashboardWargaTable != null) {
+                        dashboardWargaList.setAll(recentWarga);
+                        dashboardWargaTable.setItems(dashboardWargaList);
+                    }
                     
                     wargaChart.getData().clear();
                     wargaChart.getData().add(series);

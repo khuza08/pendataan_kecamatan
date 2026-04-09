@@ -104,6 +104,23 @@
                         <Label text="• Report exported to PDF" styleClass="activity-item"/>
                     </VBox>
                 </HBox>
+
+                <!-- NEW: Recent Citizens Table -->
+                <VBox spacing="10" styleClass="card" VBox.vgrow="ALWAYS">
+                    <Text text="Daftar Warga Terbaru" styleClass="card-title"/>
+                    <TableView fx:id="dashboardWargaTable" prefHeight="250">
+                        <columns>
+                            <TableColumn fx:id="colNik" text="NIK" prefWidth="150"/>
+                            <TableColumn fx:id="colNama" text="Nama Lengkap" prefWidth="250"/>
+                            <TableColumn fx:id="colDesa" text="Desa" prefWidth="150"/>
+                            <TableColumn fx:id="colKecamatan" text="Kecamatan" prefWidth="150"/>
+                            <TableColumn fx:id="colJenkel" text="L/P" prefWidth="60"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="Tidak ada data warga terbaru."/>
+                        </placeholder>
+                    </TableView>
+                </VBox>
             </VBox>
 
             <!-- Warga Only Content -->

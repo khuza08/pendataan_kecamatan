@@ -47,6 +47,7 @@ public class WargaController implements Initializable, DataRefreshable {
     @FXML private TableColumn<Warga, String> colJenkel;
     @FXML private TableColumn<Warga, LocalDate> colTglLahir;
     @FXML private TableColumn<Warga, String> colDesa;
+    @FXML private TableColumn<Warga, String> colKecamatan;
     @FXML private TableColumn<Warga, String> colRW;
     @FXML private TableColumn<Warga, String> colRT;
     @FXML private TableColumn<Warga, String> colAlamat;
@@ -81,6 +82,7 @@ public class WargaController implements Initializable, DataRefreshable {
         colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
         colJenkel.setCellValueFactory(cellData -> cellData.getValue().jenisKelaminProperty());
         colDesa.setCellValueFactory(cellData -> cellData.getValue().desaNamaProperty());
+        colKecamatan.setCellValueFactory(cellData -> cellData.getValue().kecamatanNamaProperty());
         colRW.setCellValueFactory(cellData -> cellData.getValue().rwProperty());
         colRT.setCellValueFactory(cellData -> cellData.getValue().rtProperty());
         colTglLahir.setCellValueFactory(cellData -> cellData.getValue().tanggalLahirProperty());
@@ -303,7 +305,11 @@ public class WargaController implements Initializable, DataRefreshable {
     private void loadWargaData() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Warga> tempWarga = FXCollections.observableArrayList();
-            String sql = "SELECT w.*, d.nama as desa_nama FROM warga w JOIN desa d ON w.desa_id = d.id ORDER BY w.nama";
+            String sql = "SELECT w.*, d.nama as desa_nama, k.nama as kecamatan_nama " +
+                         "FROM warga w " +
+                         "JOIN desa d ON w.desa_id = d.id " +
+                         "JOIN kecamatan k ON d.kecamatan_id = k.id " +
+                         "ORDER BY w.nama";
             try (Connection conn = DatabaseUtil.getConnection();
                  Statement stmt = conn.createStatement();
                  ResultSet rs = stmt.executeQuery(sql)) {
@@ -316,6 +322,7 @@ public class WargaController implements Initializable, DataRefreshable {
                         rs.getString("jenis_kelamin"),
                         rs.getInt("desa_id"),
                         rs.getString("desa_nama"),
+                        rs.getString("kecamatan_nama"),
                         rs.getString("rt"),
                         rs.getString("rw"),
                         rs.getString("tanggal_lahir") != null && !rs.getString("tanggal_lahir").isEmpty() ? 

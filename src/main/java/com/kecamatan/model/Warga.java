@@ -13,18 +13,20 @@ public class Warga {
     private final SimpleStringProperty jenisKelamin;
     private final SimpleIntegerProperty desaId;
     private final SimpleStringProperty desaNama;
+    private final SimpleStringProperty kecamatanNama;
     private final SimpleStringProperty rt;
     private final SimpleStringProperty rw;
     private final SimpleObjectProperty<LocalDate> tanggalLahir;
 
-    public Warga(int id, String nik, String nama, String alamat, String jenisKelamin, int desaId, String desaNama, String rt, String rw, LocalDate tanggalLahir) {
+    public Warga(int id, String nik, String nama, String alamat, String jenis_kelamin, int desaId, String desaNama, String kecamatanNama, String rt, String rw, LocalDate tanggalLahir) {
         this.id = new SimpleIntegerProperty(id);
         this.nik = new SimpleStringProperty(nik);
         this.nama = new SimpleStringProperty(nama);
         this.alamat = new SimpleStringProperty(alamat);
-        this.jenisKelamin = new SimpleStringProperty(jenisKelamin);
+        this.jenisKelamin = new SimpleStringProperty(jenis_kelamin);
         this.desaId = new SimpleIntegerProperty(desaId);
         this.desaNama = new SimpleStringProperty(desaNama);
+        this.kecamatanNama = new SimpleStringProperty(kecamatanNama);
         this.rt = new SimpleStringProperty(rt);
         this.rw = new SimpleStringProperty(rw);
         this.tanggalLahir = new SimpleObjectProperty<>(tanggalLahir);
@@ -50,6 +52,9 @@ public class Warga {
 
     public String getDesaNama() { return desaNama.get(); }
     public SimpleStringProperty desaNamaProperty() { return desaNama; }
+
+    public String getKecamatanNama() { return kecamatanNama.get(); }
+    public SimpleStringProperty kecamatanNamaProperty() { return kecamatanNama; }
 
     public String getRt() { return rt.get(); }
     public SimpleStringProperty rtProperty() { return rt; }

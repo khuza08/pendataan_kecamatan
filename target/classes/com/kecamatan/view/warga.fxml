@@ -49,6 +49,7 @@
             <HBox spacing="20" VBox.vgrow="ALWAYS">
                 <!-- Data Table -->
                 <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="card">
+                    <Text text="Tabel Data Warga" styleClass="card-title"/>
                     <TableView fx:id="wargaTable" VBox.vgrow="ALWAYS">
                         <columns>
                             <TableColumn fx:id="colNik" text="NIK" prefWidth="140"/>
@@ -56,6 +57,7 @@
                             <TableColumn fx:id="colJenkel" text="L/P" prefWidth="40"/>
                             <TableColumn fx:id="colTglLahir" text="Tgl Lahir" prefWidth="100"/>
                             <TableColumn fx:id="colDesa" text="Desa" prefWidth="110"/>
+                            <TableColumn fx:id="colKecamatan" text="Kecamatan" prefWidth="120"/>
                             <TableColumn fx:id="colRW" text="RW" prefWidth="40"/>
                             <TableColumn fx:id="colRT" text="RT" prefWidth="40"/>
                             <TableColumn fx:id="colAlamat" text="Alamat" prefWidth="180"/>
