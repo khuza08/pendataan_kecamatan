@@ -24,7 +24,12 @@ public class ProfilController implements Initializable {
     @FXML private TextField namaField;
     @FXML private TextField jenkelField;
     @FXML private TextField tglLahirField;
+    @FXML private TextField agamaField;
+    @FXML private TextField statusKawinField;
+    @FXML private TextField pekerjaanField;
+    @FXML private TextField noHpField;
     @FXML private TextField desaField;
+    @FXML private TextField kecamatanField;
     @FXML private TextField rtrwField;
     @FXML private TextArea alamatArea;
 
@@ -48,19 +53,28 @@ public class ProfilController implements Initializable {
     }
 
     private void loadProfileData() {
-        String sql = "SELECT w.*, d.nama as desa_nama FROM warga w JOIN desa d ON w.desa_id = d.id WHERE w.nik = ?";
+        String sql = "SELECT w.*, d.nama as desa_nama, k.nama as kecamatan_nama " +
+                     "FROM warga w JOIN desa d ON w.desa_id = d.id JOIN kecamatan k ON d.kecamatan_id = k.id " +
+                     "WHERE w.nik = ?";
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, UserSession.getNik());
             ResultSet rs = pstmt.executeQuery();
-            
+
             if (rs.next()) {
                 nikField.setText(rs.getString("nik"));
                 namaField.setText(rs.getString("nama"));
                 jenkelField.setText(rs.getString("jenis_kelamin"));
                 tglLahirField.setText(rs.getString("tanggal_lahir"));
+                agamaField.setText(rs.getString("agama"));
+                statusKawinField.setText(rs.getString("status_kawin"));
+                pekerjaanField.setText(rs.getString("pekerjaan"));
+                noHpField.setText(rs.getString("no_hp"));
                 desaField.setText(rs.getString("desa_nama"));
-                rtrwField.setText(rs.getString("rt") + " / " + rs.getString("rw"));
+                kecamatanField.setText(rs.getString("kecamatan_nama"));
+                String rt = rs.getString("rt");
+                String rw = rs.getString("rw");
+                rtrwField.setText((rt != null ? rt : "-") + " / " + (rw != null ? rw : "-"));
                 alamatArea.setText(rs.getString("alamat"));
             }
         } catch (SQLException e) {
