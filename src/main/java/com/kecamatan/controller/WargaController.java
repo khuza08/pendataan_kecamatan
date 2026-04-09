@@ -167,15 +167,21 @@ public class WargaController implements Initializable, DataRefreshable {
             }
         });
 
-        // Real-time NIK length & uniqueness validation
+        // Real-time NIK input filter: digits only
         nikField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.matches("\\d*")) {
+                nikField.setText(oldVal);
+                nikField.positionCaret(nikField.getCaretPosition() - 1);
+                return;
+            }
+
             if (newVal == null || newVal.isEmpty()) {
                 com.kecamatan.util.UIUtil.setErrorStyle(nikField, false);
                 return;
             }
 
             // 1. Format check (must be 16 digits)
-            boolean formatInvalid = newVal.length() != 16 || !newVal.matches("\\d+");
+            boolean formatInvalid = newVal.length() != 16;
             if (formatInvalid) {
                 com.kecamatan.util.UIUtil.setErrorStyle(nikField, true);
                 return;
@@ -212,6 +218,14 @@ public class WargaController implements Initializable, DataRefreshable {
             loadWargaData();
         });
 
+        // Real-time Nama input filter: letters and spaces only
+        namaField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.matches("[a-zA-Z\\s]*")) {
+                namaField.setText(oldVal);
+                namaField.positionCaret(namaField.getCaretPosition() - 1);
+            }
+        });
+
         // Real-time No HP validation: digits, hyphens, plus only; min 10, max 13
         noHpField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.isEmpty() && !newVal.matches("[\\d+\\-]+")) {
@@ -227,6 +241,7 @@ public class WargaController implements Initializable, DataRefreshable {
     }
 
     private void setupDatePicker() {
+        tglLahirPicker.setEditable(false);
         tglLahirPicker.setConverter(new StringConverter<LocalDate>() {
             @Override
             public String toString(LocalDate date) {
