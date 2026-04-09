@@ -42,6 +42,7 @@ public class KecamatanController implements Initializable, DataRefreshable {
     @FXML private Button btnProfil;
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
+    @FXML private TextField searchField;
 
     private ObservableList<Kecamatan> kecamatanList = FXCollections.observableArrayList();
     private int selectedId = -1;
@@ -63,6 +64,10 @@ public class KecamatanController implements Initializable, DataRefreshable {
                 namaField.setText(newSel.getNama());
             }
         });
+
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> {
+            loadData();
+        });
     }
 
     private void applyRBAC() {
@@ -73,13 +78,29 @@ public class KecamatanController implements Initializable, DataRefreshable {
     private void loadData() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Kecamatan> tempData = FXCollections.observableArrayList();
-            String sql = "SELECT k.*, " +
-                         "(SELECT COUNT(*) FROM desa WHERE kecamatan_id = k.id) as calculated_desa_count, " +
-                         "(SELECT COUNT(*) FROM warga w JOIN desa d ON w.desa_id = d.id WHERE d.kecamatan_id = k.id) as calculated_pop " +
-                         "FROM kecamatan k ORDER BY k.kode";
+            String searchQuery = searchField != null ? searchField.getText() : null;
+            boolean hasSearch = searchQuery != null && !searchQuery.trim().isEmpty();
+
+            StringBuilder sql = new StringBuilder(
+                "SELECT k.*, " +
+                "(SELECT COUNT(*) FROM desa WHERE kecamatan_id = k.id) as calculated_desa_count, " +
+                "(SELECT COUNT(*) FROM warga w JOIN desa d ON w.desa_id = d.id WHERE d.kecamatan_id = k.id) as calculated_pop " +
+                "FROM kecamatan k"
+            );
+
+            if (hasSearch) {
+                sql.append(" WHERE LOWER(k.kode) LIKE LOWER(?) OR LOWER(k.nama) LIKE LOWER(?)");
+            }
+            sql.append(" ORDER BY k.kode");
+
             try (Connection conn = DatabaseUtil.getConnection();
-                 Statement stmt = conn.createStatement();
-                 ResultSet rs = stmt.executeQuery(sql)) {
+                 PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+                if (hasSearch) {
+                    String likeQuery = "%" + searchQuery.trim() + "%";
+                    pstmt.setString(1, likeQuery);
+                    pstmt.setString(2, likeQuery);
+                }
+                ResultSet rs = pstmt.executeQuery();
                 while (rs.next()) {
                     tempData.add(new Kecamatan(
                         rs.getInt("id"),
@@ -89,7 +110,7 @@ public class KecamatanController implements Initializable, DataRefreshable {
                         rs.getInt("calculated_pop")
                     ));
                 }
-                
+
                 javafx.application.Platform.runLater(() -> {
                     kecamatanList.setAll(tempData);
                     kecamatanTable.setItems(kecamatanList);

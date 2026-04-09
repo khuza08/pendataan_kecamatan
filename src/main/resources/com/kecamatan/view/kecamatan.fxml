@@ -39,8 +39,9 @@
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
             
-            <HBox alignment="CENTER_LEFT" spacing="10">
+            <HBox alignment="CENTER_LEFT" spacing="15">
                 <Label text="Data Kecamatan" styleClass="title-text"/>
+                <TextField fx:id="searchField" promptText="Cari Kode atau Nama..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
             </HBox>
 
             <HBox spacing="20" VBox.vgrow="ALWAYS">
