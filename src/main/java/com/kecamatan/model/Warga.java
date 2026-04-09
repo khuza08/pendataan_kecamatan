@@ -11,6 +11,10 @@ public class Warga {
     private final SimpleStringProperty nama;
     private final SimpleStringProperty alamat;
     private final SimpleStringProperty jenisKelamin;
+    private final SimpleStringProperty agama;
+    private final SimpleStringProperty statusKawin;
+    private final SimpleStringProperty pekerjaan;
+    private final SimpleStringProperty noHp;
     private final SimpleIntegerProperty desaId;
     private final SimpleStringProperty desaNama;
     private final SimpleStringProperty kecamatanNama;
@@ -18,12 +22,16 @@ public class Warga {
     private final SimpleStringProperty rw;
     private final SimpleObjectProperty<LocalDate> tanggalLahir;
 
-    public Warga(int id, String nik, String nama, String alamat, String jenis_kelamin, int desaId, String desaNama, String kecamatanNama, String rt, String rw, LocalDate tanggalLahir) {
+    public Warga(int id, String nik, String nama, String alamat, String jenis_kelamin, String agama, String status_kawin, String pekerjaan, String no_hp, int desaId, String desaNama, String kecamatanNama, String rt, String rw, LocalDate tanggalLahir) {
         this.id = new SimpleIntegerProperty(id);
         this.nik = new SimpleStringProperty(nik);
         this.nama = new SimpleStringProperty(nama);
         this.alamat = new SimpleStringProperty(alamat);
         this.jenisKelamin = new SimpleStringProperty(jenis_kelamin);
+        this.agama = new SimpleStringProperty(agama);
+        this.statusKawin = new SimpleStringProperty(status_kawin);
+        this.pekerjaan = new SimpleStringProperty(pekerjaan);
+        this.noHp = new SimpleStringProperty(no_hp);
         this.desaId = new SimpleIntegerProperty(desaId);
         this.desaNama = new SimpleStringProperty(desaNama);
         this.kecamatanNama = new SimpleStringProperty(kecamatanNama);
@@ -46,6 +54,18 @@ public class Warga {
 
     public String getJenisKelamin() { return jenisKelamin.get(); }
     public SimpleStringProperty jenisKelaminProperty() { return jenisKelamin; }
+
+    public String getAgama() { return agama.get(); }
+    public SimpleStringProperty agamaProperty() { return agama; }
+
+    public String getStatusKawin() { return statusKawin.get(); }
+    public SimpleStringProperty statusKawinProperty() { return statusKawin; }
+
+    public String getPekerjaan() { return pekerjaan.get(); }
+    public SimpleStringProperty pekerjaanProperty() { return pekerjaan; }
+
+    public String getNoHp() { return noHp.get(); }
+    public SimpleStringProperty noHpProperty() { return noHp; }
 
     public int getDesaId() { return desaId.get(); }
     public SimpleIntegerProperty desaIdProperty() { return desaId; }

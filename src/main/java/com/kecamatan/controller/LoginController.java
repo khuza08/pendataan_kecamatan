@@ -29,14 +29,32 @@ public class LoginController {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        if (username.isEmpty() || password.isEmpty()) {
-            messageLabel.setText("Username and password are required.");
+        if (username.isEmpty()) {
+            messageLabel.setText("NIK atau Username diperlukan.");
             messageLabel.setStyle("-fx-text-fill: #2E261A;");
             return;
         }
 
         try (Connection conn = DatabaseUtil.getConnection()) {
-            // 1. Try Admin Login
+            // 1. If password is empty, try Warga-only login by NIK
+            if (password.isEmpty()) {
+                String wargaSql = "SELECT * FROM warga WHERE nik = ?";
+                try (PreparedStatement pstmt = conn.prepareStatement(wargaSql)) {
+                    pstmt.setString(1, username);
+                    ResultSet rs = pstmt.executeQuery();
+
+                    if (rs.next()) {
+                        com.kecamatan.util.UserSession.loginWarga(rs.getInt("id"), rs.getString("nama"), rs.getString("nik"));
+                        onLoginSuccess("WARGA");
+                        return;
+                    }
+                }
+                messageLabel.setText("NIK tidak ditemukan.");
+                messageLabel.setStyle("-fx-text-fill: #2E261A;");
+                return;
+            }
+
+            // 2. Both fields filled — try Admin Login
             String adminSql = "SELECT * FROM users WHERE username = ? AND password = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(adminSql)) {
                 pstmt.setString(1, username);
@@ -50,23 +68,9 @@ public class LoginController {
                 }
             }
 
-            // 2. Try Warga Login (Username = NIK, Password = Tgl Lahir dd-mm-yyyy)
-            String wargaSql = "SELECT * FROM warga WHERE nik = ? AND tanggal_lahir = ?";
-            try (PreparedStatement pstmt = conn.prepareStatement(wargaSql)) {
-                pstmt.setString(1, username);
-                pstmt.setString(2, password);
-                ResultSet rs = pstmt.executeQuery();
-
-                if (rs.next()) {
-                    com.kecamatan.util.UserSession.loginWarga(rs.getInt("id"), rs.getString("nama"), rs.getString("nik"));
-                    onLoginSuccess("WARGA");
-                    return;
-                }
-            }
-
-            messageLabel.setText("Invalid credentials.");
+            messageLabel.setText("Username atau password salah.");
             messageLabel.setStyle("-fx-text-fill: #2E261A;");
-            
+
         } catch (SQLException | IOException e) {
             messageLabel.setText("Database error: " + e.getMessage());
             messageLabel.setStyle("-fx-text-fill: #2E261A;");

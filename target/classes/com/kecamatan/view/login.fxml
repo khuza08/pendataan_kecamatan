@@ -40,13 +40,13 @@
 
         <VBox spacing="15.0" alignment="CENTER_LEFT">
             <VBox spacing="8.0">
-                <Label text="Username" styleClass="input-label"/>
-                <TextField fx:id="usernameField" promptText="Masukkan Username" styleClass="input-field"/>
+                <Label text="Username / NIK" styleClass="input-label"/>
+                <TextField fx:id="usernameField" promptText="Masukkan Username atau NIK" styleClass="input-field"/>
             </VBox>
 
             <VBox spacing="8.0">
-                <Label text="Password" styleClass="input-label"/>
-                <PasswordField fx:id="passwordField" promptText="Masukkan Password" styleClass="input-field"/>
+                <Label text="Password (Opsional)" styleClass="input-label"/>
+                <PasswordField fx:id="passwordField" promptText="Kosongkan jika Warga" styleClass="input-field"/>
             </VBox>
         </VBox>
 

@@ -67,13 +67,15 @@
                         <columns>
                             <TableColumn fx:id="colNik" text="NIK" prefWidth="140"/>
                             <TableColumn fx:id="colNama" text="Nama Lengkap" prefWidth="180"/>
-                            <TableColumn fx:id="colJenkel" text="L/P" prefWidth="80"/>
-                            <TableColumn fx:id="colTglLahir" text="Tgl Lahir" prefWidth="100"/>
-                            <TableColumn fx:id="colRW" text="RW" prefWidth="40"/>
-                            <TableColumn fx:id="colRT" text="RT" prefWidth="40"/>
-                            <TableColumn fx:id="colAlamat" text="Alamat" prefWidth="180"/>
-                            <TableColumn fx:id="colKecamatan" text="Kecamatan" prefWidth="120"/>
+                            <TableColumn fx:id="colJenkel" text="L/P" prefWidth="60"/>
+                            <TableColumn fx:id="colAgama" text="Agama" prefWidth="80"/>
+                            <TableColumn fx:id="colStatusKawin" text="Status Kawin" prefWidth="100"/>
+                            <TableColumn fx:id="colPekerjaan" text="Pekerjaan" prefWidth="120"/>
+                            <TableColumn fx:id="colNoHp" text="No HP" prefWidth="100"/>
+                            <TableColumn fx:id="colTglLahir" text="Tgl Lahir" prefWidth="90"/>
                             <TableColumn fx:id="colDesa" text="Desa" prefWidth="110"/>
+                            <TableColumn fx:id="colKecamatan" text="Kecamatan" prefWidth="120"/>
+                            <TableColumn fx:id="colAlamat" text="Alamat" prefWidth="150"/>
                         </columns>
                     </TableView>
                 </VBox>
@@ -112,6 +114,48 @@
                         <VBox spacing="5" HBox.hgrow="ALWAYS">
                             <Label text="Pilih Desa" styleClass="input-label"/>
                             <ComboBox fx:id="desaComboBox" maxWidth="Infinity" styleClass="input-field"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox spacing="10">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Agama" styleClass="input-label"/>
+                            <ComboBox fx:id="agamaComboBox" maxWidth="Infinity" styleClass="input-field">
+                                <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="Islam"/>
+                                        <String fx:value="Kristen"/>
+                                        <String fx:value="Katolik"/>
+                                        <String fx:value="Hindu"/>
+                                        <String fx:value="Buddha"/>
+                                        <String fx:value="Khonghucu"/>
+                                    </FXCollections>
+                                </items>
+                            </ComboBox>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Status Kawin" styleClass="input-label"/>
+                            <ComboBox fx:id="statusKawinComboBox" maxWidth="Infinity" styleClass="input-field">
+                                <items>
+                                    <FXCollections fx:factory="observableArrayList">
+                                        <String fx:value="Belum Kawin"/>
+                                        <String fx:value="Kawin"/>
+                                        <String fx:value="Cerai Hidup"/>
+                                        <String fx:value="Cerai Mati"/>
+                                    </FXCollections>
+                                </items>
+                            </ComboBox>
+                        </VBox>
+                    </HBox>
+
+                    <HBox spacing="10">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Pekerjaan" styleClass="input-label"/>
+                            <TextField fx:id="pekerjaanField" promptText="Masukkan Pekerjaan" styleClass="input-field"/>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="No HP" styleClass="input-label"/>
+                            <TextField fx:id="noHpField" promptText="Masukkan No HP" styleClass="input-field"/>
                         </VBox>
                     </HBox>
 

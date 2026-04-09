@@ -48,17 +48,23 @@ public class WargaController implements Initializable, DataRefreshable {
     @FXML private TableColumn<Warga, String> colNik;
     @FXML private TableColumn<Warga, String> colNama;
     @FXML private TableColumn<Warga, String> colJenkel;
+    @FXML private TableColumn<Warga, String> colAgama;
+    @FXML private TableColumn<Warga, String> colStatusKawin;
+    @FXML private TableColumn<Warga, String> colPekerjaan;
+    @FXML private TableColumn<Warga, String> colNoHp;
     @FXML private TableColumn<Warga, LocalDate> colTglLahir;
     @FXML private TableColumn<Warga, String> colDesa;
     @FXML private TableColumn<Warga, String> colKecamatan;
-    @FXML private TableColumn<Warga, String> colRW;
-    @FXML private TableColumn<Warga, String> colRT;
     @FXML private TableColumn<Warga, String> colAlamat;
 
     @FXML private TextField nikField;
     @FXML private TextField namaField;
     @FXML private ComboBox<String> jenkelComboBox;
+    @FXML private ComboBox<String> agamaComboBox;
+    @FXML private ComboBox<String> statusKawinComboBox;
     @FXML private ComboBox<Desa> desaComboBox;
+    @FXML private TextField pekerjaanField;
+    @FXML private TextField noHpField;
     @FXML private ComboBox<String> rwComboBox;
     @FXML private ComboBox<String> rtComboBox;
     @FXML private DatePicker tglLahirPicker;
@@ -90,10 +96,13 @@ public class WargaController implements Initializable, DataRefreshable {
         colNik.setCellValueFactory(cellData -> cellData.getValue().nikProperty());
         colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
         colJenkel.setCellValueFactory(cellData -> cellData.getValue().jenisKelaminProperty());
+        colAgama.setCellValueFactory(cellData -> cellData.getValue().agamaProperty());
+        colStatusKawin.setCellValueFactory(cellData -> cellData.getValue().statusKawinProperty());
+        colPekerjaan.setCellValueFactory(cellData -> cellData.getValue().pekerjaanProperty());
+        colNoHp.setCellValueFactory(cellData -> cellData.getValue().noHpProperty());
         colDesa.setCellValueFactory(cellData -> cellData.getValue().desaNamaProperty());
         colKecamatan.setCellValueFactory(cellData -> cellData.getValue().kecamatanNamaProperty());
-        colRW.setCellValueFactory(cellData -> cellData.getValue().rwProperty());
-        colRT.setCellValueFactory(cellData -> cellData.getValue().rtProperty());
+        colAlamat.setCellValueFactory(cellData -> cellData.getValue().alamatProperty());
         colTglLahir.setCellValueFactory(cellData -> cellData.getValue().tanggalLahirProperty());
         colTglLahir.setCellFactory(column -> {
             return new TableCell<Warga, LocalDate>() {
@@ -108,7 +117,6 @@ public class WargaController implements Initializable, DataRefreshable {
                 }
             };
         });
-        colAlamat.setCellValueFactory(cellData -> cellData.getValue().alamatProperty());
 
         setupDatePicker();
 
@@ -124,6 +132,10 @@ public class WargaController implements Initializable, DataRefreshable {
                 nikField.setText(newSel.getNik());
                 namaField.setText(newSel.getNama());
                 jenkelComboBox.getSelectionModel().select(newSel.getJenisKelamin());
+                agamaComboBox.getSelectionModel().select(newSel.getAgama());
+                statusKawinComboBox.getSelectionModel().select(newSel.getStatusKawin());
+                pekerjaanField.setText(newSel.getPekerjaan());
+                noHpField.setText(newSel.getNoHp());
                 tglLahirPicker.setValue(newSel.getTanggalLahir());
                 alamatArea.setText(newSel.getAlamat());
 
@@ -481,6 +493,10 @@ public class WargaController implements Initializable, DataRefreshable {
                         rs.getString("nama"),
                         rs.getString("alamat"),
                         rs.getString("jenis_kelamin"),
+                        rs.getString("agama"),
+                        rs.getString("status_kawin"),
+                        rs.getString("pekerjaan"),
+                        rs.getString("no_hp"),
                         rs.getInt("desa_id"),
                         rs.getString("desa_nama"),
                         rs.getString("kecamatan_nama"),
@@ -505,6 +521,10 @@ public class WargaController implements Initializable, DataRefreshable {
         String nik = nikField.getText();
         String nama = namaField.getText();
         String jenkel = jenkelComboBox.getSelectionModel().getSelectedItem();
+        String agama = agamaComboBox.getSelectionModel().getSelectedItem();
+        String statusKawin = statusKawinComboBox.getSelectionModel().getSelectedItem();
+        String pekerjaan = pekerjaanField.getText();
+        String noHp = noHpField.getText();
         Desa selectedDesa = desaComboBox.getSelectionModel().getSelectedItem();
         String selectedRw = rwComboBox.getSelectionModel().getSelectedItem();
         String selectedRt = rtComboBox.getSelectionModel().getSelectedItem();
@@ -515,6 +535,8 @@ public class WargaController implements Initializable, DataRefreshable {
         com.kecamatan.util.UIUtil.setErrorStyle(nikField, false);
         com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
         com.kecamatan.util.UIUtil.setErrorStyle(jenkelComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(agamaComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(statusKawinComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(rwComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(rtComboBox, false);
@@ -532,7 +554,6 @@ public class WargaController implements Initializable, DataRefreshable {
 
         if (hasError) return;
 
-        // Add length and format validation
         if (nik.length() != 16 || !nik.matches("\\d+")) {
             com.kecamatan.util.UIUtil.setErrorStyle(nikField, true);
             return;
@@ -545,9 +566,9 @@ public class WargaController implements Initializable, DataRefreshable {
 
         String sql;
         if (selectedId == -1) {
-            sql = "INSERT INTO warga (nik, nama, jenis_kelamin, desa_id, rw, rt, tanggal_lahir, alamat) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            sql = "INSERT INTO warga (nik, nama, jenis_kelamin, agama, status_kawin, pekerjaan, no_hp, desa_id, rw, rt, tanggal_lahir, alamat) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         } else {
-            sql = "UPDATE warga SET nik = ?, nama = ?, jenis_kelamin = ?, desa_id = ?, rw = ?, rt = ?, tanggal_lahir = ?, alamat = ? WHERE id = ?";
+            sql = "UPDATE warga SET nik = ?, nama = ?, jenis_kelamin = ?, agama = ?, status_kawin = ?, pekerjaan = ?, no_hp = ?, desa_id = ?, rw = ?, rt = ?, tanggal_lahir = ?, alamat = ? WHERE id = ?";
         }
 
         try (Connection conn = DatabaseUtil.getConnection();
@@ -555,13 +576,17 @@ public class WargaController implements Initializable, DataRefreshable {
             pstmt.setString(1, nik);
             pstmt.setString(2, nama);
             pstmt.setString(3, jenkel);
-            pstmt.setInt(4, selectedDesa.getId());
-            pstmt.setString(5, selectedRw);
-            pstmt.setString(6, selectedRt);
-            pstmt.setString(7, tanggalLahir != null ? formatter.format(tanggalLahir) : null);
-            pstmt.setString(8, alamat);
-            if (selectedId != -1) pstmt.setInt(9, selectedId);
-            
+            pstmt.setString(4, agama);
+            pstmt.setString(5, statusKawin);
+            pstmt.setString(6, pekerjaan);
+            pstmt.setString(7, noHp);
+            pstmt.setInt(8, selectedDesa.getId());
+            pstmt.setString(9, selectedRw);
+            pstmt.setString(10, selectedRt);
+            pstmt.setString(11, tanggalLahir != null ? formatter.format(tanggalLahir) : null);
+            pstmt.setString(12, alamat);
+            if (selectedId != -1) pstmt.setInt(13, selectedId);
+
             pstmt.executeUpdate();
 
             loadWargaData();
@@ -600,6 +625,10 @@ public class WargaController implements Initializable, DataRefreshable {
         nikField.clear();
         namaField.clear();
         jenkelComboBox.getSelectionModel().clearSelection();
+        agamaComboBox.getSelectionModel().clearSelection();
+        statusKawinComboBox.getSelectionModel().clearSelection();
+        pekerjaanField.clear();
+        noHpField.clear();
         desaComboBox.getSelectionModel().clearSelection();
         rwComboBox.getSelectionModel().clearSelection();
         rtComboBox.getSelectionModel().clearSelection();
@@ -611,6 +640,8 @@ public class WargaController implements Initializable, DataRefreshable {
         com.kecamatan.util.UIUtil.setErrorStyle(nikField, false);
         com.kecamatan.util.UIUtil.setErrorStyle(namaField, false);
         com.kecamatan.util.UIUtil.setErrorStyle(jenkelComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(agamaComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(statusKawinComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(rwComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(rtComboBox, false);
