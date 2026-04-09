@@ -6,9 +6,9 @@
 <?import javafx.scene.text.Text?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.kecamatan.controller.DesaController"
+            fx:controller="com.kecamatan.controller.KepalaDesaController"
             stylesheets="@../style/style.css" styleClass="dashboard-container">
-    
+
     <left>
         <VBox spacing="10" styleClass="sidebar">
             <padding>
@@ -16,8 +16,8 @@
             </padding>
             <Text text="MENU" styleClass="sidebar-title"/>
             <Button fx:id="btnDashboard" text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button fx:id="btnDesa" text="Data Desa" maxWidth="Infinity" styleClass="sidebar-button-active"/>
-            <Button fx:id="btnKepalaDesa" text="Data Kepala Desa" onAction="#goToKepalaDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnDesa" text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnKepalaDesa" text="Data Kepala Desa" maxWidth="Infinity" styleClass="sidebar-button-active"/>
             <Button fx:id="btnWarga" text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnLaporan" text="Statistik" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnProfil" text="Profil Saya" onAction="#goToProfil" maxWidth="Infinity" styleClass="sidebar-button"/>
@@ -38,51 +38,48 @@
             <padding>
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
-            
+
             <HBox alignment="CENTER_LEFT" spacing="15">
-                <Label text="Data Desa / Kelurahan" styleClass="title-text"/>
-                <TextField fx:id="searchField" promptText="Cari Nama Desa..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
+                <Label text="Data Kepala Desa" styleClass="title-text"/>
+                <TextField fx:id="searchField" promptText="Cari Nama Kepala Desa..." HBox.hgrow="ALWAYS" styleClass="search-field"/>
             </HBox>
 
             <HBox spacing="20" VBox.vgrow="ALWAYS">
                 <!-- Data Table -->
                 <VBox spacing="10" HBox.hgrow="ALWAYS" styleClass="card">
-                    <TableView fx:id="desaTable" VBox.vgrow="ALWAYS">
+                    <TableView fx:id="kepalaDesaTable" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn fx:id="colKecamatan" text="Kecamatan" prefWidth="120"/>
-                            <TableColumn fx:id="colNama" text="Nama Desa" prefWidth="150"/>
-                            <TableColumn fx:id="colPopulasi" text="Populasi" prefWidth="100"/>
-                            <TableColumn fx:id="colRT" text="RT" prefWidth="60"/>
-                            <TableColumn fx:id="colRW" text="RW" prefWidth="60"/>
+                            <TableColumn fx:id="colNama" text="Nama Kepala Desa" prefWidth="250"/>
+                            <TableColumn fx:id="colDesa" text="Desa" prefWidth="150"/>
+                            <TableColumn fx:id="colMulai" text="Periode Mulai" prefWidth="130"/>
+                            <TableColumn fx:id="colSelesai" text="Periode Selesai" prefWidth="130"/>
+                            <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
                         </columns>
                     </TableView>
                 </VBox>
 
                 <!-- Input Form -->
                 <VBox spacing="15" prefWidth="300" styleClass="card" maxHeight="Infinity">
-                    <Text text="Form Data Desa" styleClass="card-title"/>
-                    
-                    <VBox spacing="5">
-                        <Label text="Kecamatan" styleClass="input-label"/>
-                        <TextField fx:id="kecamatanField" editable="false" text="Siwalanpanji" styleClass="input-field"/>
-                    </VBox>
+                    <Text text="Form Kepala Desa" styleClass="card-title"/>
 
                     <VBox spacing="5">
-                        <Label text="Nama Desa" styleClass="input-label"/>
+                        <Label text="Nama Kepala Desa" styleClass="input-label"/>
                         <TextField fx:id="namaField" styleClass="input-field"/>
                     </VBox>
-                    
 
-                    <VBox spacing="5" VBox.vgrow="ALWAYS">
-                        <Label text="Daftar RW &amp; RT" styleClass="input-label"/>
-                        <ScrollPane fitToWidth="true" prefHeight="200" styleClass="input-field" style="-fx-padding: 0;">
-                            <VBox fx:id="rwContainer" spacing="10">
-                                <padding>
-                                    <Insets top="10" right="10" bottom="10" left="10"/>
-                                </padding>
-                            </VBox>
-                        </ScrollPane>
-                        <Button text="+ Tambah RW" onAction="#handleTambahRW" maxWidth="Infinity" styleClass="sidebar-button"/>
+                    <VBox spacing="5">
+                        <Label text="Pilih Desa" styleClass="input-label"/>
+                        <ComboBox fx:id="desaComboBox" maxWidth="Infinity" styleClass="input-field"/>
+                    </VBox>
+
+                    <VBox spacing="5">
+                        <Label text="Periode Mulai" styleClass="input-label"/>
+                        <DatePicker fx:id="periodeMulaiPicker" maxWidth="Infinity" styleClass="input-field"/>
+                    </VBox>
+
+                    <VBox spacing="5">
+                        <Label text="Periode Selesai" styleClass="input-label"/>
+                        <DatePicker fx:id="periodeSelesaiPicker" maxWidth="Infinity" styleClass="input-field"/>
                     </VBox>
 
                     <Region VBox.vgrow="ALWAYS"/>

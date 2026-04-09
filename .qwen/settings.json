@@ -39,7 +39,20 @@
       "Bash('3515050505860020', *)",
       "Bash(select *)",
       "Bash(from *)",
-      "Bash(eof)"
+      "Bash(eof)",
+      "Bash(create *)",
+      "Bash(nama *)",
+      "Bash(not *)",
+      "Bash(desa_id *)",
+      "Bash(on *)",
+      "Bash(periode_mulai *)",
+      "Bash(periode_selesai *)",
+      "Bash(created_at *)",
+      "Bash('h. slamet riyadi', *)",
+      "Bash('drs. bambang sutrisno', *)",
+      "Bash('sri wahyuni, s.sos', *)",
+      "Bash('agus hermawan, s.ip', *)",
+      "Bash('moh. ridwan, s.pd', *)"
     ]
   },
   "$version": 3

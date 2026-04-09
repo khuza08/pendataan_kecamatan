@@ -83,10 +83,10 @@ public class LoginController {
         messageLabel.setStyle("-fx-text-fill: #009C4B;");
         
         if ("ADMIN".equals(role)) {
-            App.preloadViews("dashboard", "desa", "warga", "laporan");
+            App.preloadViews("dashboard", "desa", "kepala_desa", "warga", "laporan");
             App.setRoot("dashboard", 1200, 800, true);
         } else {
-            App.preloadViews("profil"); // Warga only needs Profil
+            App.preloadViews("profil", "kepala_desa_warga"); // Warga only needs Profil
             App.setRoot("profil", 1200, 800, true);
         }
     }

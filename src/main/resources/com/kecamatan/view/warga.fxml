@@ -19,6 +19,7 @@
             <Text text="MENU" styleClass="sidebar-title"/>
             <Button fx:id="btnDashboard" text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnDesa" text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnKepalaDesa" text="Data Kepala Desa" onAction="#goToKepalaDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnWarga" text="Data Warga" maxWidth="Infinity" styleClass="sidebar-button-active"/>
             <Button fx:id="btnLaporan" text="Statistik" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnProfil" text="Profil Saya" onAction="#goToProfil" maxWidth="Infinity" styleClass="sidebar-button"/>

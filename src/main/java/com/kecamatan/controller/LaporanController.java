@@ -50,6 +50,7 @@ public class LaporanController implements Initializable, DataRefreshable {
     @FXML private TableColumn<Desa, Integer> colRW;
 
     @FXML private Button btnDesa;
+    @FXML private Button btnKepalaDesa;
     @FXML private Button btnWarga;
     @FXML private Button btnDashboard;
     @FXML private Button btnLaporan;
@@ -174,11 +175,12 @@ public class LaporanController implements Initializable, DataRefreshable {
 
     private void applyRBAC() {
         RBACUtil.applyFullRBAC(userNameLabel, userRoleLabel, btnProfil,
-            btnDesa, btnWarga, btnLaporan, btnDashboard);
+            btnDesa, btnKepalaDesa, btnWarga, btnLaporan, btnDashboard);
     }
 
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }
     @FXML private void goToDesa() throws IOException { App.setRoot("desa", 1200, 800, true); }
+    @FXML private void goToKepalaDesa() throws IOException { App.setRoot("kepala_desa", 1200, 800, true); }
     @FXML private void goToWarga() throws IOException { App.setRoot("warga", 1200, 800, true); }
     @FXML private void goToProfil() throws IOException { App.setRoot("profil", 1200, 800, true); }
     @FXML private void handleLogout() throws IOException { 

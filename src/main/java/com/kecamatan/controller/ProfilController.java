@@ -37,6 +37,7 @@ public class ProfilController implements Initializable {
     @FXML private Button btnWarga;
     @FXML private Button btnDashboard;
     @FXML private Button btnLaporan;
+    @FXML private Button btnKepalaDesa;
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
 
@@ -85,6 +86,15 @@ public class ProfilController implements Initializable {
     @FXML private void goToDesa() throws IOException { App.setRoot("desa", 1200, 800, true); }
     @FXML private void goToWarga() throws IOException { App.setRoot("warga", 1200, 800, true); }
     @FXML private void goToLaporan() throws IOException { App.setRoot("laporan", 1200, 800, true); }
+
+    @FXML
+    private void goToKepalaDesa() throws IOException {
+        if (UserSession.isAdmin()) {
+            App.setRoot("kepala_desa", 1200, 800, true);
+        } else {
+            App.setRoot("kepala_desa_warga", 1200, 800, true);
+        }
+    }
     
     @FXML
     private void handleLogout() throws IOException {

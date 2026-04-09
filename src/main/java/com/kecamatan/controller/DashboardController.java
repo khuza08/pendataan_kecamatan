@@ -42,6 +42,7 @@ public class DashboardController implements Initializable, DataRefreshable {
     @FXML private Text totalKecamatanText;
     @FXML private Text totalDesaText;
     @FXML private Button btnDesa;
+    @FXML private Button btnKepalaDesa;
     @FXML private Button btnWarga;
     @FXML private Button btnDashboard;
     @FXML private Button btnLaporan;
@@ -80,7 +81,7 @@ public class DashboardController implements Initializable, DataRefreshable {
     private void applyRBAC() {
         // Use centralized RBAC utility with full support for both admin and warga buttons
         RBACUtil.applyFullRBAC(userNameLabel, userRoleLabel, btnProfil,
-            btnDesa, btnWarga, btnLaporan, btnDashboard);
+            btnDesa, btnKepalaDesa, btnWarga, btnLaporan, btnDashboard);
 
         if (!com.kecamatan.util.UserSession.isAdmin()) {
             // Hide Admin Dashboard Content, Show Warga Welcome
@@ -217,6 +218,11 @@ public class DashboardController implements Initializable, DataRefreshable {
     @FXML
     private void goToDesa() throws IOException {
         App.setRoot("desa", 1200, 800, true);
+    }
+
+    @FXML
+    private void goToKepalaDesa() throws IOException {
+        App.setRoot("kepala_desa", 1200, 800, true);
     }
 
     @FXML

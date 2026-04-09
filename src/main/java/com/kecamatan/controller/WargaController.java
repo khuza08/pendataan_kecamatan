@@ -71,6 +71,7 @@ public class WargaController implements Initializable, DataRefreshable {
     @FXML private TextArea alamatArea;
 
     @FXML private Button btnDesa;
+    @FXML private Button btnKepalaDesa;
     @FXML private Button btnWarga;
     @FXML private Button btnDashboard;
     @FXML private Button btnLaporan;
@@ -237,7 +238,7 @@ public class WargaController implements Initializable, DataRefreshable {
 
     private void applyRBAC() {
         RBACUtil.applyFullRBAC(userNameLabel, userRoleLabel, btnProfil,
-            btnDesa, btnWarga, btnLaporan, btnDashboard);
+            btnDesa, btnKepalaDesa, btnWarga, btnLaporan, btnDashboard);
     }
 
     private void setupDatePicker() {
@@ -599,6 +600,7 @@ public class WargaController implements Initializable, DataRefreshable {
 
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }
     @FXML private void goToDesa() throws IOException { App.setRoot("desa", 1200, 800, true); }
+    @FXML private void goToKepalaDesa() throws IOException { App.setRoot("kepala_desa", 1200, 800, true); }
     @FXML private void goToLaporan() throws IOException { App.setRoot("laporan", 1200, 800, true); }
     @FXML private void goToProfil() throws IOException { App.setRoot("profil", 1200, 800, true); }
     @FXML private void handleLogout() throws IOException { 

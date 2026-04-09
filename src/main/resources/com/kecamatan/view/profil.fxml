@@ -15,11 +15,12 @@
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
             <Text text="MENU" styleClass="sidebar-title"/>
-            <Button fx:id="btnDashboard" text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button fx:id="btnDesa" text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button fx:id="btnWarga" text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button fx:id="btnLaporan" text="Statistik" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button text="Profil Saya" maxWidth="Infinity" styleClass="sidebar-button-active"/>
+            <Button fx:id="btnKepalaDesa" text="Data Kepala Desa" onAction="#goToKepalaDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnLaporan" text="Statistik" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnWarga" text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnDesa" text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnDashboard" text="Dashboard" onAction="#goToDashboard" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Region VBox.vgrow="ALWAYS"/>
             <HBox spacing="10" alignment="CENTER" styleClass="user-info-pane">
                 <padding>
