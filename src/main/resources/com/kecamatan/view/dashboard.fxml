@@ -109,12 +109,15 @@
                 <VBox spacing="10" styleClass="card" VBox.vgrow="ALWAYS">
                     <Text text="Daftar Warga Terbaru" styleClass="card-title"/>
                     <TableView fx:id="dashboardWargaTable" prefHeight="250">
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
                         <columns>
                             <TableColumn fx:id="colNik" text="NIK" prefWidth="150"/>
                             <TableColumn fx:id="colNama" text="Nama Lengkap" prefWidth="250"/>
-                            <TableColumn fx:id="colDesa" text="Desa" prefWidth="150"/>
+                            <TableColumn fx:id="colJenkel" text="L/P" prefWidth="80"/>
                             <TableColumn fx:id="colKecamatan" text="Kecamatan" prefWidth="150"/>
-                            <TableColumn fx:id="colJenkel" text="L/P" prefWidth="60"/>
+                            <TableColumn fx:id="colDesa" text="Desa" prefWidth="150"/>
                         </columns>
                         <placeholder>
                             <Label text="Tidak ada data warga terbaru."/>
