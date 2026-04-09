@@ -68,6 +68,14 @@ public class KecamatanController implements Initializable, DataRefreshable {
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
             loadData();
         });
+
+        // Kode validation: digits and hyphens only
+        kodeField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.isEmpty() && !newVal.matches("[\\d-]+")) {
+                kodeField.setText(oldVal);
+                kodeField.positionCaret(kodeField.getCaretPosition() - 1);
+            }
+        });
     }
 
     private void applyRBAC() {

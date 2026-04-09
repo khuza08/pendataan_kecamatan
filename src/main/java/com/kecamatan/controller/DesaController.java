@@ -393,7 +393,13 @@ public class DesaController implements Initializable, DataRefreshable {
 
         if (hasError) return;
 
-        // Collect dynamic data
+        if (nama.length() > 100) {
+            com.kecamatan.util.UIUtil.setErrorStyle(namaField, true);
+            return;
+        }
+
+        // Validate at least one RW with a value
+        boolean hasValidRW = false;
         List<RWData> collectedData = new ArrayList<>();
         int totalRTCount = 0;
         java.util.Set<String> uniqueRWs = new java.util.HashSet<>();
@@ -416,8 +422,14 @@ public class DesaController implements Initializable, DataRefreshable {
                     }
                     collectedData.add(new RWData(rwVal, rts));
                     uniqueRWs.add(rwVal);
+                    hasValidRW = true;
                 }
             }
+        }
+
+        if (!hasValidRW) {
+            UIUtil.showAlert("Error", "Minimal satu RW harus diisi!", Alert.AlertType.ERROR);
+            return;
         }
 
         final int finalRT = totalRTCount;

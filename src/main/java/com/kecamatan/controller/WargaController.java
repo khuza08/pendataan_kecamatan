@@ -215,6 +215,14 @@ public class WargaController implements Initializable, DataRefreshable {
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
             loadWargaData();
         });
+
+        // Real-time No HP validation: digits, hyphens, plus only; min 10, max 13
+        noHpField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.isEmpty() && !newVal.matches("[\\d+\\-]+")) {
+                noHpField.setText(oldVal);
+                noHpField.positionCaret(noHpField.getCaretPosition() - 1);
+            }
+        });
     }
 
     private void applyRBAC() {
@@ -537,16 +545,21 @@ public class WargaController implements Initializable, DataRefreshable {
         com.kecamatan.util.UIUtil.setErrorStyle(jenkelComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(agamaComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(statusKawinComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(pekerjaanField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(noHpField, false);
         com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(rwComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(rtComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(tglLahirPicker, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(alamatArea, false);
 
         boolean hasError = false;
 
         if (nik.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(nikField, true); hasError = true; }
         if (nama.isEmpty()) { com.kecamatan.util.UIUtil.setErrorStyle(namaField, true); hasError = true; }
         if (jenkel == null) { com.kecamatan.util.UIUtil.setErrorStyle(jenkelComboBox, true); hasError = true; }
+        if (agama == null) { com.kecamatan.util.UIUtil.setErrorStyle(agamaComboBox, true); hasError = true; }
+        if (statusKawin == null) { com.kecamatan.util.UIUtil.setErrorStyle(statusKawinComboBox, true); hasError = true; }
         if (selectedDesa == null) { com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, true); hasError = true; }
         if (selectedRw == null) { com.kecamatan.util.UIUtil.setErrorStyle(rwComboBox, true); hasError = true; }
         if (selectedRt == null) { com.kecamatan.util.UIUtil.setErrorStyle(rtComboBox, true); hasError = true; }
@@ -561,6 +574,23 @@ public class WargaController implements Initializable, DataRefreshable {
 
         if (nama.length() > 100) {
             com.kecamatan.util.UIUtil.setErrorStyle(namaField, true);
+            return;
+        }
+
+        if (pekerjaan.length() > 50) {
+            com.kecamatan.util.UIUtil.setErrorStyle(pekerjaanField, true);
+            return;
+        }
+
+        if (!noHp.isEmpty()) {
+            if (noHp.length() < 10 || noHp.length() > 13) {
+                com.kecamatan.util.UIUtil.setErrorStyle(noHpField, true);
+                return;
+            }
+        }
+
+        if (alamat.length() > 255) {
+            com.kecamatan.util.UIUtil.setErrorStyle(alamatArea, true);
             return;
         }
 
@@ -642,10 +672,13 @@ public class WargaController implements Initializable, DataRefreshable {
         com.kecamatan.util.UIUtil.setErrorStyle(jenkelComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(agamaComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(statusKawinComboBox, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(pekerjaanField, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(noHpField, false);
         com.kecamatan.util.UIUtil.setErrorStyle(desaComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(rwComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(rtComboBox, false);
         com.kecamatan.util.UIUtil.setErrorStyle(tglLahirPicker, false);
+        com.kecamatan.util.UIUtil.setErrorStyle(alamatArea, false);
     }
 
     @FXML private void goToDashboard() throws IOException { App.setRoot("dashboard", 1200, 800, true); }
