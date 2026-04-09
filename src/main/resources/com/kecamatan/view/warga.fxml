@@ -42,8 +42,18 @@
             </padding>
             
 
-            <HBox alignment="CENTER_LEFT" spacing="10">
+            <HBox alignment="CENTER_LEFT" spacing="15">
                 <Label text="Data Warga / Penduduk" styleClass="title-text"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Kecamatan:" styleClass="filter-label"/>
+                <ComboBox fx:id="filterKecamatanComboBox" prefWidth="180" styleClass="filter-combobox" promptText="Semua Kecamatan"/>
+                <Label text="Desa:" styleClass="filter-label"/>
+                <ComboBox fx:id="filterDesaComboBox" prefWidth="180" styleClass="filter-combobox" promptText="Semua Desa"/>
+                <Button onAction="#handleResetFilter" styleClass="reset-filter-button" text="Reset">
+                    <tooltip>
+                        <Tooltip text="Reset Filter"/>
+                    </tooltip>
+                </Button>
             </HBox>
 
             <HBox spacing="20" VBox.vgrow="ALWAYS">

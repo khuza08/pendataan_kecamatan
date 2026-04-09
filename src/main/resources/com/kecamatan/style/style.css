@@ -375,3 +375,40 @@
     -fx-background-color: #e9ecef;
     -fx-border-color: #adb5bd;
 }
+
+/* Filter Styles */
+.filter-label {
+    -fx-text-fill: #7A7778;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.filter-combobox {
+    -fx-background-color: #f5f5f5;
+    -fx-background-radius: 4;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 4;
+}
+
+.filter-combobox:focused {
+    -fx-border-color: #009C4B;
+}
+
+.reset-filter-button {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-min-height: 30px;
+    -fx-background-radius: 4;
+    -fx-cursor: hand;
+    -fx-padding: 0 15;
+}
+
+.reset-filter-button:hover {
+    -fx-background-color: #5a6268;
+}
+
+.reset-filter-button:pressed {
+    -fx-background-color: #4e555b;
+}
