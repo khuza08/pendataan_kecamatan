@@ -124,45 +124,32 @@ public class DashboardController implements Initializable, DataRefreshable {
     public void refreshData() {
         ThreadManager.execute(() -> {
             try (Connection conn = DatabaseUtil.getConnection()) {
-                // 1. Total Warga
-                int totalWarga = 0;
-                try (Statement stmt = conn.createStatement();
-                     ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM warga")) {
-                    if (rs.next()) totalWarga = rs.getInt(1);
-                }
+                // Combined Stats Query for Performance
+                String statsSql = "SELECT " +
+                    "(SELECT COUNT(*) FROM warga) as total_warga, " +
+                    "(SELECT COUNT(*) FROM warga WHERE LOWER(jenis_kelamin) = 'laki-laki') as male_count, " +
+                    "(SELECT COUNT(*) FROM warga WHERE LOWER(jenis_kelamin) = 'perempuan') as female_count, " +
+                    "(SELECT COALESCE(SUM(jumlah_rt), 0) FROM desa) as total_rt, " +
+                    "(SELECT COALESCE(SUM(jumlah_rw), 0) FROM desa) as total_rw, " +
+                    "(SELECT COUNT(*) FROM kecamatan) as total_kec, " +
+                    "(SELECT COUNT(*) FROM desa) as total_desa";
 
+                int totalWarga = 0, male = 0, female = 0, totalRT = 0, totalRW = 0, totalKec = 0, totalDesa = 0;
 
-                // 2. L / P Count
-                int male = 0, female = 0;
                 try (Statement stmt = conn.createStatement();
-                     ResultSet rs = stmt.executeQuery("SELECT jenis_kelamin, COUNT(*) FROM warga GROUP BY jenis_kelamin")) {
-                    while (rs.next()) {
-                        String jk = rs.getString(1);
-                        if (jk != null) {
-                            if (jk.equalsIgnoreCase("L") || jk.equalsIgnoreCase("Laki-laki")) male += rs.getInt(2);
-                            else if (jk.equalsIgnoreCase("P") || jk.equalsIgnoreCase("Perempuan")) female += rs.getInt(2);
-                        }
-                    }
-                }
-
-                // 3. RT / RW Count
-                int totalRT = 0, totalRW = 0;
-                try (Statement stmt = conn.createStatement();
-                     ResultSet rs = stmt.executeQuery("SELECT SUM(jumlah_rt), SUM(jumlah_rw) FROM desa")) {
+                     ResultSet rs = stmt.executeQuery(statsSql)) {
                     if (rs.next()) {
-                        totalRT = rs.getInt(1);
-                        totalRW = rs.getInt(2);
+                        totalWarga = rs.getInt("total_warga");
+                        male = rs.getInt("male_count");
+                        female = rs.getInt("female_count");
+                        totalRT = rs.getInt("total_rt");
+                        totalRW = rs.getInt("total_rw");
+                        totalKec = rs.getInt("total_kec");
+                        totalDesa = rs.getInt("total_desa");
                     }
                 }
 
-                // 4. Total Desa
-                int totalDesa = 0;
-                try (Statement stmt = conn.createStatement();
-                     ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM desa")) {
-                    if (rs.next()) totalDesa = rs.getInt(1);
-                }
-
-                // 5. Chart Data (Top 6 Kecamatan)
+                // Chart Data (Top 6 Kecamatan)
                 XYChart.Series<String, Number> series = new XYChart.Series<>();
                 series.setName("Populasi per Kecamatan");
                 String chartSql = "SELECT k.nama, (SELECT COUNT(*) FROM warga w JOIN desa d ON w.desa_id = d.id WHERE d.kecamatan_id = k.id) as calculated_pop " +
@@ -173,10 +160,10 @@ public class DashboardController implements Initializable, DataRefreshable {
                         series.getData().add(new XYChart.Data<>(rs.getString("nama"), rs.getInt("calculated_pop")));
                     }
                 }
- 
-                // 7. Recent Warga Table
+
+                // 7. Recent Warga Table (Optimized Columns)
                 ObservableList<Warga> recentWarga = FXCollections.observableArrayList();
-                String recentSql = "SELECT w.*, d.nama as desa_nama, k.nama as kecamatan_nama " +
+                String recentSql = "SELECT w.id, w.nik, w.nama, w.jenis_kelamin, d.nama as desa_nama, k.nama as kecamatan_nama " +
                                   "FROM warga w " +
                                   "JOIN desa d ON w.desa_id = d.id " +
                                   "JOIN kecamatan k ON d.kecamatan_id = k.id " +
@@ -188,36 +175,29 @@ public class DashboardController implements Initializable, DataRefreshable {
                             rs.getInt("id"),
                             rs.getString("nik"),
                             rs.getString("nama"),
-                            rs.getString("alamat"),
-                            rs.getString("jenis_kelamin"),
-                            rs.getString("agama"),
-                            rs.getString("status_kawin"),
-                            rs.getString("pekerjaan"),
-                            rs.getString("no_hp"),
-                            rs.getInt("desa_id"),
+                            "", rs.getString("jenis_kelamin"), "", "", "", "",
+                            0,
                             rs.getString("desa_nama"),
                             rs.getString("kecamatan_nama"),
-                            rs.getString("rt"),
-                            rs.getString("rw"),
-                            rs.getString("tanggal_lahir") != null ? java.time.LocalDate.parse(rs.getString("tanggal_lahir"), java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy")) : null
+                            "", "", null
                         ));
                     }
                 }
 
                 // UI Updates
-                final int fw = totalWarga, fm = male, ff = female, frt = totalRT, frw = totalRW, fd = totalDesa;
+                final int fw = totalWarga, fm = male, ff = female, frt = totalRT, frw = totalRW, fk = totalKec, fd = totalDesa;
                 Platform.runLater(() -> {
                     totalWargaText.setText(String.format("%,d", fw));
                     lakiText.setText(String.format("%,d", fm));
                     perempuanText.setText(String.format("%,d", ff));
                     rtrwText.setText(String.format("%d / %d", frt, frw));
                     totalDesaText.setText(String.valueOf(fd));
-                    
+
                     if (dashboardWargaTable != null) {
                         dashboardWargaList.setAll(recentWarga);
                         dashboardWargaTable.setItems(dashboardWargaList);
                     }
-                    
+
                     wargaChart.getData().clear();
                     wargaChart.getData().add(series);
 

@@ -117,7 +117,7 @@ public class KepalaDesaWargaController implements Initializable {
     private void loadData() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<KepalaDesa> tempData = FXCollections.observableArrayList();
-            String sql = "SELECT kd.*, d.nama as desa_nama FROM kepala_desa kd " +
+            String sql = "SELECT kd.id, kd.nama, kd.desa_id, kd.periode_mulai, kd.periode_selesai, d.nama as desa_nama FROM kepala_desa kd " +
                          "JOIN desa d ON kd.desa_id = d.id ORDER BY kd.nama";
 
             try (Connection conn = DatabaseUtil.getConnection();

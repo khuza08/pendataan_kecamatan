@@ -372,7 +372,7 @@ public class WargaController implements Initializable, DataRefreshable {
     private void loadDesaData() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<Desa> tempDesa = FXCollections.observableArrayList();
-            String sql = "SELECT d.*, k.nama as kecamatan_nama, (SELECT COUNT(*) FROM warga WHERE desa_id = d.id) as calculated_pop " +
+            String sql = "SELECT d.id, d.kecamatan_id, d.nama, d.jumlah_rt, d.jumlah_rw, k.nama as kecamatan_nama " +
                          "FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id " +
                          "WHERE d.kecamatan_id = (SELECT id FROM kecamatan WHERE nama = 'Siwalanpanji') ORDER BY d.nama";
             try (Connection conn = DatabaseUtil.getConnection();
@@ -384,7 +384,7 @@ public class WargaController implements Initializable, DataRefreshable {
                         rs.getInt("kecamatan_id"),
                         rs.getString("kecamatan_nama"),
                         rs.getString("nama"),
-                        rs.getInt("calculated_pop"),
+                        0,
                         rs.getInt("jumlah_rt"),
                         rs.getInt("jumlah_rw")
                     ));
@@ -409,7 +409,8 @@ public class WargaController implements Initializable, DataRefreshable {
             boolean hasSearch = searchQuery != null && !searchQuery.trim().isEmpty();
 
             StringBuilder sql = new StringBuilder(
-                "SELECT w.*, d.nama as desa_nama, k.nama as kecamatan_nama " +
+                "SELECT w.id, w.nik, w.nama, w.alamat, w.jenis_kelamin, w.agama, w.status_kawin, w.pekerjaan, w.no_hp, " +
+                "w.desa_id, w.rw, w.rt, w.tanggal_lahir, d.nama as desa_nama, k.nama as kecamatan_nama " +
                 "FROM warga w " +
                 "JOIN desa d ON w.desa_id = d.id " +
                 "JOIN kecamatan k ON d.kecamatan_id = k.id " +
@@ -442,7 +443,7 @@ public class WargaController implements Initializable, DataRefreshable {
                         rs.getInt("id"),
                         rs.getString("nik"),
                         rs.getString("nama"),
-                        rs.getString("alamat"),
+                        rs.getString("alamat"), // Note: alamat is missing in specific selection, adding it back
                         rs.getString("jenis_kelamin"),
                         rs.getString("agama"),
                         rs.getString("status_kawin"),

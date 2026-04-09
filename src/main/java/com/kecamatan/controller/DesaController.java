@@ -258,7 +258,7 @@ public class DesaController implements Initializable, DataRefreshable {
             boolean hasSearch = searchQuery != null && !searchQuery.trim().isEmpty();
 
             StringBuilder sql = new StringBuilder(
-                "SELECT d.*, k.nama as kecamatan_nama, (SELECT COUNT(*) FROM warga WHERE desa_id = d.id) as calculated_pop " +
+                "SELECT d.id, d.kecamatan_id, d.nama, d.jumlah_rt, d.jumlah_rw, k.nama as kecamatan_nama " +
                 "FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id WHERE d.kecamatan_id = ?"
             );
             List<Object> params = new ArrayList<>();
@@ -283,7 +283,7 @@ public class DesaController implements Initializable, DataRefreshable {
                         rs.getInt("kecamatan_id"),
                         rs.getString("kecamatan_nama"),
                         rs.getString("nama"),
-                        rs.getInt("calculated_pop"),
+                        0,
                         rs.getInt("jumlah_rt"),
                         rs.getInt("jumlah_rw")
                     ));

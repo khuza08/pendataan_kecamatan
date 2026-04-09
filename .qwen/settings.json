@@ -52,7 +52,13 @@
       "Bash('drs. bambang sutrisno', *)",
       "Bash('sri wahyuni, s.sos', *)",
       "Bash('agus hermawan, s.ip', *)",
-      "Bash('moh. ridwan, s.pd', *)"
+      "Bash('moh. ridwan, s.pd', *)",
+      "Bash(nik)",
+      "Bash(nama)",
+      "Bash(desa_id)",
+      "Bash(kecamatan_id)",
+      "Bash('warga', *)",
+      "Bash(order *)"
     ]
   },
   "$version": 3
