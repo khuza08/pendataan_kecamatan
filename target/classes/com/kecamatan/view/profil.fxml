@@ -19,7 +19,7 @@
             <Button fx:id="btnKecamatan" text="Data Kecamatan" onAction="#goToKecamatan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnDesa" text="Data Desa" onAction="#goToDesa" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button fx:id="btnWarga" text="Data Warga" onAction="#goToWarga" maxWidth="Infinity" styleClass="sidebar-button"/>
-            <Button fx:id="btnLaporan" text="Laporan" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
+            <Button fx:id="btnLaporan" text="Statistik" onAction="#goToLaporan" maxWidth="Infinity" styleClass="sidebar-button"/>
             <Button text="Profil Saya" maxWidth="Infinity" styleClass="sidebar-button-active"/>
             <Region VBox.vgrow="ALWAYS"/>
             <HBox spacing="10" alignment="CENTER" styleClass="user-info-pane">
