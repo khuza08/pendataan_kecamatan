@@ -13,7 +13,7 @@ import java.sql.SQLException;
  */
 public class DatabaseUtil {
     private static final String URL = "jdbc:postgresql://localhost:5432/pendataankecamatan";
-    private static final String USER = "elza";
+    private static final String USER = "huza";
     private static final String PASSWORD = "";
     
     private static final HikariDataSource dataSource;
