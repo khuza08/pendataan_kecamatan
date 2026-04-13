@@ -10,15 +10,17 @@ public class KepalaDesa {
     private final SimpleStringProperty nama;
     private final SimpleIntegerProperty desaId;
     private final SimpleStringProperty desaNama;
+    private final SimpleStringProperty noTelp;
     private final SimpleObjectProperty<LocalDate> periodeMulai;
     private final SimpleObjectProperty<LocalDate> periodeSelesai;
     private final SimpleStringProperty status;
 
-    public KepalaDesa(int id, String nama, int desaId, String desaNama, LocalDate periodeMulai, LocalDate periodeSelesai, String status) {
+    public KepalaDesa(int id, String nama, int desaId, String desaNama, String noTelp, LocalDate periodeMulai, LocalDate periodeSelesai, String status) {
         this.id = new SimpleIntegerProperty(id);
         this.nama = new SimpleStringProperty(nama);
         this.desaId = new SimpleIntegerProperty(desaId);
         this.desaNama = new SimpleStringProperty(desaNama);
+        this.noTelp = new SimpleStringProperty(noTelp);
         this.periodeMulai = new SimpleObjectProperty<>(periodeMulai);
         this.periodeSelesai = new SimpleObjectProperty<>(periodeSelesai);
         this.status = new SimpleStringProperty(status);
@@ -35,6 +37,9 @@ public class KepalaDesa {
 
     public String getDesaNama() { return desaNama.get(); }
     public SimpleStringProperty desaNamaProperty() { return desaNama; }
+
+    public String getNoTelp() { return noTelp.get(); }
+    public SimpleStringProperty noTelpProperty() { return noTelp; }
 
     public LocalDate getPeriodeMulai() { return periodeMulai.get(); }
     public SimpleObjectProperty<LocalDate> periodeMulaiProperty() { return periodeMulai; }

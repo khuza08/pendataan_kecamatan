@@ -39,11 +39,13 @@ public class KepalaDesaController implements Initializable, DataRefreshable {
     @FXML private TableView<KepalaDesa> kepalaDesaTable;
     @FXML private TableColumn<KepalaDesa, String> colNama;
     @FXML private TableColumn<KepalaDesa, String> colDesa;
+    @FXML private TableColumn<KepalaDesa, String> colNoTelp;
     @FXML private TableColumn<KepalaDesa, LocalDate> colMulai;
     @FXML private TableColumn<KepalaDesa, LocalDate> colSelesai;
     @FXML private TableColumn<KepalaDesa, String> colStatus;
 
     @FXML private TextField namaField;
+    @FXML private TextField noTelpField;
     @FXML private ComboBox<Desa> desaComboBox;
     @FXML private DatePicker periodeMulaiPicker;
     @FXML private DatePicker periodeSelesaiPicker;
@@ -70,6 +72,7 @@ public class KepalaDesaController implements Initializable, DataRefreshable {
         applyRBAC();
         colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
         colDesa.setCellValueFactory(cellData -> cellData.getValue().desaNamaProperty());
+        colNoTelp.setCellValueFactory(cellData -> cellData.getValue().noTelpProperty());
         colMulai.setCellValueFactory(cellData -> cellData.getValue().periodeMulaiProperty());
         colSelesai.setCellValueFactory(cellData -> cellData.getValue().periodeSelesaiProperty());
 
@@ -127,6 +130,7 @@ public class KepalaDesaController implements Initializable, DataRefreshable {
             if (newSel != null) {
                 selectedId = newSel.getId();
                 namaField.setText(newSel.getNama());
+                noTelpField.setText(newSel.getNoTelp());
                 periodeMulaiPicker.setValue(newSel.getPeriodeMulai());
                 periodeSelesaiPicker.setValue(newSel.getPeriodeSelesai());
                 for (Desa d : desaList) {
@@ -147,6 +151,14 @@ public class KepalaDesaController implements Initializable, DataRefreshable {
             if (newVal != null && !newVal.matches("[a-zA-Z\\s.,]*")) {
                 namaField.setText(oldVal);
                 namaField.positionCaret(namaField.getCaretPosition() - 1);
+            }
+        });
+
+        // No Telp input filter: digits, hyphens, plus only
+        noTelpField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.matches("[\\d+\\-]*")) {
+                noTelpField.setText(oldVal);
+                noTelpField.positionCaret(noTelpField.getCaretPosition() - 1);
             }
         });
 
@@ -250,7 +262,7 @@ public class KepalaDesaController implements Initializable, DataRefreshable {
             boolean hasSearch = searchQuery != null && !searchQuery.trim().isEmpty();
 
             StringBuilder sql = new StringBuilder(
-                "SELECT kd.id, kd.nama, kd.desa_id, kd.periode_mulai, kd.periode_selesai, d.nama as desa_nama FROM kepala_desa kd " +
+                "SELECT kd.id, kd.nama, kd.no_telp, kd.desa_id, kd.periode_mulai, kd.periode_selesai, d.nama as desa_nama FROM kepala_desa kd " +
                 "JOIN desa d ON kd.desa_id = d.id"
             );
             if (hasSearch) {
@@ -272,6 +284,7 @@ public class KepalaDesaController implements Initializable, DataRefreshable {
                         rs.getString("nama"),
                         rs.getInt("desa_id"),
                         rs.getString("desa_nama"),
+                        rs.getString("no_telp") != null ? rs.getString("no_telp") : "",
                         rs.getString("periode_mulai") != null ? LocalDate.parse(rs.getString("periode_mulai")) : null,
                         periodeSelesai,
                         status
@@ -290,6 +303,7 @@ public class KepalaDesaController implements Initializable, DataRefreshable {
     @FXML
     private void handleSave() {
         String nama = namaField.getText();
+        String noTelp = noTelpField.getText();
         Desa selectedDesa = desaComboBox.getSelectionModel().getSelectedItem();
         LocalDate periodeMulai = periodeMulaiPicker.getValue();
         LocalDate periodeSelesai = periodeSelesaiPicker.getValue();
@@ -303,18 +317,19 @@ public class KepalaDesaController implements Initializable, DataRefreshable {
 
         String sql;
         if (selectedId == -1) {
-            sql = "INSERT INTO kepala_desa (nama, desa_id, periode_mulai, periode_selesai) VALUES (?, ?, ?, ?)";
+            sql = "INSERT INTO kepala_desa (nama, no_telp, desa_id, periode_mulai, periode_selesai) VALUES (?, ?, ?, ?, ?)";
         } else {
-            sql = "UPDATE kepala_desa SET nama = ?, desa_id = ?, periode_mulai = ?, periode_selesai = ? WHERE id = ?";
+            sql = "UPDATE kepala_desa SET nama = ?, no_telp = ?, desa_id = ?, periode_mulai = ?, periode_selesai = ? WHERE id = ?";
         }
 
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, nama);
-            pstmt.setInt(2, selectedDesa.getId());
-            pstmt.setObject(3, periodeMulai);
-            pstmt.setObject(4, periodeSelesai);
-            if (selectedId != -1) pstmt.setInt(5, selectedId);
+            pstmt.setString(2, noTelp);
+            pstmt.setInt(3, selectedDesa.getId());
+            pstmt.setObject(4, periodeMulai);
+            pstmt.setObject(5, periodeSelesai);
+            if (selectedId != -1) pstmt.setInt(6, selectedId);
 
             pstmt.executeUpdate();
             loadData();
@@ -342,6 +357,7 @@ public class KepalaDesaController implements Initializable, DataRefreshable {
     private void handleReset() {
         selectedId = -1;
         namaField.clear();
+        noTelpField.clear();
         desaComboBox.getSelectionModel().clearSelection();
         periodeMulaiPicker.setValue(null);
         periodeSelesaiPicker.setValue(null);

@@ -109,7 +109,12 @@ public class App extends Application {
                     stage.setMaximized(false);
                     stage.setWidth(width);
                     stage.setHeight(height);
-                    stage.centerOnScreen();
+                    
+                    // Manual centering calculation to prevent "stuck at top" bug
+                    Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+                    stage.setX(screenBounds.getMinX() + (screenBounds.getWidth() - width) / 2);
+                    stage.setY(screenBounds.getMinY() + (screenBounds.getHeight() - height) / 2);
+                    
                     stage.setResizable(false); // Locking login
                 }
             });

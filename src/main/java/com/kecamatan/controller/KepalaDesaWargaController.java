@@ -32,6 +32,7 @@ public class KepalaDesaWargaController implements Initializable {
     @FXML private TableView<KepalaDesa> kepalaDesaTable;
     @FXML private TableColumn<KepalaDesa, String> colNama;
     @FXML private TableColumn<KepalaDesa, String> colDesa;
+    @FXML private TableColumn<KepalaDesa, String> colNoTelp;
     @FXML private TableColumn<KepalaDesa, LocalDate> colMulai;
     @FXML private TableColumn<KepalaDesa, LocalDate> colSelesai;
     @FXML private TableColumn<KepalaDesa, String> colStatus;
@@ -55,6 +56,7 @@ public class KepalaDesaWargaController implements Initializable {
         // Setup table columns
         colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
         colDesa.setCellValueFactory(cellData -> cellData.getValue().desaNamaProperty());
+        colNoTelp.setCellValueFactory(cellData -> cellData.getValue().noTelpProperty());
         colMulai.setCellValueFactory(cellData -> cellData.getValue().periodeMulaiProperty());
         colSelesai.setCellValueFactory(cellData -> cellData.getValue().periodeSelesaiProperty());
         colStatus.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
@@ -117,7 +119,7 @@ public class KepalaDesaWargaController implements Initializable {
     private void loadData() {
         com.kecamatan.util.ThreadManager.execute(() -> {
             ObservableList<KepalaDesa> tempData = FXCollections.observableArrayList();
-            String sql = "SELECT kd.id, kd.nama, kd.desa_id, kd.periode_mulai, kd.periode_selesai, d.nama as desa_nama FROM kepala_desa kd " +
+            String sql = "SELECT kd.id, kd.nama, kd.no_telp, kd.desa_id, kd.periode_mulai, kd.periode_selesai, d.nama as desa_nama FROM kepala_desa kd " +
                          "JOIN desa d ON kd.desa_id = d.id ORDER BY kd.nama";
 
             try (Connection conn = DatabaseUtil.getConnection();
@@ -133,6 +135,7 @@ public class KepalaDesaWargaController implements Initializable {
                         rs.getString("nama"),
                         rs.getInt("desa_id"),
                         rs.getString("desa_nama"),
+                        rs.getString("no_telp") != null ? rs.getString("no_telp") : "",
                         rs.getString("periode_mulai") != null ? LocalDate.parse(rs.getString("periode_mulai")) : null,
                         periodeSelesai,
                         status

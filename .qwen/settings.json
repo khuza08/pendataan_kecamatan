@@ -58,7 +58,8 @@
       "Bash(desa_id)",
       "Bash(kecamatan_id)",
       "Bash('warga', *)",
-      "Bash(order *)"
+      "Bash(order *)",
+      "Bash(update *)"
     ]
   },
   "$version": 3

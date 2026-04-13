@@ -50,8 +50,9 @@
                 <TableView fx:id="kepalaDesaTable" VBox.vgrow="ALWAYS">
                     <columns>
                         <TableColumn fx:id="colNama" text="Nama Kepala Desa" prefWidth="250"/>
-                        <TableColumn fx:id="colDesa" text="Desa" prefWidth="150"/>
-                        <TableColumn fx:id="colMulai" text="Periode Mulai" prefWidth="130"/>
+                        <TableColumn fx:id="colDesa" text="Desa" prefWidth="130"/>
+                        <TableColumn fx:id="colNoTelp" text="No Telp" prefWidth="120"/>
+                        <TableColumn fx:id="colMulai" text="Periode Mulai" prefWidth="120"/>
                         <TableColumn fx:id="colSelesai" text="Periode Selesai" prefWidth="130"/>
                         <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
                     </columns>
