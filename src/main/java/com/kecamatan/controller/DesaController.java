@@ -107,7 +107,7 @@ public class DesaController implements Initializable, DataRefreshable {
         kodePosField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.matches("\\d{0,5}")) {
                 kodePosField.setText(oldVal);
-                kodePosField.positionCaret(kodePosField.getCaretPosition() - 1);
+                kodePosField.positionCaret(Math.max(0, kodePosField.getCaretPosition() - 1));
             }
         });
 
