@@ -59,7 +59,8 @@
                             <TableColumn fx:id="colKecamatan" text="Kecamatan" prefWidth="120"/>
                             <TableColumn fx:id="colNama" text="Nama Desa" prefWidth="130"/>
                             <TableColumn fx:id="colKepalaDesa" text="Kepala Desa" prefWidth="160"/>
-                            <TableColumn fx:id="colPopulasi" text="Populasi" prefWidth="80"/>
+                            <TableColumn fx:id="colKodePos" text="Kode Pos" prefWidth="80"/>
+                            <TableColumn fx:id="colAlamat" text="Alamat" prefWidth="200"/>
                             <TableColumn fx:id="colRT" text="RT" prefWidth="60"/>
                             <TableColumn fx:id="colRW" text="RW" prefWidth="60"/>
                         </columns>
@@ -83,6 +84,16 @@
                     <VBox spacing="5">
                         <Label text="Kepala Desa (Saat Ini)" styleClass="input-label"/>
                         <TextField fx:id="kepalaDesaField" editable="false" promptText="Belum ada Kepala Desa" styleClass="input-field"/>
+                    </VBox>
+
+                    <VBox spacing="5">
+                        <Label text="Kode Pos" styleClass="input-label" labelFor="$kodePosField"/>
+                        <TextField fx:id="kodePosField" promptText="61xxx" styleClass="input-field"/>
+                    </VBox>
+
+                    <VBox spacing="5">
+                        <Label text="Alamat" styleClass="input-label" labelFor="$alamatArea"/>
+                        <TextArea fx:id="alamatArea" promptText="Jl. ..., RT ..., RW ..." styleClass="input-field" wrapText="true"/>
                     </VBox>
 
                     <VBox spacing="5" VBox.vgrow="ALWAYS">
