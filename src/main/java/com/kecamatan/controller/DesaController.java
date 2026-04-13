@@ -45,13 +45,16 @@ public class DesaController implements Initializable, DataRefreshable {
     @FXML private TableColumn<Desa, String> colKecamatan;
     @FXML private TableColumn<Desa, String> colNama;
     @FXML private TableColumn<Desa, String> colKepalaDesa;
-    @FXML private TableColumn<Desa, Integer> colPopulasi;
+    @FXML private TableColumn<Desa, String> colKodePos;
+    @FXML private TableColumn<Desa, String> colAlamat;
     @FXML private TableColumn<Desa, Integer> colRT;
     @FXML private TableColumn<Desa, Integer> colRW;
 
     @FXML private TextField namaField;
     @FXML private TextField kecamatanField;
     @FXML private TextField kepalaDesaField;
+    @FXML private TextField kodePosField;
+    @FXML private TextArea alamatArea;
     @FXML private VBox rwContainer;
 
     @FXML private Button btnDesa;
@@ -77,7 +80,8 @@ public class DesaController implements Initializable, DataRefreshable {
         colKecamatan.setCellValueFactory(cellData -> cellData.getValue().kecamatanNamaProperty());
         colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
         colKepalaDesa.setCellValueFactory(cellData -> cellData.getValue().kepalaDesaNamaProperty());
-        colPopulasi.setCellValueFactory(cellData -> cellData.getValue().populasiProperty().asObject());
+        colKodePos.setCellValueFactory(cellData -> cellData.getValue().kodePosProperty());
+        colAlamat.setCellValueFactory(cellData -> cellData.getValue().alamatProperty());
         colRT.setCellValueFactory(cellData -> cellData.getValue().jumlahRtProperty().asObject());
         colRW.setCellValueFactory(cellData -> cellData.getValue().jumlahRwProperty().asObject());
 
@@ -89,12 +93,22 @@ public class DesaController implements Initializable, DataRefreshable {
                 selectedId = newSel.getId();
                 namaField.setText(newSel.getNama());
                 kepalaDesaField.setText(newSel.getKepalaDesaNama());
+                kodePosField.setText(newSel.getKodePos());
+                alamatArea.setText(newSel.getAlamat());
                 loadRTRWDetails(selectedId);
             }
         });
 
         searchField.textProperty().addListener((obs, oldVal, newVal) -> {
             loadDesa();
+        });
+
+        // Kode Pos input filter: digits only, max 5
+        kodePosField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.matches("\\d{0,5}")) {
+                kodePosField.setText(oldVal);
+                kodePosField.positionCaret(kodePosField.getCaretPosition() - 1);
+            }
         });
 
         startClock();
@@ -262,7 +276,7 @@ public class DesaController implements Initializable, DataRefreshable {
             boolean hasSearch = searchQuery != null && !searchQuery.trim().isEmpty();
 
             StringBuilder sql = new StringBuilder(
-                "SELECT d.id, d.kecamatan_id, d.nama, d.jumlah_rt, d.jumlah_rw, k.nama as kecamatan_nama, " +
+                "SELECT d.id, d.kecamatan_id, d.nama, d.kode_pos, d.alamat, d.jumlah_rt, d.jumlah_rw, k.nama as kecamatan_nama, " +
                 "(SELECT kd.nama FROM kepala_desa kd WHERE kd.desa_id = d.id AND kd.periode_selesai >= CURRENT_DATE ORDER BY kd.periode_selesai DESC LIMIT 1) as kepala_desa_nama " +
                 "FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id WHERE d.kecamatan_id = ?"
             );
@@ -291,7 +305,9 @@ public class DesaController implements Initializable, DataRefreshable {
                         0,
                         rs.getInt("jumlah_rt"),
                         rs.getInt("jumlah_rw"),
-                        rs.getString("kepala_desa_nama") != null ? rs.getString("kepala_desa_nama") : "-"
+                        rs.getString("kepala_desa_nama") != null ? rs.getString("kepala_desa_nama") : "-",
+                        rs.getString("kode_pos") != null ? rs.getString("kode_pos") : "",
+                        rs.getString("alamat") != null ? rs.getString("alamat") : ""
                     ));
                 }
                 javafx.application.Platform.runLater(() -> {
@@ -307,6 +323,8 @@ public class DesaController implements Initializable, DataRefreshable {
     @FXML
     private void handleSave() {
         String nama = namaField.getText();
+        String kodePos = kodePosField.getText();
+        String alamat = alamatArea.getText();
 
         if (siwalanpanjoId == -1) {
             UIUtil.showAlert("Error", "Kecamatan Siwalanpanji tidak ditemukan!", Alert.AlertType.ERROR);
@@ -367,23 +385,27 @@ public class DesaController implements Initializable, DataRefreshable {
             conn.setAutoCommit(false);
             try {
                 if (selectedId == -1) {
-                    String sql = "INSERT INTO desa (kecamatan_id, nama, jumlah_rt, jumlah_rw) VALUES (?, ?, ?, ?) RETURNING id";
+                    String sql = "INSERT INTO desa (kecamatan_id, nama, kode_pos, alamat, jumlah_rt, jumlah_rw) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
                     try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                         pstmt.setInt(1, siwalanpanjoId);
                         pstmt.setString(2, nama);
-                        pstmt.setInt(3, finalRT);
-                        pstmt.setInt(4, finalRW);
+                        pstmt.setString(3, kodePos);
+                        pstmt.setString(4, alamat);
+                        pstmt.setInt(5, finalRT);
+                        pstmt.setInt(6, finalRW);
                         ResultSet rs = pstmt.executeQuery();
                         if (rs.next()) selectedId = rs.getInt(1);
                     }
                 } else {
-                    String sql = "UPDATE desa SET kecamatan_id = ?, nama = ?, jumlah_rt = ?, jumlah_rw = ? WHERE id = ?";
+                    String sql = "UPDATE desa SET kecamatan_id = ?, nama = ?, kode_pos = ?, alamat = ?, jumlah_rt = ?, jumlah_rw = ? WHERE id = ?";
                     try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                         pstmt.setInt(1, siwalanpanjoId);
                         pstmt.setString(2, nama);
-                        pstmt.setInt(3, finalRT);
-                        pstmt.setInt(4, finalRW);
-                        pstmt.setInt(5, selectedId);
+                        pstmt.setString(3, kodePos);
+                        pstmt.setString(4, alamat);
+                        pstmt.setInt(5, finalRT);
+                        pstmt.setInt(6, finalRW);
+                        pstmt.setInt(7, selectedId);
                         pstmt.executeUpdate();
                     }
                     // Clear old details
@@ -441,6 +463,8 @@ public class DesaController implements Initializable, DataRefreshable {
         selectedId = -1;
         namaField.clear();
         kepalaDesaField.clear();
+        kodePosField.clear();
+        alamatArea.clear();
         rwContainer.getChildren().clear();
         if (desaTable != null) desaTable.getSelectionModel().clearSelection();
 
