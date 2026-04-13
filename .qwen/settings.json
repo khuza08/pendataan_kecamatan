@@ -59,7 +59,11 @@
       "Bash(kecamatan_id)",
       "Bash('warga', *)",
       "Bash(order *)",
-      "Bash(update *)"
+      "Bash(update *)",
+      "Bash(alter *)",
+      "Bash(5)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
     ]
   },
   "$version": 3
