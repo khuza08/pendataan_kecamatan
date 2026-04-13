@@ -87,12 +87,12 @@
                     </VBox>
 
                     <VBox spacing="5">
-                        <Label text="Kode Pos" styleClass="input-label"/>
+                        <Label text="Kode Pos" styleClass="input-label" labelFor="$kodePosField"/>
                         <TextField fx:id="kodePosField" promptText="61xxx" styleClass="input-field" maxLength="5"/>
                     </VBox>
 
                     <VBox spacing="5">
-                        <Label text="Alamat" styleClass="input-label"/>
+                        <Label text="Alamat" styleClass="input-label" labelFor="$alamatArea"/>
                         <TextArea fx:id="alamatArea" promptText="Jl. ..., RT ..., RW ..." styleClass="input-field" wrapText="true"/>
                     </VBox>
 
