@@ -57,8 +57,9 @@
                     <TableView fx:id="desaTable" VBox.vgrow="ALWAYS">
                         <columns>
                             <TableColumn fx:id="colKecamatan" text="Kecamatan" prefWidth="120"/>
-                            <TableColumn fx:id="colNama" text="Nama Desa" prefWidth="150"/>
-                            <TableColumn fx:id="colPopulasi" text="Populasi" prefWidth="100"/>
+                            <TableColumn fx:id="colNama" text="Nama Desa" prefWidth="130"/>
+                            <TableColumn fx:id="colKepalaDesa" text="Kepala Desa" prefWidth="160"/>
+                            <TableColumn fx:id="colPopulasi" text="Populasi" prefWidth="80"/>
                             <TableColumn fx:id="colRT" text="RT" prefWidth="60"/>
                             <TableColumn fx:id="colRW" text="RW" prefWidth="60"/>
                         </columns>
@@ -78,7 +79,11 @@
                         <Label text="Nama Desa" styleClass="input-label"/>
                         <TextField fx:id="namaField" styleClass="input-field"/>
                     </VBox>
-                    
+
+                    <VBox spacing="5">
+                        <Label text="Kepala Desa (Saat Ini)" styleClass="input-label"/>
+                        <TextField fx:id="kepalaDesaField" editable="false" promptText="Belum ada Kepala Desa" styleClass="input-field"/>
+                    </VBox>
 
                     <VBox spacing="5" VBox.vgrow="ALWAYS">
                         <Label text="Daftar RW &amp; RT" styleClass="input-label"/>

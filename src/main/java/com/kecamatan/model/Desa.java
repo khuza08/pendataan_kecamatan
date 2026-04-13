@@ -11,8 +11,13 @@ public class Desa {
     private final SimpleIntegerProperty populasi;
     private final SimpleIntegerProperty jumlahRt;
     private final SimpleIntegerProperty jumlahRw;
+    private final SimpleStringProperty kepalaDesaNama;
 
     public Desa(int id, int kecamatanId, String kecamatanNama, String nama, int populasi, int jumlahRt, int jumlahRw) {
+        this(id, kecamatanId, kecamatanNama, nama, populasi, jumlahRt, jumlahRw, "");
+    }
+
+    public Desa(int id, int kecamatanId, String kecamatanNama, String nama, int populasi, int jumlahRt, int jumlahRw, String kepalaDesaNama) {
         this.id = new SimpleIntegerProperty(id);
         this.kecamatanId = new SimpleIntegerProperty(kecamatanId);
         this.kecamatanNama = new SimpleStringProperty(kecamatanNama);
@@ -20,6 +25,7 @@ public class Desa {
         this.populasi = new SimpleIntegerProperty(populasi);
         this.jumlahRt = new SimpleIntegerProperty(jumlahRt);
         this.jumlahRw = new SimpleIntegerProperty(jumlahRw);
+        this.kepalaDesaNama = new SimpleStringProperty(kepalaDesaNama);
     }
 
     public int getId() { return id.get(); }
@@ -42,4 +48,7 @@ public class Desa {
 
     public int getJumlahRw() { return jumlahRw.get(); }
     public SimpleIntegerProperty jumlahRwProperty() { return jumlahRw; }
+
+    public String getKepalaDesaNama() { return kepalaDesaNama.get(); }
+    public SimpleStringProperty kepalaDesaNamaProperty() { return kepalaDesaNama; }
 }

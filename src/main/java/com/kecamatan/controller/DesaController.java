@@ -44,12 +44,14 @@ public class DesaController implements Initializable, DataRefreshable {
     @FXML private TableView<Desa> desaTable;
     @FXML private TableColumn<Desa, String> colKecamatan;
     @FXML private TableColumn<Desa, String> colNama;
+    @FXML private TableColumn<Desa, String> colKepalaDesa;
     @FXML private TableColumn<Desa, Integer> colPopulasi;
     @FXML private TableColumn<Desa, Integer> colRT;
     @FXML private TableColumn<Desa, Integer> colRW;
 
     @FXML private TextField namaField;
     @FXML private TextField kecamatanField;
+    @FXML private TextField kepalaDesaField;
     @FXML private VBox rwContainer;
 
     @FXML private Button btnDesa;
@@ -74,6 +76,7 @@ public class DesaController implements Initializable, DataRefreshable {
         applyRBAC();
         colKecamatan.setCellValueFactory(cellData -> cellData.getValue().kecamatanNamaProperty());
         colNama.setCellValueFactory(cellData -> cellData.getValue().namaProperty());
+        colKepalaDesa.setCellValueFactory(cellData -> cellData.getValue().kepalaDesaNamaProperty());
         colPopulasi.setCellValueFactory(cellData -> cellData.getValue().populasiProperty().asObject());
         colRT.setCellValueFactory(cellData -> cellData.getValue().jumlahRtProperty().asObject());
         colRW.setCellValueFactory(cellData -> cellData.getValue().jumlahRwProperty().asObject());
@@ -85,6 +88,7 @@ public class DesaController implements Initializable, DataRefreshable {
             if (newSel != null) {
                 selectedId = newSel.getId();
                 namaField.setText(newSel.getNama());
+                kepalaDesaField.setText(newSel.getKepalaDesaNama());
                 loadRTRWDetails(selectedId);
             }
         });
@@ -258,7 +262,8 @@ public class DesaController implements Initializable, DataRefreshable {
             boolean hasSearch = searchQuery != null && !searchQuery.trim().isEmpty();
 
             StringBuilder sql = new StringBuilder(
-                "SELECT d.id, d.kecamatan_id, d.nama, d.jumlah_rt, d.jumlah_rw, k.nama as kecamatan_nama " +
+                "SELECT d.id, d.kecamatan_id, d.nama, d.jumlah_rt, d.jumlah_rw, k.nama as kecamatan_nama, " +
+                "(SELECT kd.nama FROM kepala_desa kd WHERE kd.desa_id = d.id AND kd.periode_selesai >= CURRENT_DATE ORDER BY kd.periode_selesai DESC LIMIT 1) as kepala_desa_nama " +
                 "FROM desa d JOIN kecamatan k ON d.kecamatan_id = k.id WHERE d.kecamatan_id = ?"
             );
             List<Object> params = new ArrayList<>();
@@ -285,7 +290,8 @@ public class DesaController implements Initializable, DataRefreshable {
                         rs.getString("nama"),
                         0,
                         rs.getInt("jumlah_rt"),
-                        rs.getInt("jumlah_rw")
+                        rs.getInt("jumlah_rw"),
+                        rs.getString("kepala_desa_nama") != null ? rs.getString("kepala_desa_nama") : "-"
                     ));
                 }
                 javafx.application.Platform.runLater(() -> {
@@ -434,6 +440,7 @@ public class DesaController implements Initializable, DataRefreshable {
     private void handleReset() {
         selectedId = -1;
         namaField.clear();
+        kepalaDesaField.clear();
         rwContainer.getChildren().clear();
         if (desaTable != null) desaTable.getSelectionModel().clearSelection();
 
